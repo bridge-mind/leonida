@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.vite/
+*.log
+!docs/screenshots/*.log
+.DS_Store
+test-results/

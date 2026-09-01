@@ -1,0 +1,26 @@
+[smoke] WebGL renderer: ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Ultra, Unspecified Version)
+[smoke] url: http://127.0.0.1:57703/?autotest=foundation
+[console.debug] [vite] connecting...
+[console.debug] [vite] connected.
+[console.info] [world] generated in 49 ms: 228 nodes, 391 edges, 0 buildings, 10 meshes, 0k tris, 17 colliders
+[smoke] game ready
+[console.log] AUTOTEST PASS foundation/ready-no-errors
+[console.log] AUTOTEST PASS foundation/walk-20m
+[console.log] AUTOTEST PASS foundation/jump-raises-player
+[console.log] AUTOTEST PASS foundation/astar-20-random-pairs
+[console.log] AUTOTEST PASS foundation/landmark-doors-near-road-nodes
+[console.log] AUTOTEST PASS foundation/static-draw-calls-under-400
+[console.log] AUTOTEST PASS foundation/dusk-turns-lamps-on
+[console.log] AUTOTEST PASS foundation/water-query
+[console.log] AUTOTEST PASS foundation/economy-wallet
+[console.log] AUTOTEST PASS foundation/damage-armor-death-respawn
+[console.log] AUTOTEST PASS foundation/interiors-enter-exit
+[console.log] AUTOTEST PASS foundation/camera-modes-and-cinematic
+[console.log] AUTOTEST PASS foundation/save-load-roundtrip
+[console.log] AUTOTEST PASS foundation/no-errors-after-run
+[console.log] AUTOTEST PASS foundation
+[smoke] perf {"fps":39,"frameMs":0.6,"drawCalls":27,"triangles":9350,"bodies":1,"colliders":19,"counts":{"buildings":0,"staticMeshes":10,"sounds":249},"sampledAt":12704.600000023842}
+[smoke] systems [{"id":"world","enabled":true,"priority":100},{"id":"player","enabled":true,"priority":150},{"id":"camera","enabled":true,"priority":190},{"id":"economy","enabled":true,"priority":500},{"id":"interiors","enabled":true,"priority":540},{"id":"audio","enabled":true,"priority":900}]
+[smoke] screenshot docs/screenshots/foundation-phase0.png
+[smoke] console errors: 0, warnings: 0, page errors: 0, autotest failed: false
+[smoke] result: PASS
