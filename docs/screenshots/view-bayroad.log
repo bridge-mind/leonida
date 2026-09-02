@@ -1,0 +1,11 @@
+[smoke] WebGL renderer: ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Ultra, Unspecified Version)
+[smoke] url: http://127.0.0.1:55740/?actions=player.teleport%3A562%3A20%3A-1.5708%2Ccamera.setOrbit%3A-1.75%3A0.08
+[console.debug] [vite] connecting...
+[console.debug] [vite] connected.
+[console.info] [world] generated in 252 ms: 228 nodes, 391 edges, 852 buildings, 301 meshes, 192k tris, 6417 colliders
+[smoke] game ready
+[smoke] perf {"fps":25,"frameMs":10.47,"drawCalls":104,"triangles":589044,"bodies":1,"colliders":6418,"counts":{"buildings":852,"staticMeshes":301,"sounds":249},"sampledAt":4647.300000011921}
+[smoke] systems [{"id":"world","enabled":true,"priority":100},{"id":"player","enabled":true,"priority":150},{"id":"camera","enabled":true,"priority":190},{"id":"economy","enabled":true,"priority":500},{"id":"interiors","enabled":true,"priority":540},{"id":"audio","enabled":true,"priority":900}]
+[smoke] screenshot docs/screenshots/view-bayroad.png
+[smoke] console errors: 0, warnings: 0, page errors: 0, autotest failed: false
+[smoke] result: PASS

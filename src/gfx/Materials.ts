@@ -29,6 +29,8 @@ export class CityMaterials {
   readonly planks: MeshStandardMaterial;
   readonly neon: MeshBasicMaterial;
   readonly lampGlow: MeshBasicMaterial;
+  /** Instance-colored traffic signal lamps (no vertex colors). */
+  readonly signal: MeshBasicMaterial;
   readonly roads: Record<'street' | 'avenue' | 'highway' | 'dirt' | 'bridge' | 'asphalt', MeshStandardMaterial>;
   readonly signs: MeshBasicMaterial;
   private readonly neonColor = new Color(1, 1, 1);
@@ -55,11 +57,16 @@ export class CityMaterials {
 
     this.flat = new MeshStandardMaterial({ vertexColors: true, roughness: 0.92, metalness: 0.0 });
     this.concrete = textured(concreteTexture(), 0.95);
+    // Lot slabs sit 4 cm above the ground plane; offset them so distant slabs never z-fight.
+    this.concrete.polygonOffset = true;
+    this.concrete.polygonOffsetFactor = -1;
+    this.concrete.polygonOffsetUnits = -1;
     this.grass = textured(grassTexture(), 1.0);
     this.sand = textured(sandTexture(), 1.0);
     this.planks = textured(plankTexture(), 0.9);
     this.neon = new MeshBasicMaterial({ vertexColors: true, color: this.neonColor, side: DoubleSide, toneMapped: false });
     this.lampGlow = new MeshBasicMaterial({ color: 0xfff1c0, toneMapped: false });
+    this.signal = new MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
     this.signs = new MeshBasicMaterial({ map: signAtlasTexture, side: DoubleSide, toneMapped: false, transparent: false });
 
     const road = (kind: 'street' | 'avenue' | 'highway' | 'dirt' | 'bridge' | 'asphalt'): MeshStandardMaterial =>
@@ -100,7 +107,7 @@ export class CityMaterials {
       t.map.dispose();
       t.emissiveMap.dispose();
     }
-    for (const m of [this.walls, this.deco, this.glass, this.flat, this.concrete, this.grass, this.sand, this.planks, this.neon, this.lampGlow, this.signs]) {
+    for (const m of [this.walls, this.deco, this.glass, this.flat, this.concrete, this.grass, this.sand, this.planks, this.neon, this.lampGlow, this.signal, this.signs]) {
       m.dispose();
     }
     for (const m of Object.values(this.roads)) {

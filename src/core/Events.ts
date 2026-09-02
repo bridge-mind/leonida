@@ -9,7 +9,9 @@
  *
  * Naming convention: `domain:pastTenseVerb`.
  */
-import type { Entity, V3 } from './entities';
+import type { DamageInfo, Entity, IPed, IVehicle, V3 } from './entities';
+import type { WantedState } from './GameState';
+import type { CharacterId, PickupKind, VehicleArchetypeId, WeaponId } from './peers';
 
 export type CrimeType =
   | 'shot_fired'
@@ -55,6 +57,65 @@ export interface GameEvents {
 
   'save:saved': { slot: string };
   'save:loaded': { slot: string };
+
+  // --- Cross-system events (payload shapes are binding; see docs/TEAM-PLAN.md §3.3) ---
+  'vehicle:entered': { vehicle: IVehicle; who: Entity; seat: number };
+  'vehicle:exited': { vehicle: IVehicle; who: Entity };
+  'vehicle:damaged': { vehicle: IVehicle; amount: number; source: Entity | 'player' | null };
+  'vehicle:exploded': { vehicle: IVehicle; position: V3 };
+  'vehicle:collided': { vehicle: IVehicle; other: Entity | null; impulse: number };
+  /** The player pulled a driver out; the peds system (if loaded) spawns the fleeing driver. */
+  'vehicle:carjacked': { vehicle: IVehicle; position: V3; heading: number; driverTypeId: string };
+  'vehicle:horn': { vehicle: IVehicle };
+
+  'ped:spawned': { ped: IPed };
+  'ped:died': { ped: IPed; source: Entity | 'player' | null };
+  'ped:knockedDown': { ped: IPed; source: Entity | null };
+  'ped:cowered': { ped: IPed };
+  'ped:fled': { ped: IPed };
+  'ped:attacked': { ped: IPed; source: Entity | 'player' | null };
+  /** A civilian witness finished calling it in (4 s after the crime). */
+  'ped:reportedCrime': { ped: IPed; position: V3 };
+
+  'weapon:fired': { weaponId: WeaponId; origin: V3; direction: V3; shooter: Entity | 'player' };
+  'weapon:reloaded': { weaponId: WeaponId };
+  'weapon:equipped': { weaponId: WeaponId };
+  'weapon:hit': { target: Entity; killed: boolean };
+  /** Emitted every frame the player aims at an entity, with the accumulated time on that target. */
+  'weapon:aimedAt': { target: Entity; seconds: number };
+
+  'damage:applied': { target: Entity; info: DamageInfo };
+  'entity:killed': { target: Entity; source: Entity | 'player' | null };
+
+  'pickup:collected': { kind: PickupKind; value: number; weaponId?: WeaponId };
+
+  'wanted:changed': { level: number; state: WantedState; previousLevel: number };
+  'wanted:cleared': { reason: string };
+  'player:busted': { position: V3 };
+
+  'casino:entered': { id: 'casino' };
+  'casino:exited': { id: 'casino' };
+  'casino:won': { game: string; amount: number };
+  'casino:lost': { game: string; amount: number };
+
+  'shop:purchased': { itemId: string; price: number };
+  'robbery:started': { storeId: string };
+  'robbery:completed': { storeId: string; amount: number };
+  'chopshop:sold': { archetypeId: VehicleArchetypeId; amount: number };
+
+  'mission:started': { id: string };
+  'mission:passed': { id: string; reward: number };
+  'mission:failed': { id: string; reason: string };
+  'mission:objective': { id: string; text: string };
+
+  'character:switched': { to: CharacterId };
+  'ability:activated': { character: CharacterId };
+  'ability:ended': { character: CharacterId };
+
+  'ui:newGame': Record<string, never>;
+  'ui:continue': Record<string, never>;
+  'ui:paused': Record<string, never>;
+  'ui:resumed': Record<string, never>;
 }
 
 export type EventName = keyof GameEvents;

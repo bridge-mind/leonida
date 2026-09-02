@@ -23,10 +23,11 @@ export class PlayerSystem implements GameSystem {
   init(): void {
     const spawn = this.resolveSpawn();
     this.entity = new Player(this.game, spawn, spawn.heading);
-    const ground = this.game.physics.groundHeightAt(spawn.x, spawn.z);
-    if (ground !== null) this.entity.teleport({ x: spawn.x, y: ground + 0.05, z: spawn.z }, spawn.heading);
     this.publishState();
   }
+
+  /** Scene queries only see colliders after the first physics step, so snap on the first tick. */
+  private needsGroundSnap = true;
 
   private resolveSpawn(): { x: number; y: number; z: number; heading: number } {
     const raw = this.game.params.get('spawn');
@@ -125,6 +126,12 @@ export class PlayerSystem implements GameSystem {
   // --- Loop ------------------------------------------------------------------
 
   fixedUpdate(dt: number): void {
+    if (this.needsGroundSnap) {
+      this.needsGroundSnap = false;
+      const p = this.entity.position;
+      const ground = this.game.physics.groundHeightAt(p.x, p.z);
+      if (ground !== null && Math.abs(ground - p.y) > 0.02) this.entity.teleport({ x: p.x, y: ground + 0.05, z: p.z });
+    }
     const input = this.game.input;
     const blocked = input.isBlocked;
     input.moveAxis(this.axis);

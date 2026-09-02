@@ -199,6 +199,8 @@ export class CameraSystem implements GameSystem {
       cam.fov = fov;
       cam.updateProjectionMatrix();
     }
+    const t = this.target;
+    this.game.audio.setListener(cam.position, cam.quaternion, t ? t.velocity : ZERO);
   }
 
   private computeThirdPerson(distance: number, offsetX: number, pivotHeight: number, heightAbovePivot: number): void {
@@ -259,9 +261,11 @@ export class CameraSystem implements GameSystem {
   /** Raycast from the pivot along the camera offset; returns the max safe distance. */
   private collisionDistance(distance: number): number {
     const player = this.game.systems.has('player') ? this.game.player.entity : undefined;
+    // While driving, the player's own car must not push the camera in.
+    const exclude = player?.mounted ? player.mounted.vehicle : player;
     const hit = this.game.physics.raycastInto(this.hit, this.pivot, this.dir, distance + C.collisionRadius, {
       groups: Groups.STATIC | Groups.VEHICLE,
-      exclude: player,
+      exclude,
     });
     if (!hit) return distance;
     return Math.max(0.5, hit.toi - C.collisionRadius);
@@ -279,6 +283,8 @@ export class CameraSystem implements GameSystem {
     state: (): Record<string, unknown> => ({ mode: this.mode, yaw: this.yaw, pitch: this.pitch, fov: this.fov, position: this.position.toArray() }),
   };
 }
+
+const ZERO = new Vector3();
 
 function v3(x: unknown, y: unknown, z: unknown): V3 {
   return { x: Number(x), y: Number(y), z: Number(z) };

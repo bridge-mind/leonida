@@ -88,6 +88,7 @@ export class WorldSystem implements GameSystem {
     stats: (): Record<string, unknown> => ({ ...this.city.stats, nodes: this.roadGraph.nodes.length, edges: this.roadGraph.edges.length }),
     night: (): number => this.dayNight.night01,
     inWater: (x: unknown, z: unknown): boolean => this.isInWater({ x: Number(x), y: 0, z: Number(z) }),
+    ground: (x: unknown, z: unknown): number | null => this.game.physics.groundHeightAt(Number(x), Number(z)),
   };
 }
 

@@ -4,11 +4,16 @@ import type { Game } from '../core/Game';
 import { Random } from '../core/Random';
 import { CityMaterials } from '../gfx/Materials';
 import { signAtlas, type SignAtlas } from '../gfx/Textures';
-import { buildGround } from './city/Ground';
+import { fillBlocks } from './city/Blocks';
 import { ChunkBatches } from './city/ChunkBatches';
+import { buildGround } from './city/Ground';
+import { buildLandmarks } from './city/LandmarkBuilder';
+import { buildRoads } from './city/RoadMeshes';
+import { buildSpecialAreas } from './city/SpecialAreas';
 import { createStaticEntities, type StaticEntities } from './city/StaticEntities';
 import type { Districts } from './Districts';
 import type { Landmarks } from './Landmarks';
+import { Props } from './Props';
 import { RoadGraph } from './RoadGraph';
 import { buildRoadGraph } from './RoadGraphBuilder';
 import { ROAD_LINES } from './roadNetwork';
@@ -19,6 +24,7 @@ export interface CityBuild {
   materials: CityMaterials;
   entities: StaticEntities;
   water: Water;
+  props: Props;
   signs: SignAtlas;
   root: Group;
   meshes: Mesh[];
@@ -58,30 +64,38 @@ export function generateCity(game: Game, districts: Districts, landmarks: Landma
   );
   const materials = new CityMaterials(Config.seed, signs.texture);
   const entities = createStaticEntities();
-  const collidersBefore = game.physics.world.colliders.len();
+  const physics = game.physics;
+  const collidersBefore = physics.world.colliders.len();
 
   const roadGraph = buildRoadGraph(ROAD_LINES);
-  const ground = buildGround({ physics: game.physics, materials, districts, entities, parent: root });
-  const water = new Water(game.physics, game.events, entities, root);
+  const ground = buildGround({ physics, materials, districts, entities, parent: root });
+  const water = new Water(physics, game.events, entities, root);
   const batches = new ChunkBatches();
-  rng.next();
+  const props = new Props(materials, physics, entities, rng.fork('props'));
+
+  const roads = buildRoads({ graph: roadGraph, batches, materials, physics, entities, parent: root, props });
+  const blocks = fillBlocks({ graph: roadGraph, batches, districts, landmarks, physics, entities, rng: rng.fork('blocks'), props, materials });
+  const marks = buildLandmarks({ landmarks, batches, physics, entities, signs, materials, parent: root, props, rng: rng.fork('landmarks') });
+  const special = buildSpecialAreas({ batches, physics, entities, props, rng: rng.fork('special'), materials, parent: root, graph: roadGraph });
 
   const built = batches.build(root, materials);
-  const meshes = [...ground.meshes, ...built.meshes];
+  const propMeshes = props.build(root);
+  const meshes = [...ground.meshes, ...roads.meshes, ...built.meshes, ...propMeshes, ...special.meshes, marks.signMesh];
   return {
     roadGraph,
     materials,
     entities,
     water,
+    props,
     signs,
     root,
     meshes,
     stats: {
-      buildings: 0,
-      triangles: built.triangles,
+      buildings: blocks.buildings + special.buildings + landmarks.list.length,
+      triangles: built.triangles + roads.triangles,
       meshes: meshes.length + water.group.children.length,
       chunks: batches.chunkCount,
-      colliders: game.physics.world.colliders.len() - collidersBefore,
+      colliders: physics.world.colliders.len() - collidersBefore,
     },
   };
 }

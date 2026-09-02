@@ -153,6 +153,19 @@ async function main() {
     line(`[smoke] perf ${perf}`);
     const systems = await page.evaluate(() => JSON.stringify(window.__game.debug.run('core.systems')));
     line(`[smoke] systems ${systems}`);
+    if (args.dump) {
+      // --dump=a.b,c.d prints the result of debug actions at the end of the run.
+      for (const action of args.dump.split(',')) {
+        const result = await page.evaluate((a) => {
+          try {
+            return JSON.stringify(window.__game.debug.runActionString(a)[0]);
+          } catch (err) {
+            return `ERROR ${err instanceof Error ? err.message : String(err)}`;
+          }
+        }, action.trim());
+        line(`[smoke] dump ${action.trim()} = ${result}`);
+      }
+    }
     await page.screenshot({ path: resolve(outDir, `${name}.png`) });
     line(`[smoke] screenshot docs/screenshots/${name}.png`);
   } catch (err) {

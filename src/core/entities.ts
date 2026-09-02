@@ -113,6 +113,26 @@ export interface IVehicle extends Entity, IEnterable, IDamageable {
   readonly state: VehicleStateInfo;
   driver: VehicleDriver | null;
   cameraTarget: CameraTarget;
+  /** World linear velocity (m/s). */
+  readonly velocity: Vector3;
+  /** Yaw in radians; 0 faces +Z (same convention as peds). */
+  heading: number;
+  /** Body color (sRGB hex). */
+  color: number;
+  readonly isPolice: boolean;
+  /** Approximate length in meters (for camera distance and parking). */
+  readonly length: number;
+  /** Occupant in seat 0, if any. */
+  readonly driverEntity: Entity | null;
+  setDriver(driver: VehicleDriver | null): void;
+  /** World position of a seat's door (for exit / enter animations). */
+  seatDoorPosition(seat: number, out: Vector3): Vector3;
+  /** Immediately destroys the vehicle (fireball, radius damage). */
+  explode(): void;
+  /** Police light bar / siren on-off; no-op on civilian archetypes. */
+  setSiren(on: boolean): void;
+  /** Teleports the body and zeroes velocity. */
+  teleport(position: V3, heading: number): void;
 }
 
 export interface VehicleDriver {
@@ -140,6 +160,8 @@ export type PedState =
 export interface PedContext {
   game: Game;
   playerPosition: V3;
+  /** Horizontal distance from this ped to the player, refreshed before each brain update. */
+  playerDistance: number;
 }
 
 export interface IPed extends Entity, IDamageable {
@@ -147,6 +169,30 @@ export interface IPed extends Entity, IDamageable {
   state: PedState;
   brain: PedBrain;
   heading: number;
+  health: number;
+  /** Horizontal velocity (m/s). */
+  readonly velocity: Vector3;
+  /** Weapon this ped fires through `weapons.npcFire`, if any. */
+  weaponId: string | null;
+  /** Cower pose flag; brains set it, the renderer reads it. */
+  handsUp: boolean;
+  /** True for cop and SWAT ped types (wanted system witness logic). */
+  readonly isCop: boolean;
+  /** Vehicle this ped is sitting in, if any. */
+  vehicle: IVehicle | null;
+  setBrain(brain: PedBrain): void;
+  // --- Motion primitives for brains (applied in the ped's fixedUpdate) ---
+  /** Walk/run toward a world point at `speedMs`; stops within 0.3 m. */
+  moveToward(target: V3, speedMs: number): void;
+  stop(): void;
+  /** Turn to face a world point (does not move). */
+  face(target: V3): void;
+  /** Swap to a dynamic body and apply an impulse (world units, kg·m/s). */
+  ragdoll(impulse: V3): void;
+  enterVehicle(vehicle: IVehicle, seat?: number): boolean;
+  exitVehicle(): void;
+  /** Kills the ped outright with attribution. */
+  kill(source?: Entity | 'player'): void;
 }
 
 export interface PedBrain {

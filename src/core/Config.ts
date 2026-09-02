@@ -14,7 +14,7 @@ export const Config = {
     shadowMapSize: 2048,
     /** Half-extent of the shadow camera box that follows the player. */
     shadowHalfExtent: 60,
-    toneMappingExposure: 1.0,
+    toneMappingExposure: 1.25,
   },
 
   loop: {
@@ -46,8 +46,8 @@ export const Config = {
     seabedDepth: -2.6,
     sidewalkWidth: 4,
     sidewalkHeight: 0.15,
-    roadSurfaceY: 0.08,
-    lotSurfaceY: 0.1,
+    roadSurfaceY: 0.02,
+    lotSurfaceY: 0.04,
     floorHeight: 3.2,
     bridgeDeckHeight: 8,
     bridgeRampLength: 60,
@@ -56,17 +56,17 @@ export const Config = {
 
   dayNight: {
     sunriseHour: 6.25,
-    sunsetHour: 19.25,
+    sunsetHour: 19.0,
     /** Sun elevation (sin) below which lamps/neon/windows are fully on. */
     lampsOnElevation: 0.02,
     /** Sun elevation above which they are fully off; ramps between. */
     lampsOffElevation: 0.22,
     fogNear: 260,
     fogFar: 1700,
-    sunIntensityDay: 2.6,
-    moonIntensity: 0.22,
-    hemiIntensityDay: 0.9,
-    hemiIntensityNight: 0.25,
+    sunIntensityDay: 3.2,
+    moonIntensity: 0.25,
+    hemiIntensityDay: 1.5,
+    hemiIntensityNight: 0.4,
   },
 
   player: {

@@ -65,7 +65,7 @@ export const DISTRICTS: readonly DistrictDef[] = [
     style: 'highRise',
     groundColor: 0x8d8d90,
     lotColor: 0x9c9c9f,
-    palette: [0x5c7fa8, 0x3f4f66, 0x7f8fa6, 0xb8bcc4, 0x2f3d55, 0x93a7c4, 0x6e7c91, 0xcfd4dc],
+    palette: [0x9fb3cc, 0x8899b0, 0xbfc8d4, 0x6f86a8, 0xa8b8c8, 0xd0d6de, 0x7d94b4, 0xe4e8ee],
     floors: [12, 36],
     lotDepth: 34,
     lotWidth: [26, 44],

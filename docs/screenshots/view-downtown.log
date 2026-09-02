@@ -1,0 +1,11 @@
+[smoke] WebGL renderer: ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Ultra, Unspecified Version)
+[smoke] url: http://127.0.0.1:59438/?actions=player.teleport%3A-20%3A120%3A3.14%2Ccamera.setOrbit%3A0.3%3A0.1
+[console.debug] [vite] connecting...
+[console.debug] [vite] connected.
+[console.info] [world] generated in 176 ms: 228 nodes, 391 edges, 852 buildings, 301 meshes, 192k tris, 6417 colliders
+[smoke] game ready
+[smoke] perf {"fps":46,"frameMs":1.43,"drawCalls":165,"triangles":753062,"bodies":1,"colliders":6418,"counts":{"buildings":852,"staticMeshes":301,"sounds":249},"sampledAt":3419.9000000059605}
+[smoke] systems [{"id":"world","enabled":true,"priority":100},{"id":"player","enabled":true,"priority":150},{"id":"camera","enabled":true,"priority":190},{"id":"economy","enabled":true,"priority":500},{"id":"interiors","enabled":true,"priority":540},{"id":"audio","enabled":true,"priority":900}]
+[smoke] screenshot docs/screenshots/view-downtown.png
+[smoke] console errors: 0, warnings: 0, page errors: 0, autotest failed: false
+[smoke] result: PASS

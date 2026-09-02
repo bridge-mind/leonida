@@ -18,6 +18,23 @@ import { Config } from './Config';
 import { Events } from './Events';
 import { createGameState, type GameState } from './GameState';
 import { Input } from './Input';
+import type {
+  ICasinoPeer,
+  ICharactersPeer,
+  IDamagePeer,
+  IMissionsPeer,
+  INavigationPeer,
+  IParticlesPeer,
+  IPedsPeer,
+  IPickupsPeer,
+  IPolicePeer,
+  IShopsPeer,
+  ITrafficPeer,
+  IUiPeer,
+  IVehiclesPeer,
+  IWantedPeer,
+  IWeaponsPeer,
+} from './peers';
 import { Perf } from './Perf';
 import { Save } from './Save';
 import { SystemRegistry, type GameSystem, type SystemEntry, type SystemModule } from './System';
@@ -115,6 +132,58 @@ export class Game {
     return (this.systems.get('audio') as unknown as AudioApi | undefined) ?? this.nullAudio;
   }
 
+  // --- Optional peers (undefined when not loaded / disabled; see src/core/peers.ts) ---
+
+  get vehicles(): IVehiclesPeer | undefined {
+    return this.peer<IVehiclesPeer>('vehicles');
+  }
+  get traffic(): ITrafficPeer | undefined {
+    return this.peer<ITrafficPeer>('traffic');
+  }
+  get peds(): IPedsPeer | undefined {
+    return this.peer<IPedsPeer>('peds');
+  }
+  get pickups(): IPickupsPeer | undefined {
+    return this.peer<IPickupsPeer>('pickups');
+  }
+  get weapons(): IWeaponsPeer | undefined {
+    return this.peer<IWeaponsPeer>('weapons');
+  }
+  get damage(): IDamagePeer | undefined {
+    return this.peer<IDamagePeer>('damage');
+  }
+  get particles(): IParticlesPeer | undefined {
+    return this.peer<IParticlesPeer>('particles');
+  }
+  get navigation(): INavigationPeer | undefined {
+    return this.peer<INavigationPeer>('navigation');
+  }
+  get ui(): IUiPeer | undefined {
+    return this.peer<IUiPeer>('ui');
+  }
+  get casino(): ICasinoPeer | undefined {
+    return this.peer<ICasinoPeer>('casino');
+  }
+  get wanted(): IWantedPeer | undefined {
+    return this.peer<IWantedPeer>('wanted');
+  }
+  get police(): IPolicePeer | undefined {
+    return this.peer<IPolicePeer>('police');
+  }
+  get shops(): IShopsPeer | undefined {
+    return this.peer<IShopsPeer>('shops');
+  }
+  get missions(): IMissionsPeer | undefined {
+    return this.peer<IMissionsPeer>('missions');
+  }
+  get characters(): ICharactersPeer | undefined {
+    return this.peer<ICharactersPeer>('characters');
+  }
+
+  private peer<T>(id: string): T | undefined {
+    return this.systems.get(id) as unknown as T | undefined;
+  }
+
   private require<T extends GameSystem>(id: string): T {
     const sys = this.systems.get<T>(id);
     if (!sys) throw new Error(`System '${id}' is not loaded or has been disabled (check ?systems=)`);
@@ -163,6 +232,8 @@ export class Game {
       }
     }
 
+    // One warm-up step so scene queries (raycasts) see every collider created during init.
+    this.physics.step(Config.loop.fixedDt);
     this.ready = true;
     this.events.emit('game:ready', { systems: this.systems.ids });
     (window as unknown as { __GAME_READY__: boolean }).__GAME_READY__ = true;

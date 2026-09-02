@@ -1,0 +1,13 @@
+[smoke] WebGL renderer: ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Ultra, Unspecified Version)
+[smoke] url: http://127.0.0.1:49490/?actions=time.set%3A18.6%2Cplayer.teleport%3A478%3A-3%3A1.5708%2Ccamera.setOrbit%3A1.45%3A0.08
+[console.debug] [vite] connecting...
+[console.debug] [vite] connected.
+[console.info] [world] generated in 154 ms: 228 nodes, 391 edges, 852 buildings, 301 meshes, 192k tris, 6417 colliders
+[smoke] game ready
+[smoke] perf {"fps":27,"frameMs":1.12,"drawCalls":225,"triangles":802314,"bodies":1,"colliders":6418,"counts":{"buildings":852,"staticMeshes":301,"sounds":249},"sampledAt":3164.100000023842}
+[smoke] systems [{"id":"world","enabled":true,"priority":100},{"id":"player","enabled":true,"priority":150},{"id":"camera","enabled":true,"priority":190},{"id":"economy","enabled":true,"priority":500},{"id":"interiors","enabled":true,"priority":540},{"id":"audio","enabled":true,"priority":900}]
+[smoke] dump player.pos = {"x":478.00001310145944,"y":6.99980035105691,"z":-2.9999997620737595}
+[smoke] dump camera.state = {"mode":"thirdPerson","yaw":1.45,"pitch":0.08,"fov":60,"position":[482.45293411646713,8.959416473917992,-2.459471614535641]}
+[smoke] screenshot docs/screenshots/view-causeway.png
+[smoke] console errors: 0, warnings: 0, page errors: 0, autotest failed: false
+[smoke] result: PASS

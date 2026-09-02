@@ -1,0 +1,11 @@
+[smoke] WebGL renderer: ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Ultra, Unspecified Version)
+[smoke] url: http://127.0.0.1:54502/?actions=player.teleport%3A575%3A40%3A-1.5708%2Ccamera.setOrbit%3A-1.9%3A0.12
+[console.debug] [vite] connecting...
+[console.debug] [vite] connected.
+[console.info] [world] generated in 176 ms: 228 nodes, 391 edges, 852 buildings, 301 meshes, 192k tris, 6417 colliders
+[smoke] game ready
+[smoke] perf {"fps":41,"frameMs":1.24,"drawCalls":109,"triangles":592832,"bodies":1,"colliders":6418,"counts":{"buildings":852,"staticMeshes":301,"sounds":249},"sampledAt":4373.199999988079}
+[smoke] systems [{"id":"world","enabled":true,"priority":100},{"id":"player","enabled":true,"priority":150},{"id":"camera","enabled":true,"priority":190},{"id":"economy","enabled":true,"priority":500},{"id":"interiors","enabled":true,"priority":540},{"id":"audio","enabled":true,"priority":900}]
+[smoke] screenshot docs/screenshots/foundation-phase1.png
+[smoke] console errors: 0, warnings: 0, page errors: 0, autotest failed: false
+[smoke] result: PASS

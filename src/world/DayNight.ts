@@ -122,7 +122,8 @@ export class DayNight {
     if (isDay) {
       sampleKeys(SUN_KEYS, e, this.sunColor);
       this.sun.color.copy(this.sunColor);
-      this.sun.intensity = DN.sunIntensityDay * MathUtils.clamp(e / 0.22, 0.08, 1);
+      // A setting sun is still bright; only fade it in the last few degrees.
+      this.sun.intensity = DN.sunIntensityDay * MathUtils.clamp(0.45 + e / 0.2, 0.2, 1);
     } else {
       this.sun.color.setRGB(0.55, 0.65, 1.0);
       this.sun.intensity = DN.moonIntensity * MathUtils.clamp(Math.sin(theta) * 1.5, 0.3, 1);
@@ -135,10 +136,10 @@ export class DayNight {
     const u = this.sky.material.uniforms;
     (u.sunPosition.value as Vector3).copy(this.sunDirection);
     const duskness = 1 - MathUtils.smoothstep(e, 0.0, 0.3);
-    u.turbidity.value = isDay ? 6 + 6 * duskness : 2;
-    u.rayleigh.value = isDay ? 1.6 + 2.4 * duskness : 0.35;
-    u.mieCoefficient.value = isDay ? 0.004 + 0.03 * duskness : 0.002;
-    u.mieDirectionalG.value = isDay ? 0.75 + 0.15 * duskness : 0.7;
+    u.turbidity.value = isDay ? 3 + 5 * duskness : 2;
+    u.rayleigh.value = isDay ? 1.2 + 2.3 * duskness : 0.35;
+    u.mieCoefficient.value = isDay ? 0.004 + 0.02 * duskness : 0.002;
+    u.mieDirectionalG.value = isDay ? 0.8 + 0.13 * duskness : 0.7;
 
     sampleKeys(HORIZON_KEYS, e, this.horizonColor);
     this.fog.color.copy(this.horizonColor);
@@ -146,11 +147,11 @@ export class DayNight {
     this.fog.far = DN.fogFar * (isDay ? 1 : 0.75);
 
     // Hemisphere: sky tint above, warm ground bounce below; deep blue at night.
-    const dayAmount = MathUtils.smoothstep(e, -0.15, 0.25);
+    const dayAmount = MathUtils.smoothstep(e, -0.12, 0.2);
     this.hemi.intensity = MathUtils.lerp(DN.hemiIntensityNight, DN.hemiIntensityDay, dayAmount);
-    this.tmpColor.setRGB(0.25, 0.32, 0.6).lerp(this.horizonColor, 0.35 + 0.4 * dayAmount);
+    this.tmpColor.setRGB(0.3, 0.38, 0.65).lerp(this.horizonColor, 0.3 + 0.35 * dayAmount);
     this.hemi.color.copy(this.tmpColor);
-    this.hemi.groundColor.setRGB(0.1, 0.09, 0.12).lerp(this.tmpColor.setRGB(0.45, 0.38, 0.3), dayAmount);
+    this.hemi.groundColor.setRGB(0.12, 0.1, 0.14).lerp(this.tmpColor.setRGB(0.55, 0.45, 0.35), dayAmount);
   }
 
   dispose(): void {

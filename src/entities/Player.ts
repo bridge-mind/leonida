@@ -262,6 +262,8 @@ export class Player implements Entity, IDamageable {
     const center = { x: position.x, y: position.y + CAPSULE_CENTER_Y, z: position.z };
     this.body.setTranslation(center, true);
     this.body.setNextKinematicTranslation(center);
+    // The character controller reads the collider's pose, which otherwise lags one step behind.
+    this.game.physics.world.propagateModifiedBodyPositionsToColliders();
     this.currPos.set(position.x, position.y, position.z);
     this.prevPos.copy(this.currPos);
     this.velocity.set(0, 0, 0);

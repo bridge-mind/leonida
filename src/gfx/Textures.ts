@@ -61,7 +61,7 @@ export function windowTextures(seed: string, style: 'concrete' | 'glass' | 'deco
   const { canvas: eCanvas, ctx: ectx } = makeCanvas(size, size);
   const cell = size / 4;
 
-  ctx.fillStyle = style === 'glass' ? '#7f8fa8' : '#ffffff';
+  ctx.fillStyle = style === 'glass' ? '#c8d2e0' : '#ffffff';
   ctx.fillRect(0, 0, size, size);
   if (style !== 'glass') noise(ctx, size, size, rng, 0.06, 8);
   ectx.fillStyle = '#000000';
@@ -76,19 +76,23 @@ export function windowTextures(seed: string, style: 'concrete' | 'glass' | 'deco
       ctx.fillStyle = style === 'glass' ? 'rgba(20,28,40,0.9)' : 'rgba(0,0,0,0.16)';
       ctx.fillRect(x, y + cell - 6, cell, 6);
       if (style === 'glass') {
-        ctx.fillStyle = '#1c2636';
+        ctx.fillStyle = '#5b6f8c';
         ctx.fillRect(x + 4, y + 4, cell - 8, cell - 14);
-        ctx.fillStyle = 'rgba(160,190,230,0.35)';
-        ctx.fillRect(x + 4, y + 4, cell - 8, 10);
+        ctx.fillStyle = 'rgba(200,220,245,0.45)';
+        ctx.fillRect(x + 4, y + 4, cell - 8, 14);
+        ctx.fillStyle = 'rgba(30,40,55,0.5)';
+        ctx.fillRect(x + cell / 2 - 2, y + 4, 4, cell - 14);
       } else {
-        const wx = x + cell * 0.26;
-        const wy = y + cell * 0.2;
-        const ww = cell * 0.48;
-        const wh = cell * 0.5;
-        ctx.fillStyle = '#1f2633';
+        const wx = x + cell * 0.3;
+        const wy = y + cell * 0.22;
+        const ww = cell * 0.4;
+        const wh = cell * 0.46;
+        ctx.fillStyle = '#26303f';
         ctx.fillRect(wx, wy, ww, wh);
-        ctx.fillStyle = 'rgba(255,255,255,0.28)';
-        ctx.fillRect(wx, wy, ww, wh * 0.18);
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.fillRect(wx, wy, ww, wh * 0.2);
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.fillRect(wx - 4, wy + wh, ww + 8, 5);
         if (style === 'deco') {
           ctx.fillStyle = 'rgba(0,0,0,0.12)';
           ctx.fillRect(x + cell * 0.1, y + cell * 0.08, cell * 0.05, cell * 0.85);
