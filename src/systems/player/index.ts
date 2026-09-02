@@ -167,6 +167,8 @@ export class PlayerSystem implements GameSystem {
     const point = this.respawnPoint(reason);
     this.entity.respawn(point, point.heading, reason);
     if (this.game.systems.has('camera')) this.game.camera.snap();
+    // Autosave after the wallet fee and the teleport so Continue resumes outside the hospital.
+    this.game.save.save();
   }
 
   private respawnPoint(reason: 'wasted' | 'busted'): { x: number; y: number; z: number; heading: number } {

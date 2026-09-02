@@ -18,6 +18,8 @@ import { UiConfig } from './config';
 
 /** URL params that mean "a test or isolation run needs the game live immediately". */
 const NO_TITLE_PARAMS = ['notitle', 'systems', 'autotest', 'actions'];
+/** Set before a reload so the next boot skips the title and starts a fresh game. */
+const FRESH_START_KEY = 'leonida.freshStart';
 
 /**
  * Mounts every overlay under `#ui`, feeds them `game.state` each frame and owns the
@@ -32,6 +34,8 @@ export class UiSystem implements GameSystem, IUiPeer {
   private notifications!: Notifications;
   private pauseMenu!: PauseMenu;
   private title!: TitleScreen;
+  /** True once gameplay has begun this page load (New Game after that reloads). */
+  private sessionStarted = false;
   private cards!: Cards;
   private dialogueBox!: Dialogue;
   private progress!: ProgressBar;
@@ -83,7 +87,16 @@ export class UiSystem implements GameSystem, IUiPeer {
       relockPointer: () => this.lockPointer(),
     });
     this.title = new TitleScreen(game, {
-      newGame: () => this.leaveTitle('ui:newGame'),
+      newGame: () => {
+        // Systems have no reset; after a session has started, a fresh world needs a reload.
+        if (this.sessionStarted) {
+          game.save.clear();
+          sessionStorage.setItem(FRESH_START_KEY, '1');
+          location.reload();
+          return;
+        }
+        this.leaveTitle('ui:newGame');
+      },
       continueGame: () => {
         game.save.load();
         this.leaveTitle('ui:continue');
@@ -108,7 +121,16 @@ export class UiSystem implements GameSystem, IUiPeer {
     );
     document.addEventListener('pointerlockchange', this.onPointerLockChange);
 
-    if (!NO_TITLE_PARAMS.some((p) => game.params.has(p))) this.showTitle();
+    if (sessionStorage.getItem(FRESH_START_KEY)) {
+      sessionStorage.removeItem(FRESH_START_KEY);
+      this.sessionStarted = true;
+      game.events.emit('ui:newGame', {});
+      this.lockPointer();
+    } else if (!NO_TITLE_PARAMS.some((p) => game.params.has(p))) {
+      this.showTitle();
+    } else {
+      this.sessionStarted = true;
+    }
   }
 
   // --- IUiPeer ---------------------------------------------------------------------
@@ -203,6 +225,7 @@ export class UiSystem implements GameSystem, IUiPeer {
 
   private leaveTitle(event: 'ui:newGame' | 'ui:continue'): void {
     const game = this.game;
+    this.sessionStarted = true;
     this.title.hide();
     if (game.systems.has('camera')) {
       const cam = game.camera;
