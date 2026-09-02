@@ -22,6 +22,8 @@ export interface CutsceneDef {
 interface Active {
   def: CutsceneDef;
   skipped: boolean;
+  /** Scene has camera/orbit steps: only then is the camera taken over (radio chatter keeps the gameplay camera). */
+  usesCamera: boolean;
   /** Wall-clock timer for `wait` and `orbit` steps (real seconds, so slow-mo cards do not stretch scenes). */
   timer: number;
   timerResolve: (() => void) | null;
@@ -55,11 +57,18 @@ export class CutsceneSystem implements GameSystem {
       for (const step of def.steps) if ('run' in step) this.safeRun(step.run);
       return Promise.resolve();
     }
-    if (this.active) this.skip();
+    if (this.active) {
+      // Tear the previous scene down now: its own `finally` would find `this.active`
+      // replaced and never pop the blocker or resolve its promise.
+      const prev = this.active;
+      this.skip();
+      this.end(prev);
+    }
     return new Promise<void>((resolve) => {
-      const active: Active = { def, skipped: false, timer: 0, timerResolve: null, grace: CutsceneConfig.skipGrace, resolve };
+      const usesCamera = def.steps.some((s) => 'camera' in s || 'orbit' in s);
+      const active: Active = { def, skipped: false, usesCamera, timer: 0, timerResolve: null, grace: CutsceneConfig.skipGrace, resolve };
       this.active = active;
-      this.begin(def);
+      this.begin(active);
       void this.runSteps(active).finally(() => this.end(active));
     });
   }
@@ -72,15 +81,15 @@ export class CutsceneSystem implements GameSystem {
     a.timerResolve?.();
     a.timerResolve = null;
     this.game.ui?.dialogue.hide();
-    if (this.game.systems.has('camera')) this.game.camera.cinematic.stop();
+    this.releaseCamera(a);
   }
 
-  private begin(def: CutsceneDef): void {
+  private begin(active: Active): void {
     const game = this.game;
     game.input.pushBlocker(CutsceneConfig.inputBlocker);
-    if (def.letterbox !== false) game.ui?.letterbox(true);
+    if (active.def.letterbox !== false) game.ui?.letterbox(true);
     game.ui?.clearPrompt('mission');
-    if (game.systems.has('camera')) game.camera.setMode('cinematic');
+    if (active.usesCamera && game.systems.has('camera')) game.camera.setMode('cinematic');
   }
 
   private end(active: Active): void {
@@ -89,9 +98,16 @@ export class CutsceneSystem implements GameSystem {
     const game = this.game;
     game.ui?.dialogue.hide();
     if (active.def.letterbox !== false) game.ui?.letterbox(false);
-    if (game.systems.has('camera')) game.camera.cinematic.stop();
+    this.releaseCamera(active);
     game.input.popBlocker(CutsceneConfig.inputBlocker);
     active.resolve();
+  }
+
+  /** Hands the camera back once per scene; `stop()` restores the pre-cinematic mode and snaps. */
+  private releaseCamera(active: Active): void {
+    if (!active.usesCamera || !this.game.systems.has('camera')) return;
+    active.usesCamera = false;
+    this.game.camera.cinematic.stop();
   }
 
   private async runSteps(active: Active): Promise<void> {
@@ -142,7 +158,11 @@ export class CutsceneSystem implements GameSystem {
     if (!a) return;
     const realDt = this.game.time.realDt;
     if (a.grace > 0) a.grace -= realDt;
-    else if (this.game.input.wasPressed(CutsceneConfig.skipKey) && !(this.game.ui?.isModal ?? false)) this.skip();
+    else if (this.game.input.wasPressed(CutsceneConfig.skipKey) && !(this.game.ui?.isModal ?? false)) {
+      // The dialogue box owns Space while a line is up (UI advances it later this frame);
+      // Space skips the scene only when no dialogue is showing.
+      if (!(this.game.ui?.dialogue.active ?? false)) this.skip();
+    }
     if (a.timerResolve) {
       a.timer -= realDt;
       if (a.timer <= 0) {

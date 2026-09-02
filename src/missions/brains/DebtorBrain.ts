@@ -28,11 +28,10 @@ export class DebtorBrain implements PedBrain {
   }
 
   update(ped: IPed, ctx: PedContext, dt: number): void {
-    if (ped.vehicle) {
-      ped.state = 'inVehicle';
-      return;
-    }
+    // Stay 'scripted' even behind the wheel: PedSpawner culls any other state past its
+    // despawn radius, which would turn a long chase into a vanished target.
     ped.state = 'scripted';
+    if (ped.vehicle) return;
     const player = ctx.playerPosition;
     // Nothing happens until the player is close enough to be noticed.
     if (!this.started) {
