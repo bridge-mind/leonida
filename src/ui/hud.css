@@ -1,0 +1,159 @@
+.hud {
+  position: absolute;
+  top: var(--hud-margin);
+  right: var(--hud-margin);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  pointer-events: none;
+  text-align: right;
+}
+
+.hud-cash-row {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.hud-cash {
+  font: 34px/1 var(--font-display);
+  letter-spacing: 1px;
+  color: var(--color-cash);
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.9),
+    0 2px 3px rgba(0, 0, 0, 0.9);
+}
+
+.hud-cash-delta {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  font: 22px/1 var(--font-display);
+  letter-spacing: 1px;
+  text-shadow: var(--shadow-text);
+  opacity: 0;
+  transform: translateY(0);
+  white-space: nowrap;
+}
+
+.hud-cash-delta.gain {
+  color: var(--color-cash);
+}
+
+.hud-cash-delta.loss {
+  color: var(--color-cash-neg);
+}
+
+.hud-chips {
+  font: 20px/1 var(--font-display);
+  color: var(--color-accent-yellow);
+  text-shadow: var(--shadow-text);
+  margin-top: 4px;
+}
+
+.hud-stars {
+  display: flex;
+  gap: 2px;
+  margin-top: 6px;
+  font: 24px/1 var(--font-ui);
+}
+
+.hud-star {
+  color: rgba(255, 255, 255, 0.18);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  transition: color 0.12s linear;
+}
+
+.hud-star.active {
+  color: var(--color-star-active);
+  text-shadow:
+    0 0 6px rgba(255, 59, 59, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.hud-star.searching {
+  color: var(--color-star-search);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.hud-star.responding {
+  color: var(--color-star-respond);
+  -webkit-text-stroke: 1.2px #ffffff;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+.hud-star.flash {
+  animation: hud-star-flash 0.32s steps(2, end) infinite;
+}
+
+@keyframes hud-star-flash {
+  to {
+    color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.hud-weapon {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.hud-weapon[hidden] {
+  display: none;
+}
+
+.hud-weapon-name {
+  font: 13px var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-muted);
+  text-shadow: var(--shadow-text);
+}
+
+.hud-ammo {
+  font: 26px/1 var(--font-display);
+  color: var(--color-text);
+  text-shadow: var(--shadow-text);
+}
+
+.hud-ammo .reserve {
+  color: var(--color-muted);
+  font-size: 20px;
+}
+
+.hud-ammo.reloading {
+  animation: hud-ammo-blink 0.5s steps(2, end) infinite;
+}
+
+@keyframes hud-ammo-blink {
+  to {
+    opacity: 0.35;
+  }
+}
+
+.hud-clock {
+  margin-top: 6px;
+  font: 15px/1 var(--font-display);
+  letter-spacing: 1px;
+  color: var(--color-muted);
+  text-shadow: var(--shadow-text);
+}
+
+/* The HUD fades while a menu owns the screen (GTA V hides it in the pause menu). */
+.ui-root.menu-open .hud,
+.ui-root.menu-open .minimap,
+.ui-root.menu-open .bottom-stack,
+.ui-root.menu-open .notifications {
+  opacity: 0;
+  transition: opacity 0.15s linear;
+}
+
+.ui-root .hud,
+.ui-root .minimap,
+.ui-root .bottom-stack,
+.ui-root .notifications {
+  transition: opacity 0.25s linear;
+}

@@ -1,0 +1,130 @@
+/**
+ * Pedestrian tunables. Units: meters, seconds, kg, radians.
+ */
+export const PedConfig = {
+  body: {
+    capsuleRadius: 0.3,
+    capsuleHeight: 1.8,
+    mass: 70,
+    maxHealth: 100,
+    headHeight: 1.5,
+    chestHeight: 1.2,
+    eyeHeight: 1.6,
+  },
+  motion: {
+    autostepHeight: 0.4,
+    autostepMinWidth: 0.2,
+    snapToGround: 0.5,
+    gravity: -18,
+    terminalFall: -40,
+    acceleration: 14,
+    deceleration: 18,
+    turnRate: 9,
+    arriveRadius: 0.3,
+  },
+  sim: {
+    /** Peds inside this radius step physics every fixed tick. */
+    nearRadius: 60,
+    /** Between near and this radius peds step every `farStepEvery` ticks with scaled dt. */
+    farRadius: 150,
+    farStepEvery: 3,
+    /** Animated pose only inside this radius (static pose beyond). */
+    animRadius: 60,
+    spatialCell: 20,
+    capacity: 160,
+  },
+  spawn: {
+    baseCount: 80,
+    minCount: 30,
+    maxCount: 100,
+    nightFactor: 0.6,
+    beachNightFactor: 1.3,
+    /** Density used off-district (bridges, water edges). */
+    fallbackDensity: 0.4,
+    minRadius: 40,
+    maxRadius: 120,
+    keepRadius: 120,
+    despawnRadius: 150,
+    interval: 0.25,
+    perTick: 4,
+    groupChance: 0.2,
+    /** Peds spawning inside the camera frustum are rejected this many times before giving up for the tick. */
+    frustumRetries: 6,
+  },
+  ragdoll: {
+    freezeAfter: 3,
+    despawnAfter: 20,
+    vehicleSpeedThreshold: 6,
+    damagePerMs: 8,
+    impulsePerMs: 60,
+    upImpulse: 150,
+    deathImpulse: 220,
+    deathUpImpulse: 60,
+    deathTorque: 40,
+    linearDamping: 0.4,
+    angularDamping: 1.2,
+  },
+  knockdown: {
+    duration: 2,
+  },
+  wander: {
+    pauseMin: 1,
+    pauseMax: 4,
+    pauseEveryMin: 8,
+    pauseEveryMax: 22,
+    nextSidewalkRadius: 25,
+    lateralJitter: 1.2,
+    /** Waypoint reached when this close (larger than the motion arrive radius so peds keep flowing). */
+    reachRadius: 0.9,
+  },
+  idleGroup: {
+    durationMin: 10,
+    durationMax: 30,
+    radius: 1.2,
+  },
+  cower: {
+    range: 12,
+    robAfter: 1.5,
+    releaseAfter: 2,
+    cashMin: 10,
+    cashMax: 150,
+    dropForward: 0.6,
+  },
+  flee: {
+    speed: 5.5,
+    duration: 12,
+    minDistance: 60,
+    repick: 2,
+    hornRange: 6,
+    hornDuration: 3,
+    explosionRange: 60,
+  },
+  callPolice: {
+    chance: 0.1,
+    duration: 4,
+    loudRange: 40,
+    witnessRange: 25,
+  },
+  fight: {
+    civilianChance: 0.1,
+    approachSpeed: 4.5,
+    punchInterval: 0.8,
+    punchRange: 1.2,
+    punchDamage: 8,
+    giveUpAfter: 20,
+    giveUpDistance: 30,
+    gunMinDistance: 8,
+    gunMaxDistance: 15,
+    fireInterval: 0.9,
+    accuracy: 0.55,
+  },
+  gang: {
+    pistolChance: 0.5,
+    dropChance: 0.4,
+    dropMin: 20,
+    dropMax: 80,
+  },
+  debug: {
+    aimSeconds: 2,
+  },
+} as const;

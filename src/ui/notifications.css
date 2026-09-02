@@ -1,0 +1,63 @@
+.notifications {
+  position: absolute;
+  top: var(--hud-margin);
+  left: var(--hud-margin);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 330px;
+  pointer-events: none;
+}
+
+.notification {
+  padding: 9px 14px 9px 12px;
+  background: rgba(8, 9, 13, 0.82);
+  border-left: 4px solid var(--color-muted);
+  color: var(--color-text);
+  font: 14px/1.35 var(--font-ui);
+  text-shadow: var(--shadow-text);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  transform: translateX(-24px);
+  opacity: 0;
+  transition:
+    transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.2),
+    opacity 0.22s linear;
+}
+
+.notification.in {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.notification.out {
+  transform: translateX(-16px);
+  opacity: 0;
+  transition:
+    transform 0.3s ease-in,
+    opacity 0.3s linear;
+}
+
+.notification.money {
+  border-left-color: var(--color-cash);
+  background: rgba(10, 34, 16, 0.86);
+}
+
+.notification.warning {
+  border-left-color: var(--color-cash-neg);
+  background: rgba(46, 10, 12, 0.88);
+}
+
+.notification-amount {
+  float: right;
+  margin-left: 12px;
+  font: 17px/1 var(--font-display);
+  letter-spacing: 0.5px;
+}
+
+.notification.money .notification-amount.gain {
+  color: var(--color-cash);
+}
+
+.notification.money .notification-amount.loss {
+  color: var(--color-cash-neg);
+}

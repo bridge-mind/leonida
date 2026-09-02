@@ -1,0 +1,115 @@
+/* Radial weapon wheel (hold Tab). Flat, high contrast, GTA-style. */
+
+/* `#ui > *` re-enables pointer events; the wheel is mouse-delta driven and must not swallow clicks. */
+#ui .weapon-wheel {
+  pointer-events: none;
+}
+
+.weapon-wheel {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.55) 0, rgba(0, 0, 0, 0.35) 40vmin, rgba(0, 0, 0, 0.1) 70vmin);
+  z-index: var(--z-overlay);
+}
+
+.weapon-wheel[hidden] {
+  display: none;
+}
+
+.weapon-wheel-ring {
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+.weapon-wheel-slot {
+  position: absolute;
+  width: 150px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 12, 18, 0.82);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  color: var(--color-text);
+  text-align: center;
+  text-shadow: var(--shadow-text);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.06s linear, background-color 0.06s linear, transform 0.06s linear;
+}
+
+.weapon-wheel-slot .ww-key {
+  position: absolute;
+  left: 6px;
+  top: 4px;
+  font: 11px var(--font-mono);
+  color: var(--color-muted);
+}
+
+.weapon-wheel-slot .ww-name {
+  display: block;
+  font: 22px var(--font-display);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.weapon-wheel-slot .ww-ammo {
+  display: block;
+  margin-top: 2px;
+  font: 13px var(--font-mono);
+  color: var(--color-muted);
+}
+
+.weapon-wheel-slot.owned .ww-ammo {
+  color: var(--color-accent-yellow);
+}
+
+.weapon-wheel-slot.locked {
+  opacity: 0.4;
+}
+
+.weapon-wheel-slot.selected {
+  border-color: var(--color-accent-yellow);
+  background: rgba(40, 34, 10, 0.92);
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.weapon-wheel-slot.selected.locked {
+  border-color: var(--color-cash-neg);
+}
+
+.weapon-wheel-slot.current::after {
+  content: '';
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  width: 6px;
+  height: 6px;
+  background: var(--color-accent-cyan);
+}
+
+.weapon-wheel-center {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.weapon-wheel-center .ww-current {
+  font: 30px var(--font-display);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: var(--shadow-text);
+}
+
+.weapon-wheel-center .ww-hint {
+  display: block;
+  margin-top: 4px;
+  font: 12px var(--font-ui);
+  color: var(--color-muted);
+}

@@ -1,0 +1,153 @@
+/* Shared menu primitives for the pause menu, settings and title screen. */
+.menu-button {
+  appearance: none;
+  display: block;
+  width: 100%;
+  padding: 10px 18px;
+  margin: 0;
+  border: 0;
+  border-left: 4px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text);
+  font: 22px/1 var(--font-display);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+  text-shadow: var(--shadow-text);
+  transition:
+    background 0.08s linear,
+    border-color 0.08s linear;
+}
+
+.menu-button + .menu-button {
+  margin-top: 4px;
+}
+
+.menu-button.selected,
+.menu-button:hover {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0b0b0f;
+  text-shadow: none;
+  border-left-color: var(--color-accent-pink);
+}
+
+.menu-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.menu-button:disabled.selected,
+.menu-button:disabled:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text);
+  border-left-color: transparent;
+}
+
+.menu-heading {
+  font: 44px/1 var(--font-display);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--color-text);
+  text-shadow: var(--shadow-text);
+  margin: 0 0 4px;
+}
+
+.menu-subheading {
+  font: 13px var(--font-ui);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 22px;
+}
+
+.menu-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 15px/1.5 var(--font-ui);
+  color: var(--color-text);
+}
+
+.menu-table th {
+  text-align: left;
+  padding: 10px 8px 6px;
+  font: 12px var(--font-ui);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-accent-yellow);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.menu-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.menu-table td:first-child {
+  color: var(--color-muted);
+  width: 45%;
+}
+
+.menu-table td.value {
+  font: 18px var(--font-display);
+  letter-spacing: 1px;
+}
+
+.menu-key {
+  display: inline-block;
+  min-width: 16px;
+  padding: 1px 6px;
+  margin-right: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font: bold 12px var(--font-ui);
+  text-align: center;
+  color: var(--color-text);
+}
+
+.settings-row {
+  display: grid;
+  grid-template-columns: 1fr 200px 56px;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font: 15px var(--font-ui);
+  color: var(--color-text);
+}
+
+.settings-row .settings-value {
+  font: 17px var(--font-display);
+  text-align: right;
+  color: var(--color-accent-cyan);
+}
+
+.settings-row input[type='range'] {
+  width: 100%;
+  accent-color: var(--color-accent-pink);
+  cursor: pointer;
+}
+
+.settings-toggle {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text);
+  font: 15px var(--font-display);
+  letter-spacing: 1.5px;
+  padding: 5px 0;
+  cursor: pointer;
+  grid-column: 2 / span 2;
+}
+
+.settings-toggle.on {
+  background: var(--color-accent-pink);
+  border-color: var(--color-accent-pink);
+  color: #0b0b0f;
+}
+
+.settings-note {
+  margin-top: 16px;
+  font: 12px/1.6 var(--font-ui);
+  color: var(--color-muted);
+}

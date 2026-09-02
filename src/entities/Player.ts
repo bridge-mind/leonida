@@ -111,7 +111,9 @@ export class Player implements Entity, IDamageable {
     this.prevPos.copy(this.currPos);
     if (this.mounted) return;
     if (!this.isAlive) {
-      this.deathTimer -= dt;
+      // Real time: the WASTED card runs the clock at 0.25x and must line up with the respawn.
+      const scale = this.game.time.scale;
+      this.deathTimer -= scale > 0 ? dt / scale : dt;
       this.velocity.x = 0;
       this.velocity.z = 0;
       this.applyGravityOnly(dt);

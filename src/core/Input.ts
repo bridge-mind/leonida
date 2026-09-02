@@ -47,7 +47,7 @@ export class Input {
     });
     window.addEventListener('blur', () => this.releaseAll());
     c.addEventListener('mousedown', (e) => {
-      if (!this.pointerLocked && this.enabled) c.requestPointerLock();
+      if (!this.pointerLocked && this.enabled) this.requestPointerLock();
       if (!this.enabled) return;
       const code = `Mouse${e.button}`;
       if (!this.down.has(code)) this.pressedThisFrame.add(code);
@@ -137,7 +137,12 @@ export class Input {
   }
 
   requestPointerLock(): void {
-    if (!this.pointerLocked) this.canvas.requestPointerLock();
+    if (this.pointerLocked) return;
+    // Browsers reject when the gesture was consumed elsewhere (menus, fresh focus); not an error.
+    const result = (this.canvas.requestPointerLock as () => Promise<void> | void).call(this.canvas);
+    if (result && typeof (result as Promise<void>).catch === 'function') {
+      (result as Promise<void>).catch(() => undefined);
+    }
   }
 
   exitPointerLock(): void {

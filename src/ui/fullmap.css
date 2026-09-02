@@ -1,0 +1,122 @@
+.fullmap {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 8, 14, 0.94);
+  display: flex;
+  /* Above the pause menu (6) so "Map" from the menu draws on top; the title never coexists with it. */
+  z-index: 8;
+}
+
+.fullmap[hidden] {
+  display: none;
+}
+
+.fullmap canvas {
+  flex: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.fullmap.dragging canvas {
+  cursor: grabbing;
+}
+
+.fullmap-side {
+  width: 250px;
+  flex: none;
+  background: rgba(10, 12, 18, 0.96);
+  border-left: 2px solid rgba(255, 255, 255, 0.12);
+  box-shadow: -6px 0 18px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.fullmap-title {
+  font: 34px var(--font-display);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-text);
+  text-shadow: var(--shadow-text);
+  margin-bottom: 4px;
+}
+
+.fullmap-sub {
+  font: 12px var(--font-ui);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 14px;
+}
+
+.fullmap-legend {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font: 13px var(--font-ui);
+}
+
+.fullmap-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 3px 4px;
+  color: var(--color-text);
+}
+
+.fullmap-legend-row.dim {
+  color: var(--color-muted);
+}
+
+.fullmap-legend-glyph {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font: bold 10px var(--font-display);
+  color: #0b0b0f;
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.fullmap-legend-glyph.dot {
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  margin: 0 3px;
+}
+
+.fullmap-hints {
+  margin-top: 12px;
+  font: 12px var(--font-ui);
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+.fullmap-hints b {
+  display: inline-block;
+  min-width: 18px;
+  padding: 0 5px;
+  margin-right: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: var(--color-text);
+  font: bold 11px var(--font-ui);
+  text-align: center;
+}
+
+.fullmap-coords {
+  position: absolute;
+  left: 16px;
+  bottom: 12px;
+  font: 12px var(--font-mono);
+  color: var(--color-muted);
+  text-shadow: var(--shadow-text);
+  pointer-events: none;
+}

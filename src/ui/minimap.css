@@ -1,0 +1,72 @@
+.minimap {
+  position: absolute;
+  left: var(--hud-margin);
+  bottom: var(--hud-margin);
+  width: 260px;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.6));
+}
+
+.minimap canvas {
+  display: block;
+  width: 260px;
+  height: 200px;
+  border: 2px solid rgba(10, 10, 14, 0.95);
+  border-radius: 6px;
+  background: #16324f;
+  box-sizing: border-box;
+}
+
+.minimap-bars {
+  display: flex;
+  gap: 4px;
+  margin-top: 5px;
+  height: 7px;
+}
+
+.minimap-bar {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+}
+
+.minimap-bar-fill {
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  transform: scaleX(1);
+  transition: transform 0.15s linear;
+}
+
+.minimap-bar-health .minimap-bar-fill {
+  background: var(--color-health);
+}
+
+.minimap-bar-armor .minimap-bar-fill {
+  background: var(--color-armor);
+}
+
+.minimap-bar.low .minimap-bar-fill {
+  animation: minimap-low-blink 0.7s steps(2, end) infinite;
+}
+
+@keyframes minimap-low-blink {
+  to {
+    opacity: 0.35;
+  }
+}
+
+.minimap-distance {
+  margin-top: 4px;
+  text-align: right;
+  font: 15px var(--font-display);
+  letter-spacing: 0.5px;
+  color: var(--color-text);
+  text-shadow: var(--shadow-text);
+  min-height: 17px;
+}
+
+.minimap-distance:empty {
+  visibility: hidden;
+}

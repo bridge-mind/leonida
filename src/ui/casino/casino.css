@@ -1,0 +1,463 @@
+/* Leonida Palms casino UI. Flat, high contrast, system fonts; variables from src/ui/styles.css. */
+.casino-panel {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(960px, 94vw);
+  max-height: 92vh;
+  overflow: auto;
+  background: #120f18;
+  border: 3px solid var(--color-accent-yellow);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  z-index: var(--z-menu);
+  pointer-events: auto;
+}
+
+.casino-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 18px;
+  background: #1d1526;
+  border-bottom: 2px solid var(--color-accent-yellow);
+}
+
+.casino-title {
+  font: 30px var(--font-display);
+  letter-spacing: 2px;
+  color: var(--color-accent-yellow);
+  text-transform: uppercase;
+  text-shadow: var(--shadow-text);
+}
+
+.casino-header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.casino-chips {
+  font: 22px var(--font-display);
+  color: var(--color-cash);
+  text-shadow: var(--shadow-text);
+}
+
+.casino-cash {
+  font: 18px var(--font-display);
+  color: var(--color-muted);
+}
+
+.casino-body {
+  padding: 16px 18px 18px;
+}
+
+.casino-btn {
+  font: bold 14px var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 10px 16px;
+  background: var(--color-accent-yellow);
+  color: #111;
+  border: 0;
+  cursor: pointer;
+}
+
+.casino-btn:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+.casino-btn:disabled {
+  background: #3a3543;
+  color: #8a8494;
+  cursor: default;
+}
+
+.casino-btn.secondary {
+  background: #2b2536;
+  color: var(--color-text);
+  border: 2px solid #4a4356;
+}
+
+.casino-btn.secondary.active {
+  border-color: var(--color-accent-cyan);
+  color: var(--color-accent-cyan);
+}
+
+.casino-btn.danger {
+  background: var(--color-cash-neg);
+  color: #fff;
+}
+
+.casino-btn.small {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.casino-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+
+.casino-label {
+  font: bold 13px var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-muted);
+}
+
+.casino-msg {
+  min-height: 28px;
+  font: bold 18px var(--font-ui);
+  text-shadow: var(--shadow-text);
+}
+
+.casino-msg.win {
+  color: var(--color-cash);
+}
+
+.casino-msg.lose {
+  color: var(--color-cash-neg);
+}
+
+.casino-msg.info {
+  color: var(--color-accent-cyan);
+}
+
+.casino-input {
+  font: 18px var(--font-mono);
+  padding: 8px 10px;
+  background: #08090d;
+  color: #fff;
+  border: 2px solid #4a4356;
+  width: 150px;
+}
+
+.casino-input:focus {
+  outline: none;
+  border-color: var(--color-accent-yellow);
+}
+
+.casino-hint {
+  font: 12px var(--font-ui);
+  color: var(--color-muted);
+}
+
+/* --- Blackjack --------------------------------------------------------------- */
+.bj-table {
+  background: #0f5f37;
+  border: 6px solid #3b2414;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+}
+
+.bj-seat {
+  margin-bottom: 10px;
+}
+
+.bj-seat.active {
+  outline: 2px solid var(--color-accent-yellow);
+  outline-offset: 6px;
+}
+
+.bj-hand {
+  display: flex;
+  gap: 8px;
+  min-height: 104px;
+  align-items: flex-end;
+}
+
+.bj-card {
+  width: 70px;
+  height: 100px;
+  background: #f5f0e0;
+  color: #111;
+  border: 2px solid #c9c2ae;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px 7px;
+  box-sizing: border-box;
+  font: bold 20px var(--font-ui);
+  animation: bj-deal 0.28s ease-out;
+}
+
+.bj-card .bj-suit {
+  font-size: 30px;
+  text-align: center;
+}
+
+.bj-card .bj-rank-bottom {
+  transform: rotate(180deg);
+}
+
+.bj-card.red {
+  color: #c0262f;
+}
+
+.bj-card.back {
+  background: repeating-linear-gradient(45deg, #5a0f1c 0 6px, #7a1524 6px 12px);
+  border-color: var(--color-accent-yellow);
+  color: transparent;
+}
+
+@keyframes bj-deal {
+  from {
+    transform: translate(80px, -50px) rotate(10deg);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.bj-caption {
+  font: bold 15px var(--font-ui);
+  color: #f2e6b3;
+  margin-bottom: 6px;
+  text-shadow: var(--shadow-text);
+}
+
+/* --- Roulette ---------------------------------------------------------------- */
+.rl-wrap {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.rl-layout {
+  display: grid;
+  grid-template-columns: 46px repeat(12, 46px) 62px;
+  grid-auto-rows: 46px;
+  gap: 2px;
+  background: #0f5f37;
+  padding: 8px;
+  border: 4px solid #3b2414;
+}
+
+.rl-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: bold 15px var(--font-ui);
+  color: #fff;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid #f2e6b3;
+}
+
+.rl-cell.red {
+  background: #b3202a;
+}
+
+.rl-cell.black {
+  background: #1a1a1a;
+}
+
+.rl-cell.green {
+  background: #1f7a3a;
+}
+
+.rl-cell.outside {
+  background: #0f5f37;
+  font-size: 12px;
+  text-align: center;
+}
+
+.rl-cell.selected {
+  outline: 3px solid var(--color-accent-cyan);
+  outline-offset: -3px;
+}
+
+.rl-cell.hit {
+  outline: 3px solid var(--color-accent-yellow);
+  outline-offset: -3px;
+}
+
+.rl-chip {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-accent-yellow);
+  color: #111;
+  font: bold 11px var(--font-ui);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #111;
+  box-sizing: border-box;
+  padding: 0 2px;
+}
+
+.rl-side {
+  width: 220px;
+  flex: none;
+}
+
+.rl-display {
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 64px var(--font-display);
+  color: #fff;
+  background: #1f7a3a;
+  border: 4px solid #3b2414;
+  margin-bottom: 10px;
+}
+
+.rl-display.red {
+  background: #b3202a;
+}
+
+.rl-display.black {
+  background: #1a1a1a;
+}
+
+.rl-bets {
+  max-height: 180px;
+  overflow: auto;
+  font: 13px var(--font-mono);
+  color: var(--color-muted);
+  margin: 6px 0;
+}
+
+.rl-bets div {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* --- Slots ------------------------------------------------------------------ */
+.sl-cabinet {
+  background: #1a1a22;
+  border: 6px solid var(--color-accent-yellow);
+  padding: 18px;
+  margin-bottom: 12px;
+}
+
+.sl-reels {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.sl-reel {
+  width: 150px;
+  height: 150px;
+  background: #f5f0e0;
+  border: 4px solid #3b2414;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 54px var(--font-display);
+  overflow: hidden;
+}
+
+.sl-reel.spinning {
+  filter: blur(1px);
+}
+
+.sl-cherry {
+  color: #ff3b5c;
+}
+
+.sl-bar {
+  color: #b8860b;
+}
+
+.sl-seven {
+  color: #ff8a1f;
+}
+
+.sl-diamond {
+  color: #35e6ff;
+}
+
+.sl-gator {
+  color: #2e8b3e;
+  font-size: 36px;
+}
+
+.sl-paytable {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px 16px;
+  font: 13px var(--font-mono);
+  color: var(--color-muted);
+  margin-top: 8px;
+}
+
+/* --- Lucky Wheel -------------------------------------------------------------- */
+.lw-display {
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 6px solid var(--color-accent-pink);
+  background: #1a1020;
+  margin-bottom: 12px;
+  transition: background 0.15s linear;
+}
+
+.lw-label {
+  font: 56px var(--font-display);
+  color: #fff;
+  text-shadow: var(--shadow-text);
+  letter-spacing: 2px;
+}
+
+.lw-sub {
+  font: bold 14px var(--font-ui);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.lw-segments {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.lw-seg {
+  padding: 6px 4px;
+  font: bold 12px var(--font-ui);
+  color: #111;
+  text-align: center;
+}
+
+.lw-seg.current {
+  outline: 3px solid #fff;
+}
+
+/* --- Cashier ---------------------------------------------------------------- */
+.cs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.cs-box {
+  background: #1d1526;
+  border: 2px solid #4a4356;
+  padding: 14px;
+}
+
+.cs-box h3 {
+  margin: 0 0 10px;
+  font: 20px var(--font-display);
+  letter-spacing: 1px;
+  color: var(--color-accent-yellow);
+  text-transform: uppercase;
+}

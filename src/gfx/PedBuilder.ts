@@ -1,10 +1,10 @@
-import { BoxGeometry, Color, Group, Mesh, MeshStandardMaterial, type BufferGeometry } from 'three';
+import { BoxGeometry, Color, Group, Matrix4, Mesh, MeshStandardMaterial, Quaternion, Vector3, type BufferGeometry } from 'three';
 
 /**
- * PedBuilder v1: a six-part low-poly human (head, torso, two arms, two legs) built
+ * PedBuilder: a six-part low-poly human (head, torso, two arms, two legs) built
  * from boxes, plus a procedural walk/run/aim pose. The Player uses the Group-based
- * rig; Agent 3 owns this file from Stage 2 and adds the instanced renderer while
- * keeping `buildPed`, `animatePed`, `PedPalette`, `PedPose` and `PED_DIMS` intact.
+ * rig (`buildPed` + `animatePed`); the ped system renders the same rig through
+ * InstancedMeshes using `computePedPartMatrices`, which mirrors `animatePed`'s math.
  *
  * Rig convention: root origin at the feet; +Z is the ped's forward direction.
  */
@@ -184,6 +184,94 @@ export function setPedPalette(rig: PedRig, palette: PedPalette): void {
     ((leg.children[0] as Mesh).material as MeshStandardMaterial).color.set(palette.pants);
     ((leg.children[1] as Mesh).material as MeshStandardMaterial).color.set(palette.shoes);
   }
+}
+
+/** Instanced part order produced by `computePedPartMatrices`. */
+export const PED_PART_NAMES = ['head', 'hair', 'torso', 'armL', 'armR', 'legL', 'legR'] as const;
+export type PedPartName = (typeof PED_PART_NAMES)[number];
+export const PED_PART_COUNT = PED_PART_NAMES.length;
+
+/** Hair cap dimensions (matches the box added in `buildPed`). */
+export const PED_HAIR = { w: PED_DIMS.head.w + 0.02, h: 0.08, d: PED_DIMS.head.d + 0.02, y: PED_DIMS.head.h / 2 - 0.02 } as const;
+
+const X_AXIS = new Vector3(1, 0, 0);
+const Y_AXIS = new Vector3(0, 1, 0);
+const ONE = new Vector3(1, 1, 1);
+const mRoot = new Matrix4();
+const mLocal = new Matrix4();
+const qRoot = new Quaternion();
+const qTmp = new Quaternion();
+const qPart = new Quaternion();
+const vPos = new Vector3();
+const vLocal = new Vector3();
+const eulerTmp = new Vector3();
+
+function localPart(out: Matrix4, x: number, y: number, z: number, rx: number, ry: number, rz: number): void {
+  // Same as Object3D with default Euler order XYZ: q = qx * qy * qz.
+  qPart.setFromAxisAngle(X_AXIS, rx);
+  if (ry !== 0) {
+    qTmp.setFromAxisAngle(Y_AXIS, ry);
+    qPart.multiply(qTmp);
+  }
+  if (rz !== 0) {
+    qTmp.set(0, 0, Math.sin(rz / 2), Math.cos(rz / 2));
+    qPart.multiply(qTmp);
+  }
+  vLocal.set(x, y, z);
+  mLocal.compose(vLocal, qPart, ONE);
+  out.multiplyMatrices(mRoot, mLocal);
+}
+
+/**
+ * Pure-math twin of `animatePed` for instanced rendering. Writes seven world matrices
+ * (order: `PED_PART_NAMES`) into `out`. `heading` yaws the rig; `pose.fallen` tips it
+ * backwards around its own hips. When `rotation` is given it replaces heading + tip-over
+ * entirely (ragdolled peds follow their rigid body), and `position` is still the feet.
+ */
+export function computePedPartMatrices(pose: PedPose, heading: number, position: Vector3, out: Matrix4[], rotation?: Quaternion): void {
+  const d = PED_DIMS;
+  if (rotation) {
+    qRoot.copy(rotation);
+    vPos.copy(position);
+  } else {
+    qRoot.setFromAxisAngle(Y_AXIS, heading);
+    if (pose.fallen > 0) {
+      qTmp.setFromAxisAngle(X_AXIS, -pose.fallen * (Math.PI / 2));
+      qRoot.multiply(qTmp);
+    }
+    vPos.set(position.x, position.y + pose.fallen * 0.15, position.z);
+  }
+  mRoot.compose(vPos, qRoot, ONE);
+
+  const swing = 0.15 + 0.75 * pose.speed01;
+  const s = Math.sin(pose.phase) * swing;
+  const legLift = Math.max(0, Math.cos(pose.phase)) * 0.15 * pose.speed01;
+  const bob = Math.abs(Math.sin(pose.phase)) * 0.04 * pose.speed01 + legLift * 0.3;
+  const lean = 0.08 * pose.speed01;
+
+  // head, hair
+  localPart(out[0], 0, d.headY + bob, 0, -lean * 0.5, 0, 0);
+  vLocal.set(0, PED_HAIR.y, 0);
+  mLocal.makeTranslation(vLocal.x, vLocal.y, vLocal.z);
+  out[1].multiplyMatrices(out[0], mLocal);
+  // torso
+  localPart(out[2], 0, d.hipY + d.torso.h / 2 + bob, 0, lean, 0, 0);
+  // arms
+  const armX = d.torso.w / 2 + d.arm.w / 2 + 0.01;
+  if (pose.handsUp) {
+    eulerTmp.set(Math.PI - 0.15, 0.25, -0.25);
+  } else if (pose.aiming) {
+    eulerTmp.set(Math.PI / 2 - 0.25, 0.35, -0.12);
+  } else {
+    eulerTmp.set(-s * 0.9, 0.08, -0.08);
+  }
+  const armRx = pose.aiming && !pose.handsUp ? Math.PI / 2 - 0.1 : pose.handsUp ? Math.PI - 0.15 : s * 0.9;
+  localPart(out[3], -armX, d.shoulderY + bob, 0, eulerTmp.x, 0, eulerTmp.y);
+  localPart(out[4], armX, d.shoulderY + bob, 0, armRx, 0, eulerTmp.z);
+  // legs
+  const legX = d.leg.w / 2 + 0.03;
+  localPart(out[5], -legX, d.hipY, 0, s, 0, 0);
+  localPart(out[6], legX, d.hipY, 0, -s, 0, 0);
 }
 
 export function disposePed(rig: PedRig): void {

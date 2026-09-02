@@ -76,6 +76,10 @@ export interface GameEvents {
   'ped:attacked': { ped: IPed; source: Entity | 'player' | null };
   /** A civilian witness finished calling it in (4 s after the crime). */
   'ped:reportedCrime': { ped: IPed; position: V3 };
+  /** A ped punched or shot at the player (UI hit direction, audio). */
+  'ped:attackedPlayer': { ped: IPed; melee: boolean };
+  /** A gang ped or robbery victim dropped cash. */
+  'ped:droppedCash': { ped: IPed; amount: number };
 
   'weapon:fired': { weaponId: WeaponId; origin: V3; direction: V3; shooter: Entity | 'player' };
   'weapon:reloaded': { weaponId: WeaponId };
