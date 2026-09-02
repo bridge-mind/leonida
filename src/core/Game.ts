@@ -53,6 +53,8 @@ export class Game {
   readonly worldRoot = new Group();
   /** Root for interior scenes. */
   readonly interiorRoot = new Group();
+  /** Player, peds, pickups: visible both in the city and inside interiors. */
+  readonly actorsRoot = new Group();
   /** The Three.js camera the renderer uses. The camera system drives it. */
   readonly viewCamera: PerspectiveCamera;
   readonly events = new Events();
@@ -93,7 +95,7 @@ export class Game {
     this.viewCamera.position.set(0, 3, 8);
     this.viewCamera.lookAt(0, 1, 0);
 
-    this.scene.add(this.worldRoot, this.interiorRoot);
+    this.scene.add(this.worldRoot, this.interiorRoot, this.actorsRoot);
     this.input = new Input(canvas);
     this.time = new Time(this.events);
     this.physics = new Physics(this.events);

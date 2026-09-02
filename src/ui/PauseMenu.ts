@@ -34,6 +34,7 @@ export class PauseMenu implements UiComponent {
   private readonly nav = new MenuNav();
   private readonly panels: Record<Exclude<Panel, null>, HTMLElement>;
   private readonly clockEl: HTMLElement;
+  private readonly abortButton: HTMLButtonElement;
   private readonly statRows: StatRow[];
   private statsTimer = 0;
   private panel: Panel = null;
@@ -58,8 +59,15 @@ export class PauseMenu implements UiComponent {
       this.button(buttons, 'Save', () => this.save()),
       this.button(buttons, 'Load', () => this.load()),
       this.button(buttons, 'Controls', () => this.showPanel('controls')),
+      this.button(buttons, 'Abort mission', () => {
+        game.missions?.abort();
+        actions.resume();
+        actions.relockPointer();
+      }),
       this.button(buttons, 'Quit to title', () => actions.quitToTitle()),
     ];
+    this.abortButton = items[items.length - 2];
+    this.refreshAbort();
     this.nav.setItems(items);
     this.nav.onMove = () => game.audio.play('ui.blip', { volume: 0.5 });
     this.clockEl = el('div', 'pause-clock');
@@ -132,6 +140,16 @@ export class PauseMenu implements UiComponent {
     for (const row of this.statRows) if (row.el) setText(row.el, row.value());
   }
 
+  /** "Abort mission" only exists while a mission runs; disabled too so MenuNav skips it. */
+  private refreshAbort(): void {
+    const show = (this.game.missions?.active ?? null) !== null;
+    const b = this.abortButton;
+    if (b.disabled === !show) return;
+    b.disabled = !show;
+    // `.menu-button` is `display: block`, which beats the `hidden` attribute.
+    b.style.display = show ? '' : 'none';
+  }
+
   private save(): void {
     if (!this.game.save.save()) this.actions.notify('Save failed', 'warning');
     else this.game.audio.play('ui.save');
@@ -153,6 +171,7 @@ export class PauseMenu implements UiComponent {
     if (this.visible) return;
     this.visible = true;
     setVisible(this.el, true);
+    this.refreshAbort();
     this.showPanel('stats');
     this.nav.select(0, false);
     setText(this.clockEl, `${this.game.time.clockLabel}  ·  Day ${this.game.time.day}`);
@@ -170,7 +189,9 @@ export class PauseMenu implements UiComponent {
   }
 
   update(_state: GameState, realDt: number): void {
-    if (!this.visible || this.panel !== 'stats') return;
+    if (!this.visible) return;
+    this.refreshAbort();
+    if (this.panel !== 'stats') return;
     this.statsTimer -= realDt;
     if (this.statsTimer > 0) return;
     this.statsTimer = UiConfig.pause.statsRefreshSeconds;

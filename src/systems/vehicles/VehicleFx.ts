@@ -47,7 +47,7 @@ function burnOccupants(game: Game, v: Vehicle, dt: number): void {
   for (let i = 0; i < occupants.length; i++) {
     const o = occupants[i];
     if (o.kind === 'player' && game.systems.has('player')) game.player.applyDamage({ amount, type: 'fire', source: v });
-    else if (isDamageable(o)) o.applyDamage({ amount, type: 'fire', source: v });
+    else if (isDamageable(o) && !game.damage?.apply(o, { amount, type: 'fire', source: v })) o.applyDamage({ amount, type: 'fire', source: v });
   }
 }
 
@@ -76,7 +76,8 @@ export function explodeVehicle(game: Game, v: Vehicle): void {
       if (!game.damage) game.player.applyDamage({ amount: D.explosionDamage, type: 'explosion', source });
     } else {
       v.exit(o);
-      if (isDamageable(o)) o.applyDamage({ amount: 1000, type: 'explosion', source });
+      // Via the damage system so occupant deaths emit `entity:killed` once (it dedupes by id).
+      if (isDamageable(o) && !game.damage?.apply(o, { amount: 1000, type: 'explosion', source })) o.applyDamage({ amount: 1000, type: 'explosion', source });
     }
   }
 

@@ -1,0 +1,219 @@
+/* In-game phone: bottom-right panel, modal (pointer released, gameplay input blocked). */
+.phone-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  z-index: var(--z-menu);
+  font-family: var(--font-ui);
+}
+
+.phone {
+  position: absolute;
+  right: 36px;
+  bottom: 28px;
+  width: 300px;
+  height: 560px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 34px;
+  padding: 14px;
+  background: linear-gradient(160deg, #1a1a22, #08080c);
+  box-shadow:
+    0 0 0 2px #2a2a34,
+    0 30px 60px rgba(0, 0, 0, 0.75);
+  animation: phone-in 0.18s ease-out;
+}
+
+@keyframes phone-in {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.phone-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-radius: 22px;
+  overflow: hidden;
+  background: radial-gradient(circle at 30% 0%, #35223f, #0d0f1c 65%);
+  color: var(--color-text);
+}
+
+.phone-status {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 16px 4px;
+  font: 11px var(--font-ui);
+  letter-spacing: 1px;
+  color: var(--color-muted);
+}
+
+.phone-title {
+  padding: 6px 16px 10px;
+  font: 24px/1 var(--font-display);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: var(--shadow-text);
+}
+
+.phone-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 12px 12px;
+}
+
+.phone-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 6px 4px;
+}
+
+.phone-app {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 8px;
+  border: 0;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text);
+  cursor: pointer;
+  font: 12px var(--font-ui);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.phone-app-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font: 22px/1 var(--font-display);
+  color: #0b0b0f;
+}
+
+.phone-app.selected,
+.phone-app:hover {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0b0b0f;
+}
+
+.phone-row {
+  appearance: none;
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-left: 3px solid transparent;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  font: 14px var(--font-ui);
+}
+
+.phone-row + .phone-row {
+  margin-top: 4px;
+}
+
+.phone-row.selected,
+.phone-row:hover {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0b0b0f;
+  border-left-color: var(--color-accent-pink);
+}
+
+.phone-row:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.phone-row-sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.phone-empty {
+  padding: 24px 12px;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.phone-post {
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.phone-post-handle {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--color-accent-cyan);
+}
+
+.phone-post-likes {
+  color: var(--color-muted);
+}
+
+.phone-snap {
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #000;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.phone-home {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 4px;
+}
+
+.phone-home-btn {
+  appearance: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #3a3a46;
+  background: #15151c;
+  cursor: pointer;
+}
+
+.phone-home-btn:hover {
+  border-color: var(--color-accent-pink);
+}
+
+.phone-hint {
+  padding: 6px 12px 0;
+  text-align: center;
+  font: 10px var(--font-ui);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}

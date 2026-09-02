@@ -44,6 +44,8 @@ export class PedSpawner {
     this.timer -= dt;
     if (this.timer > 0) return;
     this.timer = S.interval;
+    // Interiors sit far above the city at the same x/z; do not populate the street under them.
+    if (this.game.state.interior !== null) return;
 
     const live = this.system.live;
     let near = 0;

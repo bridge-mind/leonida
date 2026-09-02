@@ -79,7 +79,7 @@ export class Player implements Entity, IDamageable {
     this.rig = buildPed(PED_PALETTES.lucia);
     this.object3d = this.rig.root;
     this.object3d.name = 'player';
-    game.worldRoot.add(this.object3d);
+    game.actorsRoot.add(this.object3d);
 
     const physics = game.physics;
     this.body = physics.createKinematicBody({ x: spawn.x, y: spawn.y + CAPSULE_CENTER_Y, z: spawn.z });
@@ -152,7 +152,6 @@ export class Player implements Entity, IDamageable {
       if (input.jump && !this.jumpHeld) {
         this.velocity.y = P.jumpSpeed;
         this.grounded = false;
-        this.game.audio.play('player.jump', { position: this.position });
       } else if (this.velocity.y < 0) {
         this.velocity.y = -1; // small downward bias keeps snap-to-ground engaged
       }
@@ -235,8 +234,8 @@ export class Player implements Entity, IDamageable {
     }
     this.health -= amount;
     this.sinceDamage = 0;
+    // Hurt/death/jump cues are played by the audio system (eventCues / footstepDriver) from these events.
     this.game.events.emit('player:damaged', { amount: info.amount, source: info.source ?? null });
-    this.game.audio.play('player.hurt', { position: this.position });
     if (this.health <= 0) this.die();
   }
 
@@ -245,7 +244,6 @@ export class Player implements Entity, IDamageable {
     this.isAlive = false;
     this.deathTimer = P.deathDuration;
     this.velocity.set(0, this.velocity.y, 0);
-    this.game.audio.play('player.death', { position: this.position });
     this.game.events.emit('player:died', { position: { x: this.position.x, y: this.position.y, z: this.position.z } });
   }
 
@@ -296,7 +294,7 @@ export class Player implements Entity, IDamageable {
   }
 
   dispose(): void {
-    this.game.worldRoot.remove(this.object3d);
+    this.game.actorsRoot.remove(this.object3d);
     this.game.physics.world.removeCharacterController(this.controller);
     this.game.physics.removeBody(this.body);
   }

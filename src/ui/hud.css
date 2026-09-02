@@ -142,6 +142,47 @@
   text-shadow: var(--shadow-text);
 }
 
+/* Special-ability meter (characters system); thin bar in the health/armor bar style. */
+.hud-ability {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.hud-ability-label {
+  font: 11px var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-muted);
+  text-shadow: var(--shadow-text);
+}
+
+.hud-ability-bar {
+  width: 120px;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+}
+
+.hud-ability-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--color-accent-yellow);
+  transform-origin: left center;
+  transform: scaleX(1);
+  transition: transform 0.15s linear;
+}
+
+.hud-ability.full .hud-ability-label {
+  color: var(--color-accent-yellow);
+}
+
+.hud-ability.full .hud-ability-bar {
+  box-shadow: 0 0 6px rgba(255, 210, 63, 0.55);
+}
+
 /* The HUD fades while a menu owns the screen (GTA V hides it in the pause menu). */
 .ui-root.menu-open .hud,
 .ui-root.menu-open .minimap,

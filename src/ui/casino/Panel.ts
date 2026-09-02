@@ -16,6 +16,8 @@ export abstract class CasinoPanel {
   private readonly onKey = (e: KeyboardEvent): void => {
     if (e.code === 'Escape') {
       e.preventDefault();
+      // Eat the edge so the UI system does not also read this Esc as "pause" next frame.
+      this.casino.game.input.consume('Escape');
       this.close();
     }
   };
@@ -90,8 +92,10 @@ export abstract class CasinoPanel {
     this.offChips?.();
     this.offChips = null;
     this.el.remove();
-    this.casino.game.input.popBlocker('casino');
-    this.casino.game.audio.play('ui.close');
+    const game = this.casino.game;
+    game.input.popBlocker('casino');
+    if (game.ui?.isModal !== true && game.ui?.isPaused !== true) game.input.requestPointerLock();
+    game.audio.play('ui.close');
     this.onClosed();
     this.casino.onPanelClosed(this);
   }

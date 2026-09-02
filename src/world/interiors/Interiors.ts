@@ -178,7 +178,7 @@ export class Interiors {
       }
     }
     handle.onEnter?.();
-    this.game.audio.play('interior.enter');
+    // `interior.enter/exit` cues are played by the audio system from these events.
     this.game.events.emit('interior:entered', { id });
     await this.fade(false);
     this.transitioning = false;
@@ -208,7 +208,6 @@ export class Interiors {
         this.game.camera.snap();
       }
     }
-    this.game.audio.play('interior.exit');
     this.game.events.emit('interior:exited', { id });
     await this.fade(false);
     this.transitioning = false;

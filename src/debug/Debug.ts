@@ -135,7 +135,8 @@ export class Debug {
   async runAutotest(name: string): Promise<void> {
     this.autotestName = name;
     this.autotestResult = 'pending';
-    const loaders = import.meta.glob('./autotests/*.ts') as Record<string, AutotestLoader>;
+    // util.ts is a shared helper, not a suite; exclude it so `?autotest=util` reports "no such autotest".
+    const loaders = import.meta.glob(['./autotests/*.ts', '!./autotests/util.ts']) as Record<string, AutotestLoader>;
     const entry = Object.entries(loaders).find(([path]) => path.endsWith(`/${name}.ts`));
     if (!entry) {
       this.autotestResult = 'fail';

@@ -1,0 +1,174 @@
+/* Mission UI: retry prompt, character wheel, adrenaline overlay. */
+
+.mission-retry {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 8, 14, 0.55);
+  z-index: var(--z-menu);
+  pointer-events: none;
+}
+
+.mission-retry[hidden] {
+  display: none;
+}
+
+.mission-retry-panel {
+  width: 360px;
+  padding: 28px 32px 22px;
+  background: rgba(8, 9, 13, 0.92);
+  border-left: 4px solid var(--color-accent-pink);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+  pointer-events: auto;
+}
+
+.mission-retry-title {
+  font: 34px/1 var(--font-display);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text);
+  text-shadow: var(--shadow-text);
+}
+
+.mission-retry-reason {
+  margin: 8px 0 18px;
+  font: 14px var(--font-ui);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-accent-yellow);
+}
+
+.mission-retry-hint {
+  margin-top: 16px;
+  font: 12px var(--font-ui);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* --- Character wheel (Q) --------------------------------------------------- */
+
+.character-wheel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-overlay);
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(6, 8, 14, 0.15) 0%, rgba(6, 8, 14, 0.7) 100%);
+}
+
+.character-wheel[hidden] {
+  display: none;
+}
+
+.character-wheel-ring {
+  display: flex;
+  gap: 90px;
+}
+
+.character-slot {
+  width: 150px;
+  padding: 14px 14px 12px;
+  background: rgba(8, 9, 13, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  text-align: center;
+  transition:
+    transform 0.08s ease-out,
+    border-color 0.08s linear;
+}
+
+.character-slot.selected {
+  transform: scale(1.08);
+  border-color: var(--color-accent-yellow);
+  box-shadow: 0 0 24px rgba(255, 210, 63, 0.35);
+}
+
+.character-slot.current .cw-name::after {
+  content: ' ·';
+  color: var(--color-accent-cyan);
+}
+
+.cw-portrait {
+  display: block;
+  width: 122px;
+  height: 122px;
+  margin: 0 auto 10px;
+}
+
+.cw-name {
+  display: block;
+  font: 24px/1 var(--font-display);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-text);
+  text-shadow: var(--shadow-text);
+}
+
+.cw-trait {
+  display: block;
+  margin-top: 6px;
+  font: 12px var(--font-ui);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.character-wheel-hint {
+  position: absolute;
+  bottom: 18%;
+  font: 12px var(--font-ui);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* --- Adrenaline ------------------------------------------------------------ */
+
+.ability-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-hud);
+}
+
+.ability-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-hud);
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 45%, rgba(120, 0, 30, 0.55) 100%);
+}
+
+.ability-vignette.lucia {
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 45%, rgba(255, 79, 163, 0.45) 100%);
+}
+
+.ability-vignette.jason {
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 45%, rgba(53, 230, 255, 0.4) 100%);
+}
+
+.ability-vignette.on {
+  opacity: 1;
+}
+
+.ability-head-marker {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border: 2px solid var(--color-star-active);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255, 59, 59, 0.8);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.ability-head-marker[hidden] {
+  display: none;
+}

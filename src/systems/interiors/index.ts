@@ -1,7 +1,11 @@
+import type { Vector3 } from 'three';
 import { Config } from '../../core/Config';
+import type { V3 } from '../../core/entities';
 import type { Game } from '../../core/Game';
 import { PRIORITY, type GameSystem, type SystemModule } from '../../core/System';
 import { Interiors, type InteriorDefinition } from '../../world/interiors/Interiors';
+
+const wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Exposes the Interiors framework as `game.interiors` and handles the door
@@ -74,12 +78,42 @@ export class InteriorsSystem implements GameSystem {
       this.setPrompt(null);
       return;
     }
-    const registered = this.framework.has(door.interiorId);
-    this.setPrompt(registered ? `Enter ${door.name}` : `${door.name} (closed)`);
+    // Stores lock their doors for the rest of the day after a hold-up.
+    const open = this.framework.has(door.interiorId) && !(this.game.shops?.isStoreClosed(door.interiorId) ?? false);
+    this.setPrompt(open ? `Enter ${door.name}` : `${door.name} (closed)`);
     if (this.game.input.wasPressed('KeyE')) {
-      if (registered) void this.framework.enter(door.interiorId);
-      else this.game.events.emit('notification', { text: `${door.name} is closed.`, kind: 'info' });
+      if (open) void this.framework.enter(door.interiorId);
+      else {
+        this.game.events.emit('notification', {
+          text: `${door.name} is closed.`,
+          kind: 'info',
+        });
+        this.game.audio.play('store.closed');
+      }
     }
+  }
+
+  /** Interior-root-local point → world space (the framework builds every interior around one origin). */
+  toWorld(local: V3, out: Vector3): Vector3 {
+    const o = this.framework.origin;
+    return out.set(o.x + local.x, o.y + local.y, o.z + local.z);
+  }
+
+  /**
+   * Fade to black, run `atBlack`, fade back in. Shared by respray and the chop
+   * shop so exterior services get the same transition as walking through a door.
+   * Uses the same #fade overlay as the framework; callers never run while a door
+   * transition is in flight (both require the player to be outside and stationary).
+   */
+  async fadeThrough(atBlack: () => void, holdSeconds = 0.6): Promise<void> {
+    const el = document.getElementById('fade');
+    const ms = Config.interiors.fadeSeconds * 1000;
+    el?.classList.add('visible');
+    await wait(ms);
+    atBlack();
+    await wait(holdSeconds * 1000);
+    el?.classList.remove('visible');
+    await wait(ms);
   }
 
   private setPrompt(text: string | null): void {

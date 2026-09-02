@@ -52,7 +52,13 @@ export class PlayerControl {
         this.vehicle = null;
         return;
       }
-      const blocked = input.isBlocked || !player.isAlive;
+      if (!player.isAlive) {
+        // Died in the seat (shot, BUSTED): Player.fixedUpdate skips the death timer while
+        // mounted, so leave the car now; the camera follows the on-foot target automatically.
+        this.exitCurrent();
+        return;
+      }
+      const blocked = input.isBlocked;
       const c = v.controls;
       c.throttle = !blocked && input.isDown('KeyW') ? 1 : 0;
       c.brake = !blocked && input.isDown('KeyS') ? 1 : 0;

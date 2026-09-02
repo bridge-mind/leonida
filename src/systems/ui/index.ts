@@ -109,15 +109,29 @@ export class UiSystem implements GameSystem, IUiPeer {
       const layer = new MapLayer(game.world.roadGraph, game.world.landmarks.list);
       this.minimap = new Minimap(game, layer);
       this.fullMap = new FullMap(game, layer);
-      this.fullMap.onClose = () => game.input.popBlocker('map');
+      this.fullMap.onClose = () => {
+        game.input.popBlocker('map');
+        if (!this.paused) this.lockPointer();
+      };
       this.components.push(this.minimap, this.fullMap);
       this.root.append(this.minimap.el, this.fullMap.el);
     }
     this.root.append(this.pauseMenu.el, this.title.el);
 
     this.offs.push(
-      game.events.on('player:died', () => void this.card('wasted', 'Wasted')),
+      game.events.on('player:died', () => {
+        // `Arrest.bust()` emits player:busted synchronously after `kill('busted')` → player:died;
+        // defer so the Busted card (and its sting) claims the slot and Wasted never flashes.
+        queueMicrotask(() => {
+          if (this.cards.activeKind !== 'busted') void this.card('wasted', 'Wasted');
+        });
+      }),
       game.events.on('player:busted', () => void this.card('busted', 'Busted')),
+      // Pausing releases the pointer, which releases Tab and closes the wheel while scale is 0;
+      // the wheel cannot undo its slow-mo then, so drop it from the scale we restore on resume.
+      game.events.on('weapon:wheelToggled', ({ open }) => {
+        if (!open && this.paused && this.savedScale < 1) this.savedScale = 1;
+      }),
     );
     document.addEventListener('pointerlockchange', this.onPointerLockChange);
 
@@ -204,6 +218,7 @@ export class UiSystem implements GameSystem, IUiPeer {
     this.game.input.popBlocker('pause');
     this.game.audio.play('ui.unpause');
     this.game.events.emit('ui:resumed', {});
+    this.lockPointer();
   }
 
   get isPaused(): boolean {
@@ -252,8 +267,9 @@ export class UiSystem implements GameSystem, IUiPeer {
 
   private quitToTitle(): void {
     this.fullMap?.close();
-    this.resume();
+    // Title first so `resume()` sees a modal and does not re-lock the pointer.
     this.showTitle();
+    this.resume();
   }
 
   private openMap(): void {
@@ -272,8 +288,9 @@ export class UiSystem implements GameSystem, IUiPeer {
   /** Browsers swallow Esc while the pointer is locked; losing the lock is our pause signal. */
   private readonly onPointerLockChange = (): void => {
     if (document.pointerLockElement) return;
-    if (this.expectUnlock) {
+    if (this.expectUnlock || this.game.input.unlockRequested) {
       this.expectUnlock = false;
+      this.game.input.unlockRequested = false;
       return;
     }
     if (this.game.ready && !this.isModal) this.pause();
@@ -294,13 +311,15 @@ export class UiSystem implements GameSystem, IUiPeer {
       else this.pauseMenu.handleInput();
       return;
     }
+    if (this.dialogueBox.active && input.wasPressed('Space')) this.dialogueBox.advance();
+    // Another modal (weapon wheel, casino panel, phone, shop) owns input: Esc/M belong to it.
+    if (input.isBlocked) return;
     if (input.wasPressed('Escape')) {
       this.pause();
       return;
     }
     if (input.wasPressed('KeyM')) this.openMap();
-    if (input.wasPressed('KeyP') && !input.isBlocked) this.game.save.save();
-    if (this.dialogueBox.active && input.wasPressed('Space')) this.dialogueBox.advance();
+    if (input.wasPressed('KeyP')) this.game.save.save();
   }
 
   // --- Loop ----------------------------------------------------------------------

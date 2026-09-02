@@ -19,6 +19,8 @@ export class Input {
   /** Accumulated wheel delta since last frame (positive = scroll down). */
   wheelDelta = 0;
   pointerLocked = false;
+  /** Set by `exitPointerLock()` so the UI can tell a deliberate release from the user pressing Esc. */
+  unlockRequested = false;
   /** When false, real keyboard/mouse input is ignored (UI menus use this). Scripted input still works. */
   enabled = true;
 
@@ -71,7 +73,8 @@ export class Input {
     c.addEventListener('contextmenu', (e) => e.preventDefault());
     document.addEventListener('pointerlockchange', () => {
       this.pointerLocked = document.pointerLockElement === c;
-      if (!this.pointerLocked) this.releaseAll();
+      if (this.pointerLocked) this.unlockRequested = false;
+      else this.releaseAll();
     });
   }
 
@@ -97,14 +100,14 @@ export class Input {
     return this.releasedThisFrame.has(code);
   }
 
-  /** -1..1 on each axis from WASD/arrows: x = right, y = forward. */
+  /** -1..1 on each axis from WASD: x = right, y = forward. Arrows are reserved (Up = phone, menus). */
   moveAxis(out: { x: number; y: number }): { x: number; y: number } {
     let x = 0;
     let y = 0;
-    if (this.isDown('KeyW') || this.isDown('ArrowUp')) y += 1;
-    if (this.isDown('KeyS') || this.isDown('ArrowDown')) y -= 1;
-    if (this.isDown('KeyD') || this.isDown('ArrowRight')) x += 1;
-    if (this.isDown('KeyA') || this.isDown('ArrowLeft')) x -= 1;
+    if (this.isDown('KeyW')) y += 1;
+    if (this.isDown('KeyS')) y -= 1;
+    if (this.isDown('KeyD')) x += 1;
+    if (this.isDown('KeyA')) x -= 1;
     out.x = x;
     out.y = y;
     return out;
@@ -146,7 +149,14 @@ export class Input {
   }
 
   exitPointerLock(): void {
-    if (this.pointerLocked) document.exitPointerLock();
+    if (!this.pointerLocked) return;
+    this.unlockRequested = true;
+    document.exitPointerLock();
+  }
+
+  /** Drops this frame's press edge for `code` (a modal that handled the key via raw DOM events). */
+  consume(code: string): void {
+    this.pressedThisFrame.delete(code);
   }
 
   // --- Scripted layer (autotests) -----------------------------------------

@@ -20,8 +20,9 @@ export interface WeaponDef {
   magazine: number;
   range: number;
   spreadDeg: number;
+  /** Mirror of `WEAPON_PRICES` in data/prices.ts, which is authoritative (what the store charges). Keep in sync. */
   price: number;
-  /** Price of one magazine of ammo. */
+  /** Price of one magazine of ammo (mirror of `WEAPON_PRICES[id].ammo`). */
   ammoPrice: number;
   reloadSeconds: number;
   pellets: number;
@@ -78,7 +79,7 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
     magazine: 30,
     range: 45,
     spreadDeg: 3,
-    price: 1500,
+    price: 1200,
     ammoPrice: 60,
     reloadSeconds: 1.8,
     pellets: 1,
@@ -96,8 +97,8 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
     magazine: 8,
     range: 20,
     spreadDeg: 8,
-    price: 1200,
-    ammoPrice: 50,
+    price: 1500,
+    ammoPrice: 80,
     reloadSeconds: 2.5,
     pellets: 8,
     automatic: false,
@@ -115,7 +116,7 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
     range: 90,
     spreadDeg: 2,
     price: 3000,
-    ammoPrice: 80,
+    ammoPrice: 100,
     reloadSeconds: 2.2,
     pellets: 1,
     automatic: true,
@@ -133,7 +134,7 @@ export const WEAPONS: Record<WeaponId, WeaponDef> = {
     range: 300,
     spreadDeg: 0,
     price: 5000,
-    ammoPrice: 100,
+    ammoPrice: 150,
     reloadSeconds: 2.5,
     pellets: 1,
     automatic: false,

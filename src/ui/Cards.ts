@@ -53,6 +53,10 @@ export class Cards implements UiComponent {
     return this.active !== null;
   }
 
+  get activeKind(): CardKind | null {
+    return this.active?.kind ?? null;
+  }
+
   show(kind: CardKind, text: string, seconds: number = C.defaultSeconds): Promise<void> {
     if (this.active) this.finish();
     const label = LABELS[kind] || text;

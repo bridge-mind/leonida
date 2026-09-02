@@ -27,24 +27,28 @@ npm run smoke      # headless boot check (writes docs/screenshots/<name>.png + .
 
 ## What is in the game
 
-See [docs/PROGRESS.md](docs/PROGRESS.md) for the authoritative, per-system status (works / cut / known bugs / how to test).
+See [docs/PROGRESS.md](docs/PROGRESS.md) for the authoritative, per-system status (works / cut / known bugs / how to test). Current build: typechecked, unit-tested and code-reviewed, **not yet run in a browser** — expect first-run issues.
 
-- **World**: 2 km × 2 km Vice City with six districts (Vice Beach, Downtown, Little Habana, Port Gellhorn, the Docks, Grassrivers), a causeway, highways, water, and a 24-minute day/night cycle with neon and street lamps at dusk.
+- **World**: 2 km × 2 km Vice City with six districts (Vice Beach, Downtown, Little Habana, Port Gellhorn, the Docks, Grassrivers), a causeway, highways, water, and a 24-minute day/night cycle with neon and street lamps at dusk. No swimming, weather or boats.
 - **On foot**: third-person GTA camera, sprint, jump, aim, health/armor, WASTED → hospital.
-- **Vehicles**: nine archetypes, arcade physics on Rapier bodies, damage → smoke → fire → explosion, carjacking, traffic with lights and car-following, parked cars everywhere.
-- **Pedestrians**: instanced crowds that wander, chat, cower, flee, call the cops, fight back, and ragdoll.
-- **Combat**: six weapons, weapon wheel, hitscan with headshots, melee combo, particles and tracers.
-- **Wanted**: six stars with the GTA 6 colored states (responding / searching / active), hot crime scenes, cruisers, cops on foot, SWAT, helicopters, roadblocks, BUSTED → police station, respray to clear.
-- **Money**: rob peds and stores, sell cars at the chop shop, buy guns at Bullet Barn, eat, gamble.
-- **Casino**: Leonida Palms — blackjack (full rules, unit-tested), American roulette, slots, Lucky Wheel.
-- **Story**: eight missions for Lucia and Jason with cutscenes, an AI companion, character switching and the adrenaline ability.
-- **Meta**: minimap and full map with GPS routing, HUD, notifications, pause menu, phone, save/load.
+- **Vehicles**: nine archetypes (sedan, sports, muscle, SUV, pickup, van, taxi, police, SWAT), arcade single-body physics on Rapier (no per-wheel suspension), damage → smoke → fire → explosion, carjacking, traffic with lights and car-following, parked cars everywhere. No motorcycles or boats.
+- **Pedestrians**: instanced crowds that wander, chat, cower, flee, call the cops, fight back, and ragdoll; cash/weapon/armor/health pickups.
+- **Combat**: six weapons (fists, pistol, SMG, shotgun, rifle, sniper), weapon wheel, hitscan with headshots, melee combo, particles and tracers. No gun meshes on the player rig.
+- **Wanted**: six stars with the GTA 6 colored states (responding / searching / active), hot crime scenes, cruisers, cops on foot, SWAT, helicopters, roadblocks with spike strips, BUSTED → police station, respray to clear. Level 6 reuses SWAT (no army).
+- **Money**: rob peds and stores (24/7 ×4, gas station, Waffle Hut), sell cars at the chop shop, buy guns at Bullet Barn, eat, gamble. Chop shop and respray are drive-in markers, not garages.
+- **Casino**: Leonida Palms — blackjack (full rules, unit-tested), American roulette, slots, Lucky Wheel, cashier, guards.
+- **Story**: eight missions for Lucia and Jason with cutscenes, two repeatable jobs after the finale, an AI companion, Q character switching and the Caps Lock adrenaline ability.
+- **Meta**: minimap and full map with GPS routing, HUD, notifications, pause menu with settings, phone (contacts, map, Snapmatic, parody feed), per-system save/load (wanted level and police units are not saved).
+
+Known first-run blocker: the player, peds and pickups are currently invisible inside interiors (they are parented to the hidden world root); see `docs/PROGRESS.md` §4.
 
 ## Debugging
 
-- `F3` toggles the performance overlay.
-- `window.__game` is the `Game` instance; `__game.debug.list()` prints every debug action; `__game.debug.run('vehicles.spawnHere', 'sports')`.
-- URL params: `?systems=world,player,camera,vehicles` loads an isolation set; `&actions=time.set:22,player.teleport:0:0` runs actions after boot; `&autotest=<name>` runs `src/debug/autotests/<name>.ts`; `&notitle` skips the title screen; `&spawn=x,z`.
+- `F3` toggles the performance overlay (`&perf` in the URL turns it on at boot).
+- `window.__game` is the `Game` instance; `__game.debug.list()` prints every debug action; `__game.debug.run('vehicles.spawnHere', 'sports')`. Core actions: `time.set:<hour>`, `time.scale:<s>`, `core.systems` (which systems are enabled/disabled), `core.perf`, `core.errors` (collected console errors), `core.save`, `core.load`.
+- URL params: `?systems=world,player,camera,vehicles` loads an isolation set; `&actions=time.set:22,player.teleport:0:0` runs actions after boot (comma between actions, colon between args, args JSON-parsed when possible, so arguments cannot contain `,` or `:`); `&autotest=<name>` runs `src/debug/autotests/<name>.ts` and logs `AUTOTEST PASS/FAIL`; `&notitle` skips the title screen (also skipped when `systems`, `autotest` or `actions` is present); `&spawn=x,z`.
+- A system that throws is logged as `[system:<id>]` and disabled for the session; the game keeps running. Check `__game.debug.run('core.systems')` when something silently stops working.
+- Reporting a bug: the URL you used, the console output, and the results of `core.errors`, `core.systems` and `core.perf`. Full recipes and every system's debug actions are in [docs/PROGRESS.md](docs/PROGRESS.md) §2.
 
 ## Layout
 

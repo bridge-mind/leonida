@@ -1,7 +1,7 @@
 import type { Game } from '../core/Game';
 import type { GameState, WantedState } from '../core/GameState';
 import { UiConfig } from '../systems/ui/config';
-import { el, setText, setVisible, toggleClass, type UiComponent } from './dom';
+import { clamp01, el, setText, setVisible, toggleClass, type UiComponent } from './dom';
 import { formatCash, formatCashDelta, weaponLabel } from './format';
 import './hud.css';
 
@@ -24,6 +24,8 @@ export class HUD implements UiComponent {
   private readonly ammoMag: HTMLElement;
   private readonly ammoReserve: HTMLElement;
   private readonly clockEl: HTMLElement;
+  private readonly abilityRow: HTMLElement | null;
+  private readonly abilityFill: HTMLElement | null;
 
   private shownCash = 0;
   private cashInitialised = false;
@@ -37,6 +39,7 @@ export class HUD implements UiComponent {
   private lastChips = -1;
   private lastClock = '';
   private lastWeaponKey = '';
+  private lastAbilityPct = -1;
   private readonly offs: (() => void)[] = [];
 
   constructor(private readonly game: Game) {
@@ -63,6 +66,18 @@ export class HUD implements UiComponent {
     this.weaponRow.append(this.weaponName, this.ammoEl);
     this.clockEl = el('div', 'hud-clock');
     this.el.append(cashRow, this.chipsEl, starsRow, this.weaponRow, this.clockEl);
+    // Special-ability meter only exists when the characters system publishes `state.abilityCharge`.
+    if (game.systems.has('characters')) {
+      this.abilityRow = el('div', 'hud-ability');
+      this.abilityFill = el('div', 'hud-ability-fill');
+      const bar = el('div', 'hud-ability-bar');
+      bar.appendChild(this.abilityFill);
+      this.abilityRow.append(el('span', 'hud-ability-label', 'Ability'), bar);
+      this.el.appendChild(this.abilityRow);
+    } else {
+      this.abilityRow = null;
+      this.abilityFill = null;
+    }
 
     this.offs.push(
       game.events.on('economy:cashChanged', (e) => this.onCashChanged(e.delta)),
@@ -94,6 +109,7 @@ export class HUD implements UiComponent {
     this.updateStars(state, realDt);
     this.updateWeapon(state);
     this.updateChips(state);
+    this.updateAbility(state);
     const clock = this.game.time.clockLabel;
     if (clock !== this.lastClock) {
       this.lastClock = clock;
@@ -174,6 +190,15 @@ export class HUD implements UiComponent {
     this.lastChips = chips;
     setVisible(this.chipsEl, show);
     if (show) setText(this.chipsEl, `${chips.toLocaleString('en-US')} CHIPS`);
+  }
+
+  private updateAbility(state: GameState): void {
+    if (!this.abilityRow || !this.abilityFill) return;
+    const pct = Math.round(clamp01(state.abilityCharge) * 100);
+    if (pct === this.lastAbilityPct) return;
+    this.lastAbilityPct = pct;
+    this.abilityFill.style.transform = `scaleX(${pct / 100})`;
+    toggleClass(this.abilityRow, 'full', pct >= 100);
   }
 
   dispose(): void {

@@ -1,21 +1,56 @@
 import { Config } from '../../core/Config';
 import type { Game } from '../../core/Game';
 import { PRIORITY, type GameSystem, type SystemModule } from '../../core/System';
+import { EconomyConfig } from './config';
+
+interface EconomySave {
+  cash?: number;
+  earned?: number;
+  spent?: number;
+  fromRobberies?: number;
+  fromChopShop?: number;
+}
 
 /**
- * Minimal wallet. Agent 9 takes ownership in Stage 3 and extends it (tick
- * animation, stats, fees) without changing `cash`, `add`, `trySpend`.
+ * The wallet. `cash`, `add`, `trySpend`, `canAfford` are the public contract every
+ * other system uses; on top of that it tracks per-source income for the stats
+ * screen and charges the hospital bill when the player is wasted.
  */
 export class EconomySystem implements GameSystem {
   private balance = Config.economy.startCash;
   /** Lifetime totals for the stats screen. */
   earned = 0;
   spent = 0;
+  fromRobberies = 0;
+  fromChopShop = 0;
+  private readonly unsubs: Array<() => void> = [];
 
   constructor(private readonly game: Game) {}
 
   init(): void {
     this.publish(0);
+    this.unsubs.push(
+      // Single owner of the 'wasted' hospital bill; the player system only bills 'bail' on 'busted'.
+      this.game.events.on('player:respawned', (e) => {
+        if (e.reason !== 'wasted') return;
+        this.fee(EconomyConfig.hospitalFraction, 'hospital', EconomyConfig.hospitalMin);
+      }),
+      // Income by source is counted from the source events, not from `add` reasons:
+      // robbery cash arrives through a generic pickup, so the reason there is just 'pickup'.
+      this.game.events.on('robbery:completed', ({ amount }) => {
+        this.fromRobberies += amount;
+        this.publish(0);
+      }),
+      this.game.events.on('chopshop:sold', ({ amount }) => {
+        this.fromChopShop += amount;
+        this.publish(0);
+      }),
+    );
+  }
+
+  dispose(): void {
+    for (const u of this.unsubs) u();
+    this.unsubs.length = 0;
   }
 
   get cash(): number {
@@ -30,7 +65,11 @@ export class EconomySystem implements GameSystem {
     if (rounded > 0) this.earned += rounded;
     else this.spent += -rounded;
     this.publish(rounded);
-    this.game.events.emit('economy:cashChanged', { cash: this.balance, delta: rounded, reason });
+    this.game.events.emit('economy:cashChanged', {
+      cash: this.balance,
+      delta: rounded,
+      reason,
+    });
     this.game.audio.play(rounded > 0 ? 'cash.gain' : 'cash.loss');
   }
 
@@ -50,22 +89,45 @@ export class EconomySystem implements GameSystem {
     return Math.round(amount) <= this.balance;
   }
 
+  /**
+   * Charges a fraction of the current balance (floored at `min`, capped at the
+   * balance). Used for death/arrest bills; returns the amount actually taken.
+   */
+  fee(fraction: number, reason: string, min = 0): number {
+    const wanted = Math.max(min, Math.round(this.balance * fraction));
+    const taken = Math.min(this.balance, wanted);
+    if (taken > 0) this.add(-taken, reason);
+    return taken;
+  }
+
   private publish(delta: number): void {
-    this.game.state.cash = this.balance;
-    this.game.state.cashDelta = delta;
-    this.game.state.stats.cashEarned = this.earned;
-    this.game.state.stats.cashSpent = this.spent;
+    const s = this.game.state;
+    s.cash = this.balance;
+    s.cashDelta = delta;
+    s.stats.cashEarned = this.earned;
+    s.stats.cashSpent = this.spent;
+    s.stats.moneyFromRobberies = this.fromRobberies;
+    s.stats.moneyFromChopShop = this.fromChopShop;
   }
 
   serialize(): unknown {
-    return { cash: this.balance, earned: this.earned, spent: this.spent };
+    const data: EconomySave = {
+      cash: this.balance,
+      earned: this.earned,
+      spent: this.spent,
+      fromRobberies: this.fromRobberies,
+      fromChopShop: this.fromChopShop,
+    };
+    return data;
   }
 
   deserialize(data: unknown): void {
-    const d = data as { cash?: number; earned?: number; spent?: number };
+    const d = data as EconomySave | undefined;
     if (typeof d?.cash === 'number') this.balance = d.cash;
     if (typeof d?.earned === 'number') this.earned = d.earned;
     if (typeof d?.spent === 'number') this.spent = d.spent;
+    if (typeof d?.fromRobberies === 'number') this.fromRobberies = d.fromRobberies;
+    if (typeof d?.fromChopShop === 'number') this.fromChopShop = d.fromChopShop;
     this.publish(0);
   }
 
@@ -80,6 +142,18 @@ export class EconomySystem implements GameSystem {
       return this.balance;
     },
     get: (): number => this.balance,
+    fee: (fraction: unknown, reason: unknown = 'debug'): number => this.fee(Number(fraction), String(reason)),
+    stats: (): {
+      earned: number;
+      spent: number;
+      fromRobberies: number;
+      fromChopShop: number;
+    } => ({
+      earned: this.earned,
+      spent: this.spent,
+      fromRobberies: this.fromRobberies,
+      fromChopShop: this.fromChopShop,
+    }),
   };
 }
 

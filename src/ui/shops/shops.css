@@ -1,0 +1,153 @@
+/* Bullet Barn store panel. Modal like the pause menu: captures the pointer, blocks gameplay input. */
+.shop-panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(20, 12, 4, 0.72), rgba(0, 0, 0, 0.9));
+  pointer-events: auto;
+  z-index: var(--z-menu);
+  font-family: var(--font-ui);
+}
+
+.shop-window {
+  width: min(760px, 92vw);
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(14, 11, 8, 0.96);
+  border: 1px solid rgba(255, 179, 71, 0.35);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+}
+
+.shop-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 18px 24px 12px;
+  border-bottom: 1px solid rgba(255, 179, 71, 0.25);
+}
+
+.shop-title {
+  font: 40px/1 var(--font-display);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #ffb347;
+  text-shadow: var(--shadow-text);
+}
+
+.shop-cash {
+  font: 26px/1 var(--font-display);
+  letter-spacing: 1px;
+  color: var(--color-cash);
+  text-shadow: var(--shadow-text);
+}
+
+.shop-list {
+  overflow-y: auto;
+  padding: 10px 14px;
+}
+
+.shop-row {
+  appearance: none;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 18px;
+  align-items: center;
+  width: 100%;
+  padding: 12px 16px;
+  border: 0;
+  border-left: 4px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  font: 15px var(--font-ui);
+}
+
+.shop-row + .shop-row {
+  margin-top: 4px;
+}
+
+.shop-row.selected,
+.shop-row:hover {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0b0b0f;
+  border-left-color: #ffb347;
+}
+
+.shop-row:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.shop-row:disabled.selected,
+.shop-row:disabled:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text);
+  border-left-color: transparent;
+}
+
+.shop-row-name {
+  font: 22px/1 var(--font-display);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.shop-row-sub {
+  display: block;
+  margin-top: 4px;
+  font: 12px var(--font-ui);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.shop-row-action {
+  font: 13px var(--font-ui);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.shop-row-price {
+  font: 22px/1 var(--font-display);
+  letter-spacing: 1px;
+  min-width: 90px;
+  text-align: right;
+}
+
+.shop-row.unaffordable .shop-row-price {
+  color: var(--color-cash-neg);
+}
+
+.shop-row.selected.unaffordable .shop-row-price,
+.shop-row:hover.unaffordable .shop-row-price {
+  color: #b00020;
+}
+
+.shop-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px 16px;
+  border-top: 1px solid rgba(255, 179, 71, 0.25);
+  font: 12px var(--font-ui);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.shop-msg {
+  min-height: 16px;
+  color: var(--color-text);
+}
+
+.shop-msg.denied {
+  color: var(--color-cash-neg);
+}
+
+.shop-msg.bought {
+  color: var(--color-cash);
+}

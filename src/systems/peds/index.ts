@@ -71,7 +71,7 @@ export class PedSystem implements GameSystem, IPedsPeer {
     this.controller.setMaxSlopeClimbAngle((50 * Math.PI) / 180);
     this.controller.setMinSlopeSlideAngle((55 * Math.PI) / 180);
     this.controller.setSlideEnabled(true);
-    this.renderer = new PedRenderer(game.worldRoot);
+    this.renderer = new PedRenderer(game.actorsRoot);
     this.spawner = new PedSpawner(game, this, this.rng);
     const playerPos = game.systems.has('player') ? game.player.position : ZERO;
     this.ctx = { game, playerPosition: playerPos, playerDistance: 0, peds: this, rng: this.rng, isNight: game.time.isNight };
@@ -257,7 +257,9 @@ export class PedSystem implements GameSystem, IPedsPeer {
         this.broadcast(position, PedConfig.flee.explosionRange, (distance) => toPedEvent({ type: 'explosion', position, distance }));
       }),
       ev.on('vehicle:horn', ({ vehicle }) => this.onHorn(vehicle)),
-      ev.on('vehicle:carjacked', ({ position, heading, driverTypeId }) => {
+      ev.on('vehicle:carjacked', ({ vehicle, position, heading, driverTypeId }) => {
+        // A real crew (police cruisers) bails on this same event; only virtual traffic drivers need a ped conjured.
+        if (vehicle.state.occupants.some((o) => o.kind === 'ped')) return;
         const ped = this.spawn(driverTypeId, position, { heading }) as Ped;
         ped.notify(toPedEvent({ type: 'carjacked', threat: this.ctx.playerPosition }));
       }),
@@ -268,11 +270,13 @@ export class PedSystem implements GameSystem, IPedsPeer {
     );
   }
 
-  private broadcast(position: V3, radius: number, make: (distance: number) => ReturnType<typeof toPedEvent>): void {
+  private broadcast(position: V3, radius: number, make: (distance: number) => ReturnType<typeof toPedEvent>, maxDy = 12): void {
     const buf = this.hash.query(position.x, position.z, radius, this.queryBuf);
     for (let i = 0; i < buf.length; i++) {
       const ped = buf[i];
       if (!ped.active || !ped.isAlive || ped.vehicle) continue;
+      // Interiors sit far above the city on the same x/z; a shot indoors must not alarm the street.
+      if (Math.abs(ped.position.y - position.y) > maxDy) continue;
       const dx = ped.position.x - position.x;
       const dz = ped.position.z - position.z;
       ped.notify(make(Math.sqrt(dx * dx + dz * dz)));
@@ -302,12 +306,15 @@ export class PedSystem implements GameSystem, IPedsPeer {
       ped.ragdoll(tmpV);
       this.game.events.emit('ped:knockedDown', { ped, source: vehicle });
       const len = Math.hypot(v.x, v.z);
-      ped.applyDamage({
-        type: 'vehicle',
+      // Through the damage system so a fatal run-over emits `entity:killed` / `kill_ped`
+      // (attributed to the player when they are driving), like every other kill.
+      const info = {
+        type: 'vehicle' as const,
         amount: speed * RD.damagePerMs,
-        source: vehicle,
+        source: vehicle.driverEntity?.kind === 'player' ? ('player' as const) : vehicle,
         direction: len > 1e-3 ? { x: v.x / len, y: 0, z: v.z / len } : undefined,
-      });
+      };
+      if (!this.game.damage?.apply(ped, info)) ped.applyDamage(info);
     } else {
       ped.knockDown(vehicle, speed);
     }

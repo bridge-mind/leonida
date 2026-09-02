@@ -7,10 +7,11 @@ describe('weapon table', () => {
   it('matches SYSTEM_PROMPT §8', () => {
     expect(WEAPON_ORDER).toEqual(['fists', 'pistol', 'smg', 'shotgun', 'rifle', 'sniper']);
     expect(WEAPONS.pistol).toMatchObject({ damage: 25, rpm: 300, magazine: 12, range: 60, spreadDeg: 1.5, price: 500, ammoPrice: 30 });
-    expect(WEAPONS.smg).toMatchObject({ damage: 18, rpm: 800, magazine: 30, range: 45, spreadDeg: 3, price: 1500, ammoPrice: 60, automatic: true });
-    expect(WEAPONS.shotgun).toMatchObject({ damage: 12, pellets: 8, rpm: 70, magazine: 8, range: 20, spreadDeg: 8, price: 1200, ammoPrice: 50 });
-    expect(WEAPONS.rifle).toMatchObject({ damage: 30, rpm: 600, magazine: 30, range: 90, spreadDeg: 2, price: 3000, ammoPrice: 80, automatic: true });
-    expect(WEAPONS.sniper).toMatchObject({ damage: 200, rpm: 40, magazine: 5, range: 300, spreadDeg: 0, price: 5000, ammoPrice: 100 });
+    // Prices mirror data/prices.ts (WEAPON_PRICES), the authoritative store table.
+    expect(WEAPONS.smg).toMatchObject({ damage: 18, rpm: 800, magazine: 30, range: 45, spreadDeg: 3, price: 1200, ammoPrice: 60, automatic: true });
+    expect(WEAPONS.shotgun).toMatchObject({ damage: 12, pellets: 8, rpm: 70, magazine: 8, range: 20, spreadDeg: 8, price: 1500, ammoPrice: 80 });
+    expect(WEAPONS.rifle).toMatchObject({ damage: 30, rpm: 600, magazine: 30, range: 90, spreadDeg: 2, price: 3000, ammoPrice: 100, automatic: true });
+    expect(WEAPONS.sniper).toMatchObject({ damage: 200, rpm: 40, magazine: 5, range: 300, spreadDeg: 0, price: 5000, ammoPrice: 150 });
     expect(WEAPONS.fists).toMatchObject({ damage: 15, range: 1.5, rpm: 0, magazine: 0 });
     for (const id of WEAPON_ORDER) {
       const def = WEAPONS[id];

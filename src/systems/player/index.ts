@@ -159,10 +159,11 @@ export class PlayerSystem implements GameSystem {
   }
 
   private respawn(reason: 'wasted' | 'busted'): void {
+    // 'wasted' hospital fee is owned by the economy system (on `player:respawned`); only bail is billed here.
     const economy = this.game.economy;
-    if (economy) {
+    if (economy && reason === 'busted') {
       const loss = Math.min(P.deathCashMax, Math.floor(economy.cash * P.deathCashFraction));
-      if (loss > 0) economy.trySpend(loss, reason === 'wasted' ? 'hospital' : 'bail');
+      if (loss > 0) economy.trySpend(loss, 'bail');
     }
     const point = this.respawnPoint(reason);
     this.entity.respawn(point, point.heading, reason);
@@ -210,8 +211,9 @@ export class PlayerSystem implements GameSystem {
     const d = data as { x: number; y: number; z: number; heading: number; health: number; armor: number };
     if (!d || typeof d.x !== 'number') return;
     this.teleport({ x: d.x, y: d.y, z: d.z }, d.heading);
-    this.entity.health = d.health;
-    this.entity.armor = d.armor;
+    // A save written mid-death would otherwise resume with 0 hp but `isAlive` true.
+    if (typeof d.health === 'number' && Number.isFinite(d.health)) this.entity.health = Math.max(1, d.health);
+    if (typeof d.armor === 'number' && Number.isFinite(d.armor)) this.entity.armor = Math.max(0, d.armor);
   }
 
   debugActions = {

@@ -32,7 +32,7 @@ export class PickupSystem implements GameSystem, IPickupsPeer {
   constructor(private readonly game: Game) {}
 
   init(): void {
-    this.renderer = new PickupRenderer(this.game.worldRoot);
+    this.renderer = new PickupRenderer(this.game.actorsRoot);
   }
 
   get count(): number {

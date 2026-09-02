@@ -34,7 +34,6 @@ export class CasinoSystem implements GameSystem, ICasinoPeer {
   private crimePending = false;
   private warnedMissing = false;
   private activePanel: CasinoPanel | null = null;
-  private ambient: ReturnType<Game['audio']['loop']> | null = null;
   private readonly rngSource = Random.unseeded();
   readonly rng = (): number => this.rngSource.next();
   readonly rig = new CasinoRig();
@@ -291,7 +290,7 @@ export class CasinoSystem implements GameSystem, ICasinoPeer {
     }
     this.inside = true;
     this.guards.spawn();
-    this.ambient = this.game.audio.loop('casino.ambient.loop', { volume: 0.6 });
+    // Ambient bed: the audio system's AmbientManager already plays `casino.ambient.loop` from `state.interior`.
     this.game.events.emit('casino:entered', { id: 'casino' });
   }
 
@@ -301,10 +300,6 @@ export class CasinoSystem implements GameSystem, ICasinoPeer {
     this.inside = false;
     this.closePanel();
     this.guards.despawn();
-    if (this.ambient) {
-      this.game.audio.stop(this.ambient);
-      this.ambient = null;
-    }
     if (wasInside) this.game.events.emit('casino:exited', { id: 'casino' });
     if (this.crimePending) {
       this.crimePending = false;
@@ -355,7 +350,6 @@ export class CasinoSystem implements GameSystem, ICasinoPeer {
   dispose(): void {
     this.closePanel();
     this.guards.despawn();
-    if (this.ambient) this.game.audio.stop(this.ambient);
   }
 
   serialize(): unknown {
