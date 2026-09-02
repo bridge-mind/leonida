@@ -4,7 +4,17 @@ A GTA VI-style open-world crime sandbox that runs in the browser. Vice City, Sta
 stylized low-poly city in Three.js with Rapier physics. Everything — buildings, cars, people, audio — is generated
 from code; there are no downloaded assets.
 
-Non-commercial fan project for testing. No Rockstar assets, logos, fonts or music are used.
+Non-commercial fan project for testing. No Rockstar assets, logos, fonts or music are used. Grand Theft Auto, GTA and
+related names are trademarks of Take-Two Interactive; this project is not affiliated with or endorsed by Rockstar Games
+or Take-Two.
+
+## Play it
+
+**https://bridge-mind.github.io/leonida/** — built from `main` on every push by [GitHub Actions](.github/workflows/deploy.yml).
+Desktop Chrome, Edge or Firefox with WebGL2 and a keyboard + mouse; no mobile support.
+
+Found a bug? [Open an issue](https://github.com/bridge-mind/leonida/issues) with the URL you used, the console output
+and the results of the debug actions listed under [Debugging](#debugging).
 
 ## Run it
 
@@ -27,7 +37,7 @@ npm run smoke      # headless boot check (writes docs/screenshots/<name>.png + .
 
 ## What is in the game
 
-See [docs/PROGRESS.md](docs/PROGRESS.md) for the authoritative, per-system status (works / cut / known bugs / how to test). Current build: typechecked, unit-tested and code-reviewed, **not yet run in a browser** — expect first-run issues.
+See [docs/PROGRESS.md](docs/PROGRESS.md) for the authoritative, per-system status (works / cut / known bugs / how to test). Current build: typechecked, unit-tested, code-reviewed and boots headlessly with zero console errors (`npm run smoke`), but it has had **very little hands-on play-testing** — expect rough edges and please report them.
 
 - **World**: 2 km × 2 km Vice City with six districts (Vice Beach, Downtown, Little Habana, Port Gellhorn, the Docks, Grassrivers), a causeway, highways, water, and a 24-minute day/night cycle with neon and street lamps at dusk. No swimming, weather or boats.
 - **On foot**: third-person GTA camera, sprint, jump, aim, health/armor, WASTED → hospital.
@@ -64,3 +74,8 @@ src/missions   story missions
 src/data       tunable tables (weapons, vehicles, peds, prices, landmarks, dialogue)
 docs           TEAM-PLAN, PROGRESS, per-system progress notes, screenshots
 ```
+
+## License
+
+Code is released under the [MIT License](LICENSE). Character names and the setting are fan-fiction references to an
+unreleased Rockstar Games title and remain the property of their respective owners.
