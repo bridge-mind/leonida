@@ -253,6 +253,7 @@ export class WeaponSystem implements GameSystem, IWeaponsPeer {
     p.halfAngle = spreadHalfAngle(def.spreadDeg) * (this.aiming || player.isMounted ? 1 : C.hipFireSpreadMul);
     p.exclude = this.excludeEntity();
     p.shooter = 'player';
+    p.damageMultiplier = player.entity.stats.damageMultiplier;
     p.exactFirst = C.exactScriptedAim && game.input.mouseWorld !== null;
     this.hitscan.fire(p);
 
@@ -262,7 +263,8 @@ export class WeaponSystem implements GameSystem, IWeaponsPeer {
     stats.shotsFired = (stats.shotsFired ?? 0) + 1;
     if (game.systems.has('camera')) {
       const cam = game.camera;
-      cam.pitch = MathUtils.clamp(cam.pitch - def.recoil, Config.camera.pitchMin, Config.camera.pitchMax);
+      const recoil = def.recoil * player.entity.stats.recoilMultiplier;
+      cam.pitch = MathUtils.clamp(cam.pitch - recoil, Config.camera.pitchMin, Config.camera.pitchMax);
       cam.fovKick(C.recoil.fovKick);
       cam.shake(C.recoil.shake, C.recoil.shakeSeconds);
     }

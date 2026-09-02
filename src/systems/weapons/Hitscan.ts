@@ -43,6 +43,8 @@ export interface FireParams {
   halfAngle: number;
   /** Shooter's own entity (or vehicle) to ignore. */
   exclude: Entity | null;
+  /** Scales `def.damage` (character abilities); undefined = 1. */
+  damageMultiplier?: number;
   shooter: Entity | 'player';
   /** First projectile flies exactly along `direction` (scripted aim). */
   exactFirst: boolean;
@@ -74,7 +76,7 @@ export class Hitscan {
     for (let i = 0; i < def.pellets; i++) {
       if (i === 0 && p.exactFirst) this.dir.set(p.direction.x, p.direction.y, p.direction.z);
       else randomInCone(p.direction, p.halfAngle, this.dir);
-      this.castProjectile(def, p.origin, this.dir, p.exclude, p.shooter, this.end);
+      this.castProjectile(def, p.origin, this.dir, p.exclude, p.shooter, this.end, p.damageMultiplier ?? 1);
       this.game.particles?.emit('tracer', p.muzzle, { end: this.end });
     }
     this.game.particles?.emit('muzzleFlash', p.muzzle, { direction: p.direction });
@@ -90,7 +92,15 @@ export class Hitscan {
   }
 
   /** Casts one projectile; writes the end point (hit or max range) to `outEnd` and returns the entity hit. */
-  castProjectile(def: WeaponDef, origin: V3, dir: Vector3, exclude: Entity | null, shooter: Entity | 'player', outEnd: Vector3): Entity | null {
+  castProjectile(
+    def: WeaponDef,
+    origin: V3,
+    dir: Vector3,
+    exclude: Entity | null,
+    shooter: Entity | 'player',
+    outEnd: Vector3,
+    damageMultiplier = 1,
+  ): Entity | null {
     const h = this.game.physics.raycastInto(this.hit, origin, dir, def.range, {
       groups: Groups.STATIC | Groups.VEHICLE | Groups.PED,
       exclude: exclude ?? undefined,
@@ -107,7 +117,7 @@ export class Hitscan {
       const part: BodyPart = h.point.y - entity.position.y > headHeight ? 'head' : 'body';
       // Fresh objects: damage consumers may hold on to point/direction (ragdoll, decals).
       const info: DamageInfo = {
-        amount: def.damage,
+        amount: def.damage * damageMultiplier,
         type: 'bullet',
         point: { x: h.point.x, y: h.point.y, z: h.point.z },
         direction: { x: dir.x, y: dir.y, z: dir.z },

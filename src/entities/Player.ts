@@ -60,6 +60,8 @@ export class Player implements Entity, IDamageable {
   /** Seconds since last damage (drives regen). */
   sinceDamage = Infinity;
   moveSpeed01 = 0;
+  /** Per-character tuning (characters system): 1 = baseline. */
+  readonly stats = { sprintMultiplier: 1, recoilMultiplier: 1, damageMultiplier: 1 };
 
   readonly cameraTarget: CameraTarget;
 
@@ -125,7 +127,7 @@ export class Player implements Entity, IDamageable {
     }
 
     this.aiming = input.aiming;
-    const maxSpeed = input.walk ? P.walkSpeed : input.sprint ? P.sprintSpeed : P.runSpeed;
+    const maxSpeed = input.walk ? P.walkSpeed : input.sprint ? P.sprintSpeed * this.stats.sprintMultiplier : P.runSpeed;
     const len = Math.hypot(input.x, input.y);
     const ix = len > 1 ? input.x / len : input.x;
     const iy = len > 1 ? input.y / len : input.y;
