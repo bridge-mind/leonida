@@ -61,6 +61,11 @@
 .title-buttons .menu-button {
   font-size: 28px;
   padding: 12px 20px;
+}
+
+/* Not on the selected/hovered item: this rule ties `.menu-button.selected` on
+   specificity and loads later, which left dark text on a dark background. */
+.title-buttons .menu-button:not(.selected):not(:hover) {
   background: rgba(0, 0, 0, 0.45);
 }
 
