@@ -148,7 +148,12 @@ export class StoreKit {
     const hd = (quarter ? w : d) / 2;
     const o = this.ctx.origin;
     this.tmp.set(o.x + x + this.ox, o.y + y + h / 2, o.z + z);
-    this.ctx.physics.addStaticCuboid({ x: hw, y: h / 2, z: hd }, this.tmp);
+    // addStaticCuboid(center, halfExtents). Swapping these puts a city-sized
+    // box at the origin and leaves the room with no floor.
+    this.ctx.physics.addStaticCuboid(
+      { x: this.tmp.x, y: this.tmp.y, z: this.tmp.z },
+      { x: hw, y: h / 2, z: hd },
+    );
   }
 
   light(parent: Group, color: number, intensity: number, distance: number, x: number, y: number, z: number): PointLight {
