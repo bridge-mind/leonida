@@ -59,7 +59,7 @@ export interface GameEvents {
   'save:loaded': { slot: string };
 
   // --- Cross-system events (payload shapes are binding; see docs/TEAM-PLAN.md §3.3) ---
-  'vehicle:entered': { vehicle: IVehicle; who: Entity; seat: number };
+  'vehicle:entered': { vehicle: IVehicle; who: Entity; seat: number; alreadyClaimed: boolean };
   'vehicle:exited': { vehicle: IVehicle; who: Entity };
   'vehicle:damaged': { vehicle: IVehicle; amount: number; source: Entity | 'player' | null };
   'vehicle:exploded': { vehicle: IVehicle; position: V3 };
