@@ -1,5 +1,6 @@
 import { Config } from '../../core/Config';
 import type { Game } from '../../core/Game';
+import { WeaponsConfig } from '../weapons/config';
 import { UiConfig } from './config';
 
 /**
@@ -54,6 +55,7 @@ export function saveSettings(settings: Settings): void {
 export function applySettings(game: Game, s: Settings): void {
   const { sensitivityMin, sensitivityMax } = UiConfig.settings;
   Config.camera.mouseSensitivity = Math.min(sensitivityMax, Math.max(sensitivityMin, s.mouseSensitivity));
+  WeaponsConfig.aimAssist = s.aimAssist;
   game.audio.setBusVolume('master', s.masterVolume);
   game.audio.setBusVolume('sfx', s.sfxVolume);
   game.audio.setBusVolume('music', s.musicVolume);
