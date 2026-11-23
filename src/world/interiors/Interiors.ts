@@ -185,6 +185,26 @@ export class Interiors {
     return true;
   }
 
+  /**
+   * Shows an interior the player is already standing in (a save written at the
+   * safehouse bed). No fade and no teleport: the player system restores the
+   * saved coordinates, which are in interior space, hundreds of metres up.
+   */
+  restore(id: string): boolean {
+    const def = this.definitions.get(id);
+    if (!def || this.current === id) return this.current === id;
+    if (this.current) this.deactivate(this.current);
+    const handle = this.getHandle(def);
+    const root = this.roots.get(id) as Group;
+    root.visible = true;
+    this.game.worldRoot.visible = false;
+    this.current = id;
+    this.game.state.interior = id;
+    handle.onEnter?.();
+    this.game.events.emit('interior:entered', { id });
+    return true;
+  }
+
   async exit(): Promise<boolean> {
     const id = this.current;
     if (!id || this.transitioning) return false;

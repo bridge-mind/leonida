@@ -39,6 +39,16 @@ export class InteriorsSystem implements GameSystem {
     return this.framework.exit();
   }
 
+  serialize(): unknown {
+    return { id: this.framework.current };
+  }
+
+  /** Continue after sleeping indoors must reopen that interior, or the saved height is open sky. */
+  deserialize(data: unknown): void {
+    const id = (data as { id?: unknown } | null)?.id;
+    if (typeof id === 'string') this.framework.restore(id);
+  }
+
   get current(): string | null {
     return this.framework.current;
   }
