@@ -4,8 +4,8 @@ import { applySettings, loadSettings, saveSettings, type Settings as SettingsDat
 import { el } from './dom';
 import './menu.css';
 
-type NumericKey = 'mouseSensitivity' | 'masterVolume' | 'sfxVolume' | 'musicVolume';
-type BoolKey = 'aimAssist' | 'shadows';
+type NumericKey = 'mouseSensitivity' | 'masterVolume' | 'sfxVolume' | 'musicVolume' | 'drawDistance';
+type BoolKey = 'invertY' | 'shadows' | 'bloom' | 'aimAssist';
 
 /**
  * Settings form for the pause menu. Every change applies immediately and is persisted
@@ -19,14 +19,17 @@ export class SettingsPanel {
     this.data = loadSettings();
     applySettings(game, this.data);
     this.el = el('div', 'settings');
-    const { sensitivityMin, sensitivityMax } = UiConfig.settings;
+    const { sensitivityMin, sensitivityMax, drawMin, drawMax } = UiConfig.settings;
     this.el.append(
       this.slider('Mouse sensitivity', 'mouseSensitivity', sensitivityMin, sensitivityMax, (v) => `${Math.round((v / sensitivityMax) * 100)}`),
+      this.toggle('Invert Y', 'invertY'),
+      this.toggle('Shadows', 'shadows'),
+      this.slider('Draw distance', 'drawDistance', drawMin, drawMax, (v) => `${Math.round(v * 100)}%`),
+      this.toggle('Bloom', 'bloom'),
       this.slider('Master volume', 'masterVolume', 0, 1, percent),
       this.slider('Effects volume', 'sfxVolume', 0, 1, percent),
       this.slider('Music volume', 'musicVolume', 0, 1, percent),
       this.toggle('Aim assist', 'aimAssist'),
-      this.toggle('Shadows', 'shadows'),
       el('div', 'settings-note', 'Settings apply immediately and persist between sessions.'),
     );
   }

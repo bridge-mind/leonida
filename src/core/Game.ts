@@ -7,6 +7,7 @@ import {
   WebGLRenderer,
 } from 'three';
 import { Debug } from '../debug/Debug';
+import { BloomView } from '../gfx/Bloom';
 import { Physics } from '../physics/Physics';
 import { NullAudio, type AudioApi } from '../systems/audio/api';
 import type { CameraSystem } from '../systems/camera';
@@ -74,6 +75,7 @@ export class Game {
   private lastFrameMs = 0;
   private running = false;
   private rafId = 0;
+  private bloomView: BloomView | null = null;
 
   constructor(readonly canvas: HTMLCanvasElement) {
     this.params = new URLSearchParams(window.location.search);
@@ -267,6 +269,7 @@ export class Game {
       this.call(entry, () => entry.instance.dispose?.());
     }
     this.physics.dispose();
+    this.bloomView?.dispose();
     this.renderer.dispose();
   }
 
@@ -304,7 +307,8 @@ export class Game {
     this.state.day = this.time.day;
 
     this.renderer.info.reset();
-    this.renderer.render(this.scene, this.viewCamera);
+    if (Config.render.bloom) this.ensureBloom().render();
+    else this.renderer.render(this.scene, this.viewCamera);
     this.perf.drawCalls = this.renderer.info.render.calls;
     this.perf.triangles = this.renderer.info.render.triangles;
     this.perf.bodies = this.physics.world.bodies.len();
@@ -345,5 +349,11 @@ export class Game {
     this.renderer.setSize(w, h, false);
     this.viewCamera.aspect = w / h;
     this.viewCamera.updateProjectionMatrix();
+    this.bloomView?.setSize(w, h, this.renderer.getPixelRatio());
+  }
+
+  private ensureBloom(): BloomView {
+    if (!this.bloomView) this.bloomView = new BloomView(this.renderer, this.scene, this.viewCamera);
+    return this.bloomView;
   }
 }

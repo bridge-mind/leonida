@@ -11,6 +11,9 @@ export const Config = {
     near: 0.3,
     far: 3000,
     shadows: true,
+    /** 1 is the authored fog and camera far. The pause menu scales this. */
+    drawDistance: 1,
+    bloom: false,
     shadowMapSize: 2048,
     /** Half-extent of the shadow camera box that follows the player. */
     shadowHalfExtent: 60,
@@ -116,6 +119,8 @@ export const Config = {
     pitchMin: -0.55,
     pitchMax: 1.2,
     mouseSensitivity: 0.0022,
+    /** Pause menu. Off matches a normal look: mouse down pitches down. */
+    invertY: false,
     collisionRadius: 0.3,
     pivotHeight: 1.3,
     shakeFrequency: 28,
