@@ -13,10 +13,11 @@ export class MenuNav {
     this.items = items;
     for (let i = 0; i < items.length; i++) {
       items[i].addEventListener('mouseenter', () => this.select(i, false));
+      items[i].addEventListener('click', () => this.select(i, true));
     }
     this.select(Math.min(this.index, items.length - 1), false);
   }
-
+  
   get current(): HTMLButtonElement | null {
     return this.items[this.index] ?? null;
   }
