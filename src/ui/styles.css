@@ -61,7 +61,12 @@ body {
   z-index: var(--z-hud);
 }
 
-#ui > * {
+/*
+ * Zero specificity on purpose: a bare `#ui > *` outranks every component's own
+ * `pointer-events: none`, which left full-screen overlays (ability FX, HUD, cards)
+ * click-opaque and made the title and pause menus unclickable.
+ */
+:where(#ui > *) {
   pointer-events: auto;
 }
 
