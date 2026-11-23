@@ -133,7 +133,7 @@ export function winAtCasino(amount: number, target: V3 | null, text: string): Ob
       ];
     },
     update(ctx) {
-      obj.text = `${text} ~y~$${Math.max(0, net).toLocaleString()} / $${amount.toLocaleString()}~y~`;
+      obj.text = `${text} ~y~$${Math.max(0, net).toLocaleString('en-US')} / $${amount.toLocaleString('en-US')}~y~`;
       if (net >= amount) return 'done';
       const casino = ctx.game.casino;
       const cash = ctx.game.economy?.cash ?? Infinity;
