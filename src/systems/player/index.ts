@@ -7,6 +7,19 @@ import { Player, type PlayerMoveInput } from '../../entities/Player';
 
 const P = Config.player;
 
+/** Short downward probe that starts just above a saved height. */
+export const CONTINUE_PROBE = { above: 2, drop: 8 } as const;
+
+/**
+ * Feet height for Continue. `ground` is the hit of that short probe, or null.
+ * A miss keeps the saved height: the room may not be loaded yet, and a jump
+ * must not be pulled down onto the street.
+ */
+export function continueFeetY(savedY: number, ground: number | null): number {
+  if (ground === null || !Number.isFinite(ground)) return savedY;
+  return ground + 0.05;
+}
+
 /**
  * Drives the Player entity from input, handles death/respawn, and publishes
  * player state. Public API used by other agents: `entity`, `mount`, `dismount`,
@@ -210,7 +223,13 @@ export class PlayerSystem implements GameSystem {
   deserialize(data: unknown): void {
     const d = data as { x: number; y: number; z: number; heading: number; health: number; armor: number };
     if (!d || typeof d.x !== 'number') return;
-    this.teleport({ x: d.x, y: d.y, z: d.z }, d.heading);
+    // The default teleport probes from y = 200, so a save inside a room (y ≈ 600)
+    // lands on the street. Probe just around the saved height instead, and do not
+    // let the first-tick city snap run afterwards.
+    const savedY = typeof d.y === 'number' && Number.isFinite(d.y) ? d.y : 0;
+    const ground = this.game.physics.groundHeightAt(d.x, d.z, savedY + CONTINUE_PROBE.above, CONTINUE_PROBE.drop);
+    this.needsGroundSnap = false;
+    this.teleport({ x: d.x, y: continueFeetY(savedY, ground), z: d.z }, d.heading, false);
     // A save written mid-death would otherwise resume with 0 hp but `isAlive` true.
     if (typeof d.health === 'number' && Number.isFinite(d.health)) this.entity.health = Math.max(1, d.health);
     if (typeof d.armor === 'number' && Number.isFinite(d.armor)) this.entity.armor = Math.max(0, d.armor);
