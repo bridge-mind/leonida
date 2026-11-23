@@ -148,7 +148,7 @@ export class StoreKit {
     const hd = (quarter ? w : d) / 2;
     const o = this.ctx.origin;
     this.tmp.set(o.x + x + this.ox, o.y + y + h / 2, o.z + z);
-    this.ctx.physics.addStaticCuboid({ x: hw, y: h / 2, z: hd }, this.tmp);
+    this.ctx.physics.addStaticCuboid(this.tmp, { x: hw, y: h / 2, z: hd });
   }
 
   light(parent: Group, color: number, intensity: number, distance: number, x: number, y: number, z: number): PointLight {
