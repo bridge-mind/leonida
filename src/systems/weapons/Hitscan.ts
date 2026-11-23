@@ -10,6 +10,8 @@ import { isDummy } from './Dummy';
 import { randomInCone } from './spread';
 
 const DEFAULT_HEAD_HEIGHT = 1.5;
+const PLAYER_SHOT_GROUPS = Groups.STATIC | Groups.VEHICLE | Groups.PED;
+const NPC_SHOT_GROUPS = PLAYER_SHOT_GROUPS | Groups.PLAYER;
 
 interface SurfaceFx {
   effect: ParticleEffectId;
@@ -101,8 +103,11 @@ export class Hitscan {
     outEnd: Vector3,
     damageMultiplier = 1,
   ): Entity | null {
+    // The player's capsule lives in its own collision group: NPC shots must query it too,
+    // otherwise no bullet can ever reach the player.
+    const groups = shooter === 'player' ? PLAYER_SHOT_GROUPS : NPC_SHOT_GROUPS;
     const h = this.game.physics.raycastInto(this.hit, origin, dir, def.range, {
-      groups: Groups.STATIC | Groups.VEHICLE | Groups.PED,
+      groups,
       exclude: exclude ?? undefined,
     });
     if (!h) {
