@@ -49,6 +49,7 @@ See [docs/PROGRESS.md](docs/PROGRESS.md) for the authoritative, per-system statu
 - **Casino**: Leonida Palms — blackjack (full rules, unit-tested), American roulette, slots, Lucky Wheel, cashier, guards.
 - **Story**: eight missions for Lucia and Jason with cutscenes, two repeatable jobs after the finale, an AI companion, Q character switching and the Caps Lock adrenaline ability.
 - **Meta**: minimap and full map with GPS routing, HUD, notifications, pause menu with settings, phone (contacts, map, Snapmatic, parody feed), per-system save/load (wanted level and police units are not saved).
+- **Mods**: not available in the game you play on GitHub Pages. There is no Mods button and nothing is loaded from the network or from a folder next to the page. A source build can compile a mod in: add `src/mods/<id>/index.ts` that default-exports `{ id, setup(game) }` with the same `id` as the folder. `setup` runs once, after the built-in systems and before `game:ready`. `__game.debug.run('core.mods')` lists the ones that started. The hosted build ships none.
 
 Known first-run blocker: the player, peds and pickups are currently invisible inside interiors (they are parented to the hidden world root); see `docs/PROGRESS.md` §4.
 
@@ -68,6 +69,7 @@ src/physics    Rapier wrapper
 src/world      road graph, city generator, districts, landmarks, water, day/night, interiors
 src/entities   Player, Vehicle, Ped, Pickup
 src/systems    one folder per system (world, player, camera, vehicles, traffic, peds, ...)
+src/mods       optional compiled-in mods (empty in the hosted build; see Mods above)
 src/ui         HTML/CSS overlays
 src/casino     pure game logic (unit-tested)
 src/missions   story missions

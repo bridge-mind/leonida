@@ -47,6 +47,7 @@ export class Debug {
     });
     this.register('core', {
       systems: () => game.systems.all.map((e) => ({ id: e.id, enabled: e.enabled, priority: e.module.priority })),
+      mods: () => game.mods.slice(),
       perf: () => game.perf.toJSON(),
       save: () => game.save.save(),
       load: () => game.save.load(),

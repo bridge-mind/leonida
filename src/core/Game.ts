@@ -36,6 +36,7 @@ import type {
   IWeaponsPeer,
 } from './peers';
 import { Perf } from './Perf';
+import { loadMods, startMods, type GameMod } from './mods';
 import { Save } from './Save';
 import { SystemRegistry, type GameSystem, type SystemEntry, type SystemModule } from './System';
 import { Time } from './Time';
@@ -66,6 +67,8 @@ export class Game {
   readonly perf = new Perf();
   readonly debug: Debug;
   readonly systems = new SystemRegistry();
+  /** Ids of compiled-in mods whose `setup` finished. Empty on the hosted build. */
+  readonly mods: string[] = [];
   readonly params: URLSearchParams;
   readonly nullAudio = new NullAudio();
 
@@ -236,6 +239,7 @@ export class Game {
 
     // One warm-up step so scene queries (raycasts) see every collider created during init.
     this.physics.step(Config.loop.fixedDt);
+    await this.bootMods();
     this.ready = true;
     this.events.emit('game:ready', { systems: this.systems.ids });
     (window as unknown as { __GAME_READY__: boolean }).__GAME_READY__ = true;
@@ -243,6 +247,16 @@ export class Game {
     this.lastFrameMs = performance.now();
     this.rafId = requestAnimationFrame((t) => this.frame(t));
     await this.debug.afterReady();
+  }
+
+  /** `src/mods/<id>/index.ts` modules compiled into this build. A failure stays in the console. */
+  private async bootMods(): Promise<void> {
+    const loaders = import.meta.glob('../mods/*/index.ts') as Record<string, () => Promise<{ default?: GameMod }>>;
+    const report = await loadMods(loaders);
+    for (const err of report.errors) console.error(`[mod:${err.id}] ${err.reason}`);
+    const started = await startMods(this, report.mods);
+    for (const err of started.errors) console.error(`[mod:${err.id}] ${err.reason}`);
+    this.mods.push(...started.ids);
   }
 
   private parseSystemsFilter(): Set<string> | null {
