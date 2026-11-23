@@ -2,6 +2,7 @@ import type { Quaternion } from 'three';
 import type { V3 } from '../../core/entities';
 import type { Game } from '../../core/Game';
 import { PRIORITY, type GameSystem, type SystemModule } from '../../core/System';
+import { applySettings, loadSettings } from '../ui/settings';
 import { AmbientManager } from './ambientManager';
 import type { AudioApi, AudioBus, LoopHandle, LoopParams, PlayOptions } from './api';
 import { AudioConfig } from './config';
@@ -62,6 +63,9 @@ export class AudioSystem implements GameSystem, AudioApi {
     }
     this.offs.push(this.game.events.on('ui:newGame', this.onGesture), this.game.events.on('ui:continue', this.onGesture));
     this.cues.attach();
+    // The pause menu applies settings while this system is still unregistered, so that
+    // call hits the silent stub. Re-apply now that `game.audio` is this system.
+    applySettings(this.game, loadSettings());
   }
 
   update(dt: number): void {
