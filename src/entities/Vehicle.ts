@@ -80,6 +80,8 @@ export class Vehicle implements IVehicle {
   /** Instance slot in the VehicleRenderer, -1 while pooled. */
   slot = -1;
   playerDriven = false;
+  /** Stays set after the player has sat in this car, so getting back in is not a new theft. */
+  claimedByPlayer = false;
   /** Headlights: null follows the night level, true/false is the L toggle. */
   lightsOverride: boolean | null = null;
   /** Ped type of the virtual traffic driver (spawned as a real ped on carjack/panic). */
@@ -160,6 +162,7 @@ export class Vehicle implements IVehicle {
     this.color = color;
     this.isAlive = true;
     this.playerDriven = false;
+    this.claimedByPlayer = false;
     this.driver = null;
     this.driverTypeId = null;
     this.lightsOverride = null;
@@ -212,6 +215,7 @@ export class Vehicle implements IVehicle {
     this.driver?.dispose?.();
     this.driver = null;
     this.playerDriven = false;
+    this.claimedByPlayer = false;
     this.isAlive = false;
     this.object3d.visible = false;
     this.seats.fill(null);
@@ -351,13 +355,15 @@ export class Vehicle implements IVehicle {
     if (idx < 0) return -1;
     this.seats[idx] = who;
     this.rebuildOccupants();
+    const alreadyClaimed = this.claimedByPlayer;
+    if (who.kind === 'player') this.claimedByPlayer = true;
     if (idx === 0 && who.kind === 'player') {
       this.playerDriven = true;
       this.driverTypeId = null;
       this.body.wakeUp();
       this.body.enableCcd(true);
     }
-    this.game.events.emit('vehicle:entered', { vehicle: this, who, seat: idx });
+    this.game.events.emit('vehicle:entered', { vehicle: this, who, seat: idx, alreadyClaimed });
     return idx;
   }
 

@@ -40,10 +40,15 @@ export function subscribeCrimes(game: Game, sink: CrimeSink): () => void {
       if (e.info.type === 'bullet' || e.info.type === 'melee') sink.crime('hit_cop', e.target.position, e.info.type === 'bullet');
     }),
     ev.on('vehicle:entered', (e) => {
-      if (e.vehicle.isPolice && e.who.kind === 'player') sink.crime('steal_police_vehicle', e.vehicle.position, false);
+      if (isFreshPoliceTheft(e.vehicle, e.who, e.alreadyClaimed)) sink.crime('steal_police_vehicle', e.vehicle.position, false);
     }),
   ];
   return () => offs.forEach((off) => off());
+}
+
+/** First time the player sits in a cruiser. Getting back into one they already took is not another theft. */
+export function isFreshPoliceTheft(vehicle: { isPolice: boolean }, who: { kind: string }, alreadyClaimed: boolean): boolean {
+  return vehicle.isPolice && who.kind === 'player' && !alreadyClaimed;
 }
 
 /** Who saw the crime: a cop nearby counts as direct sight, a civilian as a phone-call witness. */
