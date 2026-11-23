@@ -162,7 +162,7 @@ export class MissionSystem implements GameSystem, IMissionsPeer {
     game.state.stats.missionsPassed = (game.state.stats.missionsPassed ?? 0) + 1;
     game.events.emit('mission:passed', { id: run.def.id, reward });
     game.save.save();
-    await game.ui?.card('missionPassed', reward > 0 ? `+$${reward.toLocaleString()}` : 'Mission Passed', this.cardSeconds);
+    await game.ui?.card('missionPassed', reward > 0 ? `+$${reward.toLocaleString('en-US')}` : 'Mission Passed', this.cardSeconds);
     this.refreshMarkers();
   }
 
