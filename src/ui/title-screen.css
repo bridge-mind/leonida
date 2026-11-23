@@ -64,6 +64,15 @@
   background: rgba(0, 0, 0, 0.45);
 }
 
+/* More specific than `.menu-button.selected`, so the light selected/hover
+   background has to be restated here or the label stays near-black on the dark wash. */
+.title-buttons .menu-button.selected:not(:disabled),
+.title-buttons .menu-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0b0b0f;
+  text-shadow: none;
+}
+
 .title-footer {
   position: absolute;
   left: 9vw;
