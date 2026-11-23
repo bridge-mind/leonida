@@ -143,8 +143,15 @@ export class DayNight {
 
     sampleKeys(HORIZON_KEYS, e, this.horizonColor);
     this.fog.color.copy(this.horizonColor);
+    const reach = Config.render.drawDistance;
     this.fog.near = DN.fogNear;
-    this.fog.far = DN.fogFar * (isDay ? 1 : 0.75);
+    this.fog.far = DN.fogFar * (isDay ? 1 : 0.75) * reach;
+    const far = Config.render.far * reach;
+    const cam = this.game.viewCamera;
+    if (cam.far !== far) {
+      cam.far = far;
+      cam.updateProjectionMatrix();
+    }
 
     // Hemisphere: sky tint above, warm ground bounce below; deep blue at night.
     const dayAmount = MathUtils.smoothstep(e, -0.12, 0.2);

@@ -80,5 +80,8 @@ export const UiConfig = {
     storageKey: 'leonida.settings',
     sensitivityMin: 0.0008,
     sensitivityMax: 0.005,
+    /** Fraction of the authored fog and camera far. */
+    drawMin: 0.45,
+    drawMax: 1.6,
   },
 } as const;

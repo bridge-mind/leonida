@@ -127,7 +127,8 @@ export class CameraSystem implements GameSystem {
       const dy = input.mouseDeltaY;
       if (dx !== 0 || dy !== 0) {
         this.yaw -= dx * C.mouseSensitivity;
-        this.pitch = MathUtils.clamp(this.pitch + dy * C.mouseSensitivity, C.pitchMin, C.pitchMax);
+        const pitchIn = C.invertY ? -dy : dy;
+        this.pitch = MathUtils.clamp(this.pitch + pitchIn * C.mouseSensitivity, C.pitchMin, C.pitchMax);
         this.mouseIdle = 0;
       } else {
         this.mouseIdle += dt;

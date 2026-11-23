@@ -135,6 +135,12 @@
   z-index: var(--z-hud);
 }
 
+/* `#ui > *` turns pointer events back on. This overlay covers the pause menu
+   and must not take its clicks. */
+#ui > .ability-fx {
+  pointer-events: none;
+}
+
 .ability-vignette {
   position: absolute;
   inset: 0;
