@@ -155,14 +155,19 @@ export class NavigationSystem implements GameSystem, INavigationPeer {
     }
     route.push(this.point(n++, target.x, target.y, target.z));
     for (let i = 1; i < route.length; i++) this.routeLength += Math.hypot(route[i].x - route[i - 1].x, route[i].z - route[i - 1].z);
-    this.measureRoute(from);
+    // A fresh plan is the best we have: never re-plan from here, or a player standing
+    // further than `strayDistance` from the road network recurses until the stack overflows.
+    this.measureRoute(from, false);
   }
 
-  /** Nearest route segment to the player; re-plans when they strayed, else updates the distance left. */
-  private measureRoute(p: V3): void {
+  /**
+   * Nearest route segment to the player; re-plans when they strayed (unless `allowReplan`
+   * is false), else updates the distance left.
+   */
+  private measureRoute(p: V3, allowReplan = true): void {
     const route = this.game.state.route;
     if (route.length === 0) {
-      this.replan();
+      if (allowReplan) this.replan();
       return;
     }
     if (route.length === 1) {
@@ -185,7 +190,7 @@ export class NavigationSystem implements GameSystem, INavigationPeer {
         bestT = t;
       }
     }
-    if (bestD > N.strayDistance * N.strayDistance) {
+    if (allowReplan && bestD > N.strayDistance * N.strayDistance) {
       this.replan();
       return;
     }
