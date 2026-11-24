@@ -77,5 +77,4 @@ docs           TEAM-PLAN, PROGRESS, per-system progress notes, screenshots
 
 ## License
 
-Code is released under the [MIT License](LICENSE). Character names and the setting are fan-fiction references to an
-unreleased Rockstar Games title and remain the property of their respective owners.
+Code is released under the [MIT License](LICENSE). Character names and the setting are fan-fiction references to a released Rockstar Games title and remain the property of their respective owners.
