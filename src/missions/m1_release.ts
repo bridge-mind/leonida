@@ -20,7 +20,7 @@ export const m1: MissionDef = {
   build() {
     let car: IVehicle | null = null;
     const gate = landmarkDoor('prison');
-    const safehouse = doorFront('safehouse', 8);
+    const safehouse = doorFront('safehouse', 2);
     return [
       action((ctx) => {
         if (ctx.game.systems.has('player')) ctx.game.player.teleport(forwardOf(gate.pos, gate.heading, 3), gate.heading);
