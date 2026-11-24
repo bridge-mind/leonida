@@ -1,4 +1,4 @@
-import RAPIER, { type Collider, type RigidBody, type World } from '@dimforge/rapier3d-compat';
+import RAPIER, { Collider, RigidBody, type World } from '@dimforge/rapier3d-compat';
 import { Quaternion, Vector3 } from 'three';
 import { Config } from '../core/Config';
 import type { Entity, V3 } from '../core/entities';
@@ -153,8 +153,8 @@ export class Physics {
     let predicate: ((c: Collider) => boolean) | undefined;
     const ex = opts?.exclude;
     if (ex) {
-      if (ex instanceof RAPIER.Collider) excludeCollider = ex;
-      else if (ex instanceof RAPIER.RigidBody) excludeBody = ex;
+      if (ex instanceof Collider) excludeCollider = ex;
+      else if (ex instanceof RigidBody) excludeBody = ex;
       else {
         const list = this.collidersByEntity.get(ex);
         if (list && list.length === 1) excludeCollider = list[0];
@@ -231,6 +231,10 @@ export class Physics {
       this.tmpQuat.setFromAxisAngle(UP, opts.rotationY);
       desc.setRotation({ x: this.tmpQuat.x, y: this.tmpQuat.y, z: this.tmpQuat.z, w: this.tmpQuat.w });
     }
+    if (opts?.linearDamping !== undefined) desc.setLinearDamping(opts.linearDamping);
+    if (opts?.angularDamping !== undefined) desc.setAngularDamping(opts.angularDamping);
+    if (opts?.ccd) desc.setCcdEnabled(true);
+    if (opts?.canSleep !== undefined) desc.setCanSleep(opts.canSleep);
     return this.world.createRigidBody(desc);
   }
 
@@ -249,7 +253,7 @@ export class Physics {
 
   /** Attach a collider to a body and register its entity. */
   addCollider(desc: RAPIER.ColliderDesc, body: RigidBody, entity?: Entity, opts?: StaticColliderOptions): Collider {
-    this.applyColliderOptions(desc, { groups: Groups.STATIC, ...opts });
+    this.applyColliderOptions(desc, opts);
     const collider = this.world.createCollider(desc, body);
     if (entity) this.register(collider, entity);
     return collider;
@@ -261,7 +265,8 @@ export class Physics {
   }
 
   removeBody(body: RigidBody): void {
-    for (let i = 0; i < body.numColliders(); i++) this.unregister(body.collider(i));
+    const n = body.numColliders();
+    for (let i = 0; i < n; i++) this.unregister(body.collider(i));
     this.world.removeRigidBody(body);
   }
 
@@ -277,7 +282,8 @@ export class Physics {
         colliderA: h1,
         colliderB: h2,
       };
-      this.events.emit(started ? 'physics:contactStarted' : 'physics:contactEnded', payload);
+      if (started) this.events.emit('physics:contactStarted', payload);
+      else this.events.emit('physics:contactEnded', payload);
     });
   }
 
