@@ -1,0 +1,5 @@
+EXPORTS
+    bundled_attach_count @1
+    bundled_alloc_sum @2
+    bundled_fwd_alloc=xmem.XMemAlloc @3
+    bundled_fwd_free=xmem.XMemFree @4

@@ -1,0 +1,16 @@
+[package]
+name = "leonida-xma2-decoder"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0-or-later"
+publish = false
+
+[lib]
+name = "leonida_xma2_decoder"
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+xma = { git = "https://github.com/omonkeyz/xbox-emulator", package = "xma", rev = "27122f7dfcceb9a899555362ee0dde2d530e033c" }
+
+[profile.release]
+panic = "unwind"

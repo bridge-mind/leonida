@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leonida // 3D Studio & Asset Inspector</title>
+<style>
+:root {
+  --bg-dark: #07070d;
+  --bg-panel: rgba(16, 14, 28, 0.88);
+  --bg-panel-border: rgba(255, 42, 133, 0.25);
+  --bg-card: rgba(25, 22, 45, 0.7);
+  --bg-card-hover: rgba(38, 32, 68, 0.9);
+  --accent-pink: #ff2a85;
+  --accent-cyan: #00f0ff;
+  --accent-gold: #ffb703;
+  --text-main: #f5f6fa;
+  --text-muted: #8e8ba8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(circle at 15% 15%, rgba(255, 42, 133, 0.08) 0%, transparent 40%),
+              radial-gradient(circle at 85% 85%, rgba(0, 240, 255, 0.06) 0%, transparent 40%),
+              var(--bg-dark);
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+header {
+  background: var(--bg-panel);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--bg-panel-border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-logo {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-cyan));
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; color: #000; font-size: 15px;
+  box-shadow: 0 0 12px rgba(255, 42, 133, 0.5);
+}
+.brand-title h1 {
+  font-size: 15px; font-weight: 800; letter-spacing: 0.5px;
+  background: linear-gradient(90deg, #fff, #ffcee3);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.brand-title p { font-size: 11px; color: var(--text-muted); }
+
+.tabs { display: flex; gap: 8px; }
+.tab-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  padding: 6px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all .2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.tab-btn:hover { color: #fff; border-color: var(--accent-pink); }
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--accent-pink), #cc1364);
+  color: #fff;
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 14px rgba(255, 42, 133, 0.4);
+}
+.badge {
+  background: rgba(0, 0, 0, 0.35);
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+}
+
+main { flex: 1; position: relative; overflow: hidden; display: flex; }
+.view-panel { width: 100%; height: 100%; display: none; }
+.view-panel.active { display: flex; }
+
+/* Models Layout */
+#models-view { width: 100%; height: 100%; display: flex; }
+#sidebar {
+  width: 340px;
+  background: var(--bg-panel);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid var(--bg-panel-border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.sidebar-search {
+  padding: 12px;
+  border-bottom: 1px solid var(--bg-panel-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.search-input {
+  width: 100%;
+  background: rgba(10, 8, 20, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+  transition: border-color .2s;
+}
+.search-input:focus { border-color: var(--accent-cyan); box-shadow: 0 0 8px rgba(0, 240, 255, 0.3); }
+
+.filter-chips {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.filter-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.filter-chip.active {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+#model-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+/* Accordion categories */
+.cat-group { margin-bottom: 8px; }
+.cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: #e0e0ff;
+  user-select: none;
+  transition: background .15s;
+}
+.cat-header:hover { background: rgba(255, 42, 133, 0.1); border-color: rgba(255, 42, 133, 0.3); }
+.cat-header .arrow { transition: transform .2s; font-size: 10px; }
+.cat-header.collapsed .arrow { transform: rotate(-90deg); }
+.cat-content { padding-left: 6px; margin-top: 4px; display: flex; flex-direction: column; gap: 3px; }
+.cat-header.collapsed + .cat-content { display: none; }
+.model-page { display: flex; flex-direction: column; gap: 3px; }
+.model-pagination { display: flex; align-items: center; justify-content: space-between; gap: 4px; font-size: 11px; }
+.model-pagination button:disabled { opacity: 0.5; cursor: default; }
+
+.model-item {
+  padding: 8px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all .15s;
+}
+.model-item:hover { background: var(--bg-card-hover); border-color: var(--accent-cyan); transform: translateX(2px); }
+.model-item.active {
+  background: rgba(255, 42, 133, 0.2);
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 10px rgba(255, 42, 133, 0.3);
+}
+.model-item .m-name { font-weight: 600; word-break: break-all; color: #fff; margin-bottom: 2px; }
+.model-item .m-meta { font-size: 10px; color: var(--text-muted); display: flex; justify-content: space-between; }
+
+/* 3D Canvas & Toolbar */
+#canvas-container { flex: 1; position: relative; background: #050508; }
+#three-canvas { width: 100%; height: 100%; display: block; }
+
+#toolbar {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--bg-panel);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--bg-panel-border);
+  padding: 6px 10px;
+  border-radius: 8px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+.tool-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #eee;
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.tool-btn:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+.tool-btn.active {
+  background: var(--accent-cyan);
+  color: #000;
+  font-weight: 700;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+#stats-overlay {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  background: var(--bg-panel);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--bg-panel-border);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  min-width: 200px;
+}
+#stats-overlay b { color: #fff; }
+
+/* Textures Gallery Layout */
+#textures-view {
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+.tex-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.tex-search {
+  max-width: 320px;
+  width: 100%;
+}
+#textures-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  padding-bottom: 30px;
+}
+.tex-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--bg-panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all .2s;
+  cursor: pointer;
+}
+.tex-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-pink);
+  box-shadow: 0 4px 16px rgba(255, 42, 133, 0.25);
+}
+.tex-preview {
+  height: 150px;
+  background: #020205;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.tex-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform .3s;
+}
+.tex-card:hover .tex-preview img { transform: scale(1.05); }
+.tex-info { padding: 10px; font-size: 11px; }
+.tex-name { font-weight: 600; margin-bottom: 4px; word-break: break-all; color: #fff; }
+.tex-meta { color: var(--text-muted); font-size: 10px; display: flex; justify-content: space-between; }
+
+/* Modal Lightbox */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal-content {
+  background: var(--bg-panel);
+  border: 1px solid var(--accent-pink);
+  box-shadow: 0 0 30px rgba(255, 42, 133, 0.4);
+  border-radius: 10px;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.modal-header {
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+#dds-controls:not(:empty) { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 8px 16px; }
+#dds-controls input { width: 5em; }
+.modal-body {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #040407;
+  overflow: auto;
+}
+.modal-body img { max-width: 80vw; max-height: 70vh; object-fit: contain; }
+
+#loading-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-pink), var(--accent-cyan));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .2s;
+  z-index: 50;
+}
+
+</style>
+<script src="/vendor/three.min.js" onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'"></script>
+<script src="/vendor/OrbitControls.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js'"></script>
+<script src="/vendor/GLTFLoader.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js'"></script>
+</head>
+<body>
+
+<div id="loading-bar"></div>
+
+<header>
+  <div class="brand">
+    <div class="brand-logo">L</div>
+    <div class="brand-title">
+      <div style="font-family: monospace; font-size: 10px; color: var(--accent-pink); letter-spacing: 1px; margin-bottom: 2px;">//digital piece by ESLL</div>
+      <h1>LEONIDA // 3D STUDIO</h1>
+      <p id="t-subtitle">Clean-Room Asset Pipeline & Vice City Inspector</p>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-btn-models" onclick="switchTab('models')">
+      3D Модели <span class="badge" id="badge-models">0</span>
+    </button>
+    <button class="tab-btn" id="tab-btn-textures" onclick="switchTab('textures')">
+      Текстуры <span class="badge" id="badge-textures">0</span>
+    </button>
+  <div style="display: flex; gap: 4px; align-items: center; margin-left: 10px;">
+      <button class="tool-btn active" id="lang-btn-ru" onclick="setLanguage('ru')" style="padding: 4px 8px; font-size: 11px;">RU</button>
+      <button class="tool-btn" id="lang-btn-eu" onclick="setLanguage('eu')" style="padding: 4px 8px; font-size: 11px;">EU</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- 3D Models Panel -->
+  <section id="models-view" class="view-panel active">
+    <aside id="sidebar">
+      <div class="sidebar-search">
+        <input type="text" id="model-search" class="search-input" placeholder="Поиск по названию или категории..." oninput="onModelSearch()">
+        <div class="filter-chips" id="category-chips"></div>
+      </div>
+      <div id="model-list"></div>
+    </aside>
+
+    <div id="canvas-container">
+      <canvas id="three-canvas"></canvas>
+      <div id="toolbar">
+        <button class="tool-btn active" id="btn-shade-original" onclick="setShadingMode('original')">Оригинал</button>
+        <button class="tool-btn" id="btn-shade-clay" onclick="setShadingMode('clay')">Studio Clay</button>
+        <button class="tool-btn" id="btn-shade-normals" onclick="setShadingMode('normals')">Нормали</button>
+        <button class="tool-btn" id="btn-wireframe" onclick="toggleWireframe()">Сетка</button>
+        <button class="tool-btn" id="btn-autorotate" onclick="toggleAutoRotate()">Вращение</button>
+        <button class="tool-btn" onclick="resetCamera()">Сброс камеры</button>
+      </div>
+      <div id="stats-overlay">
+        <div>Модель: <b id="stat-name">—</b></div>
+        <div>Категория: <b id="stat-category">—</b></div>
+        <div>Полигонов (треугольников): <b id="stat-triangles">0</b></div>
+        <div>Вершин: <b id="stat-vertices">0</b></div>
+        <div>Размер файла: <b id="stat-size">—</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Textures Gallery Panel -->
+  <section id="textures-view" class="view-panel">
+    <div class="tex-controls">
+      <div>
+        <h2 style="font-size: 16px; font-weight: 700; color: var(--accent-pink);">Галерея текстур (DDS & PNG)</h2>
+        <span id="tex-count" style="font-size: 12px; color: var(--text-muted);">Загрузка...</span>
+      </div>
+      <div class="tex-search">
+        <input type="text" id="tex-search-input" class="search-input" placeholder="Фильтр текстур..." oninput="onTextureSearch()">
+      </div>
+    </div>
+    <div id="textures-grid"></div>
+  </section>
+</main>
+
+<!-- Lightbox Modal -->
+<div class="modal-overlay" id="tex-modal" onclick="closeModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span id="modal-title" style="font-size: 13px; font-weight: 600;">Просмотр текстуры</span>
+      <button class="tool-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div id="dds-controls"></div>
+    <div class="modal-body">
+      <img id="modal-img" src="" alt="">
+    </div>
+  </div>
+</div>
+
+<script>
+
+let currentLang = localStorage.getItem('leonida_lang') || 'ru';
+
+const I18N = {
+  ru: {
+    subtitle: "Clean-Room Asset Pipeline & Vice City Inspector",
+    tabModels: "3D Модели",
+    tabTextures: "Текстуры",
+    searchModelPlaceholder: "Поиск по названию или категории...",
+    allCategories: "Все",
+    shadeOriginal: "Оригинал",
+    shadeClay: "Studio Clay",
+    shadeNormals: "Нормали",
+    wireframe: "Сетка",
+    autoRotate: "Вращение",
+    resetCamera: "Сброс камеры",
+    statModel: "Модель:",
+    statCategory: "Категория:",
+    statTriangles: "Полигонов (треугольников):",
+    statVertices: "Вершин:",
+    statSize: "Размер файла:",
+    texHeading: "Галерея текстур (DDS & PNG)",
+    texSearchPlaceholder: "Фильтр текстур...",
+    texCountSuffix: "текстур найдено",
+    texNotFound: "Текстуры не найдены",
+    modelsNotFound: "Ничего не найдено",
+    previousModelPage: "Назад",
+    nextModelPage: "Далее",
+    modalTitle: "Просмотр текстуры",
+    catNames: {
+      "Оружие (Weapons)": "Оружие",
+      "Транспорт (Vehicles)": "Транспорт",
+      "Персонажи (Characters)": "Персонажи",
+      "Объекты и Пропы (Props)": "Объекты и Пропы",
+      "Карта и Здания (World)": "Карта и Здания",
+      "Растительность (Nature)": "Растительность",
+      "Прочее (Miscellaneous)": "Прочее"
+    }
+  },
+  eu: {
+    subtitle: "Clean-Room Asset Pipeline & Vice City Inspector",
+    tabModels: "3D Models",
+    tabTextures: "Textures",
+    searchModelPlaceholder: "Search by name or category...",
+    allCategories: "All",
+    shadeOriginal: "Original",
+    shadeClay: "Studio Clay",
+    shadeNormals: "Normals",
+    wireframe: "Wireframe",
+    autoRotate: "Auto-Rotate",
+    resetCamera: "Reset Camera",
+    statModel: "Model:",
+    statCategory: "Category:",
+    statTriangles: "Polygons (triangles):",
+    statVertices: "Vertices:",
+    statSize: "File size:",
+    texHeading: "Texture Gallery (DDS & PNG)",
+    texSearchPlaceholder: "Filter textures...",
+    texCountSuffix: "textures found",
+    texNotFound: "No textures found",
+    modelsNotFound: "No models found",
+    previousModelPage: "Previous",
+    nextModelPage: "Next",
+    modalTitle: "Texture Preview",
+    catNames: {
+      "Оружие (Weapons)": "Weapons",
+      "Транспорт (Vehicles)": "Vehicles",
+      "Персонажи (Characters)": "Characters",
+      "Объекты и Пропы (Props)": "Props & Objects",
+      "Карта и Здания (World)": "World & Architecture",
+      "Растительность (Nature)": "Vegetation & Nature",
+      "Прочее (Miscellaneous)": "Miscellaneous"
+    }
+  }
+};
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('leonida_lang', lang);
+  document.getElementById('lang-btn-ru').classList.toggle('active', lang === 'ru');
+  document.getElementById('lang-btn-eu').classList.toggle('active', lang === 'eu');
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const t = I18N[currentLang];
+  document.getElementById('t-subtitle').innerText = t.subtitle;
+  document.getElementById('tab-btn-models').childNodes[0].nodeValue = t.tabModels + " ";
+  document.getElementById('tab-btn-textures').childNodes[0].nodeValue = t.tabTextures + " ";
+  document.getElementById('model-search').placeholder = t.searchModelPlaceholder;
+  document.getElementById('btn-shade-original').innerText = t.shadeOriginal;
+  document.getElementById('btn-shade-clay').innerText = t.shadeClay;
+  document.getElementById('btn-shade-normals').innerText = t.shadeNormals;
+  document.getElementById('btn-wireframe').innerText = t.wireframe;
+  document.getElementById('btn-autorotate').innerText = t.autoRotate;
+  document.getElementById('tex-search-input').placeholder = t.texSearchPlaceholder;
+  document.getElementById('modal-title').innerText = t.modalTitle;
+
+  renderAccordionList();
+  renderTexturesGrid();
+}
+
+let allModels = [];
+let selectedModel = null;
+const modelPages = new Map();
+let allTextures = [];
+let activeCategory = 'ALL';
+let modelSearchQuery = '';
+let texSearchQuery = '';
+
+let scene, camera, renderer, controls;
+let currentMesh = null;
+let modelLoadId = 0;
+let shadingMode = 'original'; // 'original' | 'clay' | 'normals'
+let wireframeActive = false;
+let autoRotateActive = false;
+
+const clayMaterial = new THREE.MeshStandardMaterial({
+  color: 0xd6dae5,
+  roughness: 0.45,
+  metalness: 0.08,
+  flatShading: false
+});
+const normalMaterial = new THREE.MeshNormalMaterial();
+
+function formatBytes(bytes) {
+  if (!bytes) return '0 B';
+  const k = 1024, dm = 2;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, c => `&#${c.charCodeAt(0)};`);
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+
+  if (tab === 'models') {
+    document.getElementById('tab-btn-models').classList.add('active');
+    document.getElementById('models-view').classList.add('active');
+    onWindowResize();
+  } else {
+    document.getElementById('tab-btn-textures').classList.add('active');
+    document.getElementById('textures-view').classList.add('active');
+    if (allTextures.length === 0) loadTextures();
+  }
+}
+
+function initThree() {
+  const container = document.getElementById('canvas-container');
+  const canvas = document.getElementById('three-canvas');
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x06060c);
+
+  camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+  camera.position.set(0, 2, 5);
+
+  renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setPixelRatio(window.devicePixelRatio || 1);
+  if (THREE.sRGBEncoding) renderer.outputEncoding = THREE.sRGBEncoding;
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+
+  // Studio Lighting (Vice City Studio Look)
+  const hemiLight = new THREE.HemisphereLight(0xfff5f8, 0x1a1528, 1.4);
+  hemiLight.position.set(0, 30, 0);
+  scene.add(hemiLight);
+
+  const mainLight = new THREE.DirectionalLight(0xffffff, 1.6);
+  mainLight.position.set(6, 12, 8);
+  scene.add(mainLight);
+
+  const cyanRim = new THREE.DirectionalLight(0x00f0ff, 0.9);
+  cyanRim.position.set(-8, -4, -6);
+  scene.add(cyanRim);
+
+  const pinkRim = new THREE.DirectionalLight(0xff2a85, 0.7);
+  pinkRim.position.set(8, 2, -6);
+  scene.add(pinkRim);
+
+  // Neon Grid Ground
+  const grid = new THREE.GridHelper(20, 40, 0xff2a85, 0x1f1a3a);
+  grid.position.y = -0.01;
+  scene.add(grid);
+
+  window.addEventListener('resize', onWindowResize);
+  animate();
+}
+
+function onWindowResize() {
+  const container = document.getElementById('canvas-container');
+  if (!container || !renderer || !camera) return;
+  camera.aspect = container.clientWidth / container.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(container.clientWidth, container.clientHeight);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (controls) {
+    controls.autoRotate = autoRotateActive;
+    controls.autoRotateSpeed = 2.0;
+    controls.update();
+  }
+  if (renderer && scene && camera) {
+    renderer.render(scene, camera);
+  }
+}
+
+function setShadingMode(mode) {
+  shadingMode = mode;
+  document.getElementById('btn-shade-original').classList.toggle('active', mode === 'original');
+  document.getElementById('btn-shade-clay').classList.toggle('active', mode === 'clay');
+  document.getElementById('btn-shade-normals').classList.toggle('active', mode === 'normals');
+  applyMeshShading();
+}
+
+function toggleWireframe() {
+  wireframeActive = !wireframeActive;
+  document.getElementById('btn-wireframe').classList.toggle('active', wireframeActive);
+  applyMeshShading();
+}
+
+function toggleAutoRotate() {
+  autoRotateActive = !autoRotateActive;
+  document.getElementById('btn-autorotate').classList.toggle('active', autoRotateActive);
+}
+
+function resetCamera() {
+  if (controls) controls.reset();
+}
+
+function applyMeshShading() {
+  if (!currentMesh) return;
+  currentMesh.traverse(child => {
+    if (child.isMesh) {
+      if (shadingMode === 'clay') {
+        child.material = clayMaterial;
+      } else if (shadingMode === 'normals') {
+        child.material = normalMaterial;
+      } else {
+        child.material = child.userData.origMaterial || child.material;
+      }
+      if (child.material) {
+        child.material.wireframe = wireframeActive;
+        child.material.needsUpdate = true;
+      }
+    }
+  });
+}
+
+function disposeModel(root) {
+  root.traverse(child => {
+    if (child.geometry) child.geometry.dispose();
+    // In clay/normals mode child.material is a shared material; the model's own is origMaterial.
+    const material = child.userData.origMaterial || child.material;
+    if (!material) return;
+    Object.values(material).forEach(value => {
+      if (value && value.isTexture) value.dispose();
+    });
+    material.dispose();
+  });
+}
+
+function loadModel(url, name, category, size) {
+  const loadId = ++modelLoadId;
+  const bar = document.getElementById('loading-bar');
+  bar.style.transform = 'scaleX(0.4)';
+
+  const loader = new THREE.GLTFLoader();
+  loader.load(url, (gltf) => {
+    if (loadId !== modelLoadId) return;
+    bar.style.transform = 'scaleX(1)';
+    setTimeout(() => { bar.style.transform = 'scaleX(0)'; }, 250);
+
+    if (currentMesh) {
+      scene.remove(currentMesh);
+      disposeModel(currentMesh);
+    }
+    currentMesh = gltf.scene;
+    scene.add(currentMesh);
+
+    let verts = 0;
+    let tris = 0;
+
+    currentMesh.traverse((child) => {
+      if (child.isMesh) {
+        child.userData.origMaterial = child.material;
+        if (child.geometry) {
+          verts += child.geometry.attributes.position ? child.geometry.attributes.position.count : 0;
+          tris += child.geometry.index ? child.geometry.index.count / 3 : (child.geometry.attributes.position ? child.geometry.attributes.position.count / 3 : 0);
+        }
+      }
+    });
+
+    applyMeshShading();
+
+    document.getElementById('stat-name').innerText = name;
+    document.getElementById('stat-category').innerText = category || '—';
+    document.getElementById('stat-triangles').innerText = Math.round(tris).toLocaleString();
+    document.getElementById('stat-vertices').innerText = Math.round(verts).toLocaleString();
+    document.getElementById('stat-size').innerText = formatBytes(size);
+
+    // Auto-fit camera to bounding box
+    const box = new THREE.Box3().setFromObject(currentMesh);
+    const center = box.getCenter(new THREE.Vector3());
+    const sizeVec = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(sizeVec.x, sizeVec.y, sizeVec.z) || 1.0;
+
+    currentMesh.position.sub(center);
+    camera.position.set(maxDim * 1.5, maxDim * 1.2, maxDim * 1.8);
+    controls.target.set(0, 0, 0);
+    controls.update();
+  }, undefined, (err) => {
+    if (loadId !== modelLoadId) return;
+    bar.style.transform = 'scaleX(0)';
+    console.error('Error loading model:', err);
+    alert('Не удалось загрузить 3D модель: ' + name);
+  });
+}
+
+async function loadModels() {
+  try {
+    const res = await fetch('/api/models');
+    const data = await res.json();
+    allModels = data.models || [];
+    selectedModel = allModels[0] || null;
+    modelPages.clear();
+    document.getElementById('badge-models').innerText = allModels.length;
+
+    renderCategoryChips(data.categories || {});
+    renderAccordionList();
+
+    if (selectedModel) {
+      const first = selectedModel;
+      loadModel(first.url, first.name, first.category, first.size);
+    }
+  } catch (e) {
+    console.error('Failed to load models:', e);
+  }
+}
+
+function renderCategoryChips(categories) {
+  const container = document.getElementById('category-chips');
+  container.innerHTML = '';
+
+  const allChip = document.createElement('div');
+  allChip.className = 'filter-chip active';
+  allChip.innerText = `Все (${allModels.length})`;
+  allChip.onclick = () => selectCategory('ALL', allChip);
+  container.appendChild(allChip);
+
+  Object.entries(categories).forEach(([cat, count]) => {
+    const chip = document.createElement('div');
+    chip.className = 'filter-chip';
+    chip.innerText = `${cat} (${count})`;
+    chip.onclick = () => selectCategory(cat, chip);
+    container.appendChild(chip);
+  });
+}
+
+function selectCategory(cat, chipElem) {
+  if (activeCategory !== cat) modelPages.clear();
+  activeCategory = cat;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  chipElem.classList.add('active');
+  renderAccordionList();
+}
+
+function onModelSearch() {
+  const query = document.getElementById('model-search').value.toLowerCase().trim();
+  if (query === modelSearchQuery) return;
+  modelSearchQuery = query;
+  modelPages.clear();
+  renderAccordionList();
+}
+
+function renderAccordionList() {
+  const container = document.getElementById('model-list');
+  container.innerHTML = '';
+
+  // Filter models
+  const filtered = allModels.filter(m => {
+    const matchesCat = (activeCategory === 'ALL' || m.category === activeCategory);
+    const matchesSearch = !modelSearchQuery ||
+      m.name.toLowerCase().includes(modelSearchQuery) ||
+      (m.category && m.category.toLowerCase().includes(modelSearchQuery)) ||
+      (m.folder && m.folder.toLowerCase().includes(modelSearchQuery));
+    return matchesCat && matchesSearch;
+  });
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="padding: 16px; color: var(--text-muted); font-size: 12px; text-align: center;">Ничего не найдено</div>';
+    return;
+  }
+
+  // Group by category
+  const groups = {};
+  filtered.forEach(m => {
+    const cat = m.category || 'Прочее';
+    groups[cat] = groups[cat] || [];
+    groups[cat].push(m);
+  });
+
+  Object.entries(groups).forEach(([cat, list]) => {
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'cat-group';
+
+    const header = document.createElement('div');
+    header.className = 'cat-header';
+    header.innerHTML = `
+      <span>${escapeHtml(cat)} <span class="badge">${list.length}</span></span>
+      <span class="arrow">▼</span>
+    `;
+
+    const content = document.createElement('div');
+    content.className = 'cat-content';
+
+    const pageSize = 100;
+    const pageRows = document.createElement('div');
+    pageRows.className = 'model-page';
+    let page = modelPages.get(cat) ?? 0;
+
+    function renderPage() {
+      const start = page * pageSize;
+      const end = Math.min(start + pageSize, list.length);
+      pageRows.replaceChildren(...list.slice(start, end).map(m => {
+        const item = document.createElement('div');
+        item.className = 'model-item';
+        if (m === selectedModel) item.classList.add('active');
+        item.innerHTML = `
+          <div class="m-name">${escapeHtml(m.name)}</div>
+          <div class="m-meta">
+            <span>${m.folder !== 'Корневая папка' ? escapeHtml(m.folder) : ''}</span>
+            <span>${formatBytes(m.size)}</span>
+          </div>
+        `;
+        item.onclick = () => {
+          document.querySelectorAll('.model-item').forEach(el => el.classList.remove('active'));
+          selectedModel = m;
+          item.classList.add('active');
+          loadModel(m.url, m.name, m.category, m.size);
+        };
+        return item;
+      }));
+      if (range) {
+        previous.disabled = page === 0;
+        next.disabled = end === list.length;
+        range.innerText = `${start + 1}–${end} / ${list.length}`;
+      }
+    }
+
+    let previous, next, range;
+    if (list.length > pageSize) {
+      const pager = document.createElement('nav');
+      previous = document.createElement('button');
+      next = document.createElement('button');
+      range = document.createElement('span');
+      pager.className = 'model-pagination';
+      pager.setAttribute('aria-label', cat);
+      range.setAttribute('aria-live', 'polite');
+      const labels = I18N[currentLang] || I18N.ru;
+      for (const [button, label, step] of [[previous, labels.previousModelPage, -1], [next, labels.nextModelPage, 1]]) {
+        button.type = 'button';
+        button.className = 'tool-btn';
+        button.innerText = label;
+        button.onclick = () => {
+          page += step;
+          modelPages.set(cat, page);
+          renderPage();
+          if (button.disabled) (step < 0 ? next : previous).focus();
+        };
+      }
+      pager.appendChild(previous);
+      pager.appendChild(range);
+      pager.appendChild(next);
+      content.appendChild(pager);
+    }
+    content.appendChild(pageRows);
+    renderPage();
+
+    header.onclick = () => {
+      header.classList.toggle('collapsed');
+    };
+
+    groupDiv.appendChild(header);
+    groupDiv.appendChild(content);
+    container.appendChild(groupDiv);
+  });
+}
+
+// Textures View Logic
+async function loadTextures() {
+  try {
+    const res = await fetch('/api/textures');
+    const data = await res.json();
+    allTextures = data.textures || [];
+    document.getElementById('badge-textures').innerText = allTextures.length;
+    document.getElementById('tex-count').innerText = `${allTextures.length} текстур найдено`;
+    renderTexturesGrid();
+  } catch (e) {
+    console.error('Failed to load textures:', e);
+    document.getElementById('tex-count').innerText = 'Ошибка загрузки текстур';
+  }
+}
+
+function onTextureSearch() {
+  texSearchQuery = document.getElementById('tex-search-input').value.toLowerCase().trim();
+  renderTexturesGrid();
+}
+
+function renderTexturesGrid() {
+  const grid = document.getElementById('textures-grid');
+  grid.innerHTML = '';
+
+  const filtered = allTextures.filter(t => !texSearchQuery || t.name.toLowerCase().includes(texSearchQuery));
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="grid-column: 1/-1; padding: 30px; text-align: center; color: var(--text-muted);">Текстуры не найдены</div>';
+    return;
+  }
+
+  // Render initial batch (up to 80 for speed)
+  const batch = filtered.slice(0, 80);
+  batch.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'tex-card';
+    card.innerHTML = `
+      <div class="tex-preview">
+        <img src="${t.preview}" alt="${escapeHtml(t.name)}" loading="lazy" onerror="this.onerror=null; this.src=''; this.alt='DDS / Pre-converted'">
+      </div>
+      <div class="tex-info">
+        <div class="tex-name" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</div>
+        <div class="tex-meta">
+          <span>${t.format}</span>
+          <span>${formatBytes(t.size)}</span>
+        </div>
+      </div>
+    `;
+    card.onclick = () => openModal(t);
+    grid.appendChild(card);
+  });
+
+  if (filtered.length > 80) {
+    const loadMore = document.createElement('div');
+    loadMore.style.gridColumn = '1 / -1';
+    loadMore.style.textAlign = 'center';
+    loadMore.style.padding = '20px';
+    loadMore.innerHTML = `<button class="tab-btn" style="margin: 0 auto;">Показать все (${filtered.length - 80} ещё)</button>`;
+    loadMore.onclick = () => {
+      loadMore.remove();
+      filtered.slice(80).forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'tex-card';
+        card.innerHTML = `
+          <div class="tex-preview">
+            <img src="${t.preview}" alt="${escapeHtml(t.name)}" loading="lazy" onerror="this.onerror=null; this.src=''; this.alt='DDS / Pre-converted'">
+          </div>
+          <div class="tex-info">
+            <div class="tex-name" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</div>
+            <div class="tex-meta">
+              <span>${t.format}</span>
+              <span>${formatBytes(t.size)}</span>
+            </div>
+          </div>
+        `;
+        card.onclick = () => openModal(t);
+        grid.appendChild(card);
+      });
+    };
+    grid.appendChild(loadMore);
+  }
+}
+
+let modalVersion = 0;
+
+async function openModal(texture) {
+  const version = ++modalVersion;
+  const controls = document.getElementById('dds-controls');
+  const image = document.getElementById('modal-img');
+  controls.replaceChildren();
+  document.getElementById('modal-title').innerText = texture.name;
+  image.src = texture.preview;
+  document.getElementById('tex-modal').classList.add('active');
+  if (!texture.ddsPreview) return;
+
+  try {
+    const response = await fetch(texture.ddsPreview + '?info');
+    if (!response.ok) return;
+    const info = await response.json();
+    if (version !== modalVersion) return;
+    const volume = info.dimension === '3d';
+    const axis = volume ? 'z' : 'layer';
+    const indices = {mip: 0, [axis]: 0};
+    let sliceInput;
+    let updateTexel;
+    const dimensions = document.createElement('span');
+    function updatePreview() {
+      const scale = 2 ** indices.mip;
+      if (sliceInput) {
+        const lastSlice = Math.max(1, Math.floor(info.depth / scale)) - 1;
+        indices.z = Math.min(indices.z, lastSlice);
+        sliceInput.max = lastSlice;
+        sliceInput.value = indices.z;
+        sliceInput.disabled = lastSlice === 0;
+      }
+      dimensions.textContent = Math.max(1, Math.floor(info.width / scale)) + ' × ' +
+                               Math.max(1, Math.floor(info.height / scale));
+      image.src = texture.ddsPreview + '?' + new URLSearchParams(indices);
+      if (updateTexel) updateTexel();
+    }
+    const axisLabel = volume ? (currentLang === 'ru' ? 'Срез Z ' : 'Z slice ') :
+                               (currentLang === 'ru' ? 'Слой ' : 'Layer ');
+    for (const [key, count] of [['mip', info.mip_count], [axis, volume ? info.depth : info.array_size]]) {
+      if (count <= 1) continue;
+      const label = document.createElement('label');
+      label.textContent = key === 'mip' ? 'Mip ' : axisLabel;
+      const input = document.createElement('input');
+      input.type = 'number';
+      if (key === 'z') sliceInput = input;
+      input.min = 0;
+      input.max = count - 1;
+      input.value = 0;
+      input.onchange = () => {
+        if (!input.value || !input.validity.valid) {
+          input.value = indices[key];
+          return;
+        }
+        indices[key] = input.valueAsNumber;
+        updatePreview();
+      };
+      label.appendChild(input);
+      controls.appendChild(label);
+    }
+    if (['R16_FLOAT', 'RGBA16_FLOAT'].includes(info.format)) {
+      const coords = {};
+      const result = document.createElement('output');
+      let request = 0;
+      for (const axis of ['x', 'y']) {
+        const label = document.createElement('label');
+        label.textContent = axis.toUpperCase() + ' ';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = 0;
+        input.value = 0;
+        input.onchange = () => updateTexel();
+        coords[axis] = input;
+        label.appendChild(input);
+        controls.appendChild(label);
+      }
+      controls.appendChild(result);
+      updateTexel = async () => {
+        const ticket = ++request;
+        const query = new URLSearchParams(indices);
+        for (const [axis, size] of [['x', info.width], ['y', info.height]]) {
+          const input = coords[axis];
+          input.max = Math.max(1, Math.floor(size / 2 ** indices.mip)) - 1;
+          const value = Number(input.value);
+          input.value = Number.isSafeInteger(value) ? Math.min(input.max, Math.max(0, value)) : 0;
+          query.set(axis, input.value);
+        }
+        result.textContent = '…';
+        try {
+          const reply = await fetch(texture.ddsPreview + '?' + query);
+          if (!reply.ok) throw new Error('DDS texel unavailable');
+          const values = await reply.json();
+          if (ticket === request && version === modalVersion) {
+            result.textContent = Object.entries(values).map(([c, v]) => c + ' = ' + v).join('   ');
+          }
+        } catch {
+          if (ticket === request && version === modalVersion) {
+            result.textContent = currentLang === 'ru' ? 'Значение недоступно' : 'Texel unavailable';
+          }
+        }
+      };
+    }
+    if (controls.childElementCount) {
+      controls.appendChild(dimensions);
+      updatePreview();
+    }
+  } catch (error) {
+    console.error('Failed to inspect DDS texture', error);
+  }
+}
+
+function closeModal() {
+  ++modalVersion;
+  document.getElementById('tex-modal').classList.remove('active');
+}
+
+window.onload = () => {
+  initThree();
+  loadModels();
+  setLanguage(currentLang);
+};
+
+</script>
+</body>
+</html>

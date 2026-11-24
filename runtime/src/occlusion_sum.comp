@@ -1,0 +1,19 @@
+#version 450
+
+layout(local_size_x = 1) in;
+layout(set = 0, binding = 0, std430) buffer QueryResults {
+    uvec2 total;
+    uvec2 segments[];
+};
+layout(push_constant) uniform ResolveRange { uint count; };
+
+void main() {
+    uvec2 sum = total;
+    for (uint i = 0; i < count; ++i) {
+        uvec2 segment = segments[i];
+        uint low = sum.x + segment.x;
+        sum.y += segment.y + uint(low < sum.x);
+        sum.x = low;
+    }
+    total = sum;
+}

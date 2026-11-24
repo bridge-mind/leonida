@@ -1,0 +1,439 @@
+{
+ "title": "Xbox Series package",
+ "version": "1.0.2.1",
+ "files": {
+  "Bink2Scarlett.dll": {
+   "size": 255488,
+   "sha256": "9eaf045d004cd7d6a8382aaff0c6ea23a29fec4ef8bfacd726b54f5bc26fafd0"
+  },
+  "Catalog000.bin": {
+   "size": 815104,
+   "sha256": "4afbdbe22aad2bc338a5ba1ffe83cccb96e072eb4e92f6a5dd90b49b2e227c59"
+  },
+  "MicrosoftGame.Config": {
+   "size": 2542,
+   "sha256": "d0d5e4777460045916046619cd0fd433aa251d4a74f4d91e83987588f907f80c"
+  },
+  "Update.alignmentchunk": {
+   "size": 1,
+   "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+  },
+  "XCurl.dll": {
+   "size": 199152,
+   "sha256": "d11ba4e4a07f42f8d80c48553c5c2588ab4114ecdbe023305f5f8fa8262131f8"
+  },
+  "XboxBvhBuilder.dll": {
+   "size": 884224,
+   "sha256": "99f803ac22c01ef329dddb1d40be67238d2a812d01e8d040b3cb5135bc23707e"
+  },
+  "amd_fidelityfx_loader_xbox.dll": {
+   "size": 13312,
+   "sha256": "431bdd2e26c0c8214fd7601140eb9fe6d8a249f5000539453a9a9b6a0b7c0ee8"
+  },
+  "amd_fidelityfx_upscaler_xbox.dll": {
+   "size": 786432,
+   "sha256": "faff02f294a7e9149ce079dffe3dedbcabe99b1f180ab14222aa8689e00a75fa"
+  },
+  "anim.rpf": {
+   "size": 4407626384,
+   "sha256": "7f5c53162ab66a8915dfc95ddf22aad9055635b6ddd3cffc40f431e24ea1c189"
+  },
+  "appdata0.rpf": {
+   "size": 8880,
+   "sha256": "d9d4d2ddcd23e73a8862fbb5d5b53ca259e454f90319910d88f3a5c8da212535"
+  },
+  "appxmanifest.xml": {
+   "size": 3394,
+   "sha256": "662a05d05f8449b94b2ffc052f2a9ad2c090b3708d5a274fc9b2db0e14b03a34"
+  },
+  "audio.rpf": {
+   "size": 28543454672,
+   "sha256": "883581135f2fb0ba7ec5068da6f89363951400d4d3f9c0b99c06ac7eef24134a"
+  },
+  "common.rpf": {
+   "size": 6642192,
+   "sha256": "31dc6aa5394dd8cd3c83b90c9661f37325f22851cc6d5d7150e11041c7618ced"
+  },
+  "concrt140.dll": {
+   "size": 298992,
+   "sha256": "554168b99726cbe982b542ec97c493f48483b20a4ea4e54e102ba3a0d098e75f"
+  },
+  "data.rpf": {
+   "size": 481544304,
+   "sha256": "e5af629ef458bb7be55cae3dc890c69613c8028060ac765d54a4ccd73991640c"
+  },
+  "data/ttdb/graphics/ttdb_graphics.ttpf": {
+   "size": 34411776,
+   "sha256": "0b23f3f4ea9f63d8bb8abd835fb15b584fbc63a2b2f9cdbb6f675d78db16cb7e"
+  },
+  "data/ttdb/interiors/ttdb_interiors_0_3.ttpf": {
+   "size": 883202048,
+   "sha256": "5f109fcd493235e271c0106c9da92a27de1e48d809a18a5d2af8c2183bb23516"
+  },
+  "data/ttdb/interiors/ttdb_interiors_1_3.ttpf": {
+   "size": 898113536,
+   "sha256": "3598c14ad6b1df887b21b3f8685be2ab8a060264ca3f8db3829d3f4bc0863b8c"
+  },
+  "data/ttdb/interiors/ttdb_interiors_2_3.ttpf": {
+   "size": 881431552,
+   "sha256": "b8616380028bb8fe027c46c0a225793e5814a6639afb9d90dede4acabfde2004"
+  },
+  "data/ttdb/interiors/ttdb_interiors_3_3.ttpf": {
+   "size": 900875008,
+   "sha256": "d284d983873bc726b68c36ea85d0fd8c3a7c8ae58be049c981218eed00f614ba"
+  },
+  "data/ttdb/lighting/lighting.ttpf": {
+   "size": 151531776,
+   "sha256": "87727791b5026439d8f0b3bcceeae02b074fda9670270cac9bc248ffac16e3ca"
+  },
+  "data/ttdb/maps/ttdb_maps_0_7.ttpf": {
+   "size": 1765679616,
+   "sha256": "d672e99c248b943c3a3acb694eb16fe6236d3d9d04c86451cf68259ca68d4409"
+  },
+  "data/ttdb/maps/ttdb_maps_1_7.ttpf": {
+   "size": 1746187776,
+   "sha256": "df9f32bb42168ac0abf9e44573d837186107d5d3dc926a0cf597750f6cae112f"
+  },
+  "data/ttdb/maps/ttdb_maps_2_7.ttpf": {
+   "size": 1818806528,
+   "sha256": "2ca6dd82a842990b6a2c3440936b443808a6d98bf6b540048978591bdc23b7c0"
+  },
+  "data/ttdb/maps/ttdb_maps_3_7.ttpf": {
+   "size": 1787349760,
+   "sha256": "f90577103ef7986ba7ae4d190782bf73378d4e0e5be6f9664ea3fc3f3088255e"
+  },
+  "data/ttdb/maps/ttdb_maps_4_7.ttpf": {
+   "size": 1791670784,
+   "sha256": "ccc48a1662467b78423d3f83220e3bc4f4ae36c32a873d09344d48c1faab9760"
+  },
+  "data/ttdb/maps/ttdb_maps_5_7.ttpf": {
+   "size": 1840029440,
+   "sha256": "16229da15fb88d8a76dceadfb0cacb852144878960a7584b3345051d351c9c3c"
+  },
+  "data/ttdb/maps/ttdb_maps_6_7.ttpf": {
+   "size": 1745923072,
+   "sha256": "b852c332f5474a3631e13c708f2233b27668065d8a9ee751155efb98e27a3a6e"
+  },
+  "data/ttdb/maps/ttdb_maps_7_7.ttpf": {
+   "size": 1755748608,
+   "sha256": "27be3cf33f23326b9dec29692788e8ee75f73ce0050c23307600dbd067964de5"
+  },
+  "data/ttdb/peds/decorations_0_3.ttpf": {
+   "size": 494316032,
+   "sha256": "31246c91ea208b2b58809cb5bd82c5e0c044c88ae4198831aab727584675b0f3"
+  },
+  "data/ttdb/peds/decorations_1_3.ttpf": {
+   "size": 510001152,
+   "sha256": "baf71941408cf65f9aed0335a737783f62ca1899f863322d89f9a990bcb7f0e3"
+  },
+  "data/ttdb/peds/decorations_2_3.ttpf": {
+   "size": 491507456,
+   "sha256": "5c622d5a00f0f84125edc3c84061a4f97d57dd695ec6a286657f7135445cb3c6"
+  },
+  "data/ttdb/peds/decorations_3_3.ttpf": {
+   "size": 497391360,
+   "sha256": "aeabd38813f8af5582aad43e84b0a0262ef187d03115483764433ad5b1f848df"
+  },
+  "data/ttdb/peds/peds_loose.ttpf": {
+   "size": 135676160,
+   "sha256": "0c7ad96cf458be86c38f1cbdbc067f93ea444eda4a88c72b16d0ecdfcc91e311"
+  },
+  "data/ttdb/peds/ttdb_peds_0_3.ttpf": {
+   "size": 953116416,
+   "sha256": "73891cde5598e26e4dda53971d45d91c749e3d54dc2afe93bee9885344ea3dde"
+  },
+  "data/ttdb/peds/ttdb_peds_1_3.ttpf": {
+   "size": 965556736,
+   "sha256": "b37dcb845e9143409879de2b7fddf82d38a736d07041082648a7f718f9583faa"
+  },
+  "data/ttdb/peds/ttdb_peds_2_3.ttpf": {
+   "size": 937699072,
+   "sha256": "8ebca98d174266f5cf18cb50cc3c5ca5e7ecdbc84604f352bb6ff4fb05f9c2ef"
+  },
+  "data/ttdb/peds/ttdb_peds_3_3.ttpf": {
+   "size": 957291520,
+   "sha256": "3f9d03d67978f5454a927266c7f866f20c700bb753a83f5cbc7182a398618eeb"
+  },
+  "data/ttdb/props/octa_imposters.ttpf": {
+   "size": 983620352,
+   "sha256": "03a7d6dd60da98871228b1ec06a93d4a00387143dd20f123c0408087385f203c"
+  },
+  "data/ttdb/props/ttdb_props_0_3.ttpf": {
+   "size": 1304458240,
+   "sha256": "8e620456a4a296faf8be5632a8d929df590be1efeee7d5ce34059726a0ac65f4"
+  },
+  "data/ttdb/props/ttdb_props_1_3.ttpf": {
+   "size": 1256908800,
+   "sha256": "3cba53b0fa123e39597e8331fe4b432294fcf32baebb94f9db47a52f1b46ac4d"
+  },
+  "data/ttdb/props/ttdb_props_2_3.ttpf": {
+   "size": 1239990784,
+   "sha256": "6999079496270431dfb6df46a6406f721cfb4331e418bab6c6facb962f4d288f"
+  },
+  "data/ttdb/props/ttdb_props_3_3.ttpf": {
+   "size": 1328911616,
+   "sha256": "7633d784b6e77258f8d576777633fc72eebbff004c1640ee27d53773ced83639"
+  },
+  "data/ttdb/terrain/ttdb_terrain_0_7.ttpf": {
+   "size": 2775084288,
+   "sha256": "6de6efac9d3d7b862548b3d0aee352b086c2e01ebcf8cda8ede617afb495187f"
+  },
+  "data/ttdb/terrain/ttdb_terrain_1_7.ttpf": {
+   "size": 2739444480,
+   "sha256": "e1f5139ed75d6781754737cf277981aa5c3afea5d2d06e7dcd57a36fb4ff505c"
+  },
+  "data/ttdb/terrain/ttdb_terrain_2_7.ttpf": {
+   "size": 2780145920,
+   "sha256": "40b157a43413359fafef667aab1a6ec53d2c078c50fe24292678c3d1b33ede9a"
+  },
+  "data/ttdb/terrain/ttdb_terrain_3_7.ttpf": {
+   "size": 2718679808,
+   "sha256": "5799083008834d706e6b3606b647abfbfa6068574c96f3803ad957013bb4eb1a"
+  },
+  "data/ttdb/terrain/ttdb_terrain_4_7.ttpf": {
+   "size": 2741339648,
+   "sha256": "18c6ce167de25a1cea110401da7c2ce679106f7766df0b7af2668cba7a1ab25b"
+  },
+  "data/ttdb/terrain/ttdb_terrain_5_7.ttpf": {
+   "size": 2674379008,
+   "sha256": "60bcba6a7f3a658cec51232cc48098cf86a6e54d37f21ab9401b2a76e2a6ea53"
+  },
+  "data/ttdb/terrain/ttdb_terrain_6_7.ttpf": {
+   "size": 2688808960,
+   "sha256": "553961eff42fb8deb7cf7330d303e843b88ab29c87ab30b85cdd0c0501d1fc14"
+  },
+  "data/ttdb/terrain/ttdb_terrain_7_7.ttpf": {
+   "size": 2828296704,
+   "sha256": "dc887908067d49d9bd05c40029f7248a6bbf76fe79f34abea0199dd6a7edf244"
+  },
+  "data/ttdb/terrain/ttdb_terrain_image_based_0_1.ttpf": {
+   "size": 1946070528,
+   "sha256": "30a3020d15d4d159b06aa9fd31508a534c79d9990de215bf20d2572ec2713995"
+  },
+  "data/ttdb/terrain/ttdb_terrain_image_based_1_1.ttpf": {
+   "size": 1890978048,
+   "sha256": "1e0afca572034adebc2899e733546fb12a620acd10b32a4c21fbcc5926abed69"
+  },
+  "data/ttdb/ui/platform.ttpf": {
+   "size": 222976,
+   "sha256": "3e64d01e062ed55d290aaf3a7b9694d562a8591cf461e638dd135d388d4b5e5c"
+  },
+  "data/ttdb/ui/ttdb_ui.ttpf": {
+   "size": 845115648,
+   "sha256": "dc983ed7f6b78d1693fa5757f17c03bafb790e851594fdf4d412579b61d867f6"
+  },
+  "data/ttdb/vehicles/ttdb_vehicles.ttpf": {
+   "size": 195418624,
+   "sha256": "02add8dc1c4f8f485ef8abc5b4480b746e24fa4a546eb488ec37ff1b4d3c4e34"
+  },
+  "data/ttdb/vehicles/ttdb_vehicles_loose_0_1.ttpf": {
+   "size": 838474496,
+   "sha256": "0e90a8dbda5e32fb6c47a4ecabf821451a59abd349755c8030c380d4a9e9f834"
+  },
+  "data/ttdb/vehicles/ttdb_vehicles_loose_1_1.ttpf": {
+   "size": 890206208,
+   "sha256": "a3aae83237fedd1f7c32e8ab2adc8bf9a87d8b019a2242c5181547714b00f8cc"
+  },
+  "data/ttdb/vfx/ttdb_vfx.ttpf": {
+   "size": 238897664,
+   "sha256": "7625184c4e9c899f3b708b88d61fa2e12b836db63640385cecd750cb30c8f26e"
+  },
+  "data/ttdb/weapons/ttdb_weapons.ttpf": {
+   "size": 1421518080,
+   "sha256": "41c4fc92143fc26e44dcb4ca93142b914f9ac1188f9b53cbf8db27c6a97b6d4c"
+  },
+  "data/ttdb/weapons/weapon_liveries.ttpf": {
+   "size": 739758848,
+   "sha256": "7cae5a1ce890e7a4d452387f4dcb4ebde8e3e3b905409d7ed33903203a348ba5"
+  },
+  "gameos.xvd": {
+   "size": 348069888,
+   "sha256": "d02ff50ae9164e540ce55b60b2f128b5c78bab6bace6e5eee46e584438d9af36"
+  },
+  "layout_3202719e-b4b4-421c-9f8f-70d1c4a7d60b_xs.xml": {
+   "size": 13698,
+   "sha256": "2eeb9b05047f83c8bc82fcee7646e7d675266f4545f940593a6b56e92358663d"
+  },
+  "levels.rpf": {
+   "size": 76155065056,
+   "sha256": "9d1b1bd70659a32dc6259fc890dbc3e167dd3f9253f41000a3c9aa7c17539c47"
+  },
+  "libHttpClient.GDK.dll": {
+   "size": 975856,
+   "sha256": "14d97b3d071e0ce461e758dbcf1511941ae5c0bdd6e32ed33cb87aaae0414d3a"
+  },
+  "microsoft_gameconfig.bin": {
+   "size": 8192,
+   "sha256": "27735d6ca90ff4eb8f432e3d3e701fd85f75303f1adade2cdbc4bef165159a0a"
+  },
+  "movies.rpf": {
+   "size": 8832481776,
+   "sha256": "a0647c0325333dd42b25b00d85ee9b3915a55ce99127b97ef00662ef4866cba4"
+  },
+  "msvcp140.dll": {
+   "size": 565232,
+   "sha256": "6036fdb3ee3a5813ef0b17462219ebcee5f06b46ef738bacde07aa797e6d2b75"
+  },
+  "msvcp140_1.dll": {
+   "size": 26104,
+   "sha256": "c56b530e0894d9c4d11b12d389786fef40463dbd81d4438b8414f909d6226211"
+  },
+  "msvcp140_2.dll": {
+   "size": 187888,
+   "sha256": "276813083c55c079120e0db49898088bb0c8d1c912ed59ec0d00fedf56a694a8"
+  },
+  "msvcp140_atomic_wait.dll": {
+   "size": 57312,
+   "sha256": "b7f879662095f71dc08efcbc0d24ac3c0ff2dde8d475f92f5c5646a39bf8f2c3"
+  },
+  "msvcp140_codecvt_ids.dll": {
+   "size": 22008,
+   "sha256": "89cf5b07b98709277e8511d9a402ce72279e8df3ae24a8dd641ab0265c799a0c"
+  },
+  "navmeshes.rpf": {
+   "size": 6707512496,
+   "sha256": "30f8d4ebc0fd1d9f786cd50627a7bd3bd537288707606a18815a6440da8e3109"
+  },
+  "pack/core_bvh4/core_bvh4.rpf": {
+   "size": 8297921520,
+   "sha256": "a316887568569127e4ebb0053de11b9cefa4305ce6199fb85b5acc62bfa2ff5a"
+  },
+  "pack/core_licenses/core_licenses_data.rpf": {
+   "size": 13536,
+   "sha256": "6ca2574aa699b4583f110c6b3e3ae605a6a0ca8c36d65769f76e3beb58e93751"
+  },
+  "pack/core_restofworld/core_restofworld.rpf": {
+   "size": 1295760752,
+   "sha256": "a28e53eee58e0b7541bee699ca0136d7a8402934984fe1d12d573905a24da5f0"
+  },
+  "pack/core_restofworld/data/ttdb/peds/ttdb_peds.ttpf": {
+   "size": 24529408,
+   "sha256": "b3514f9b1fe258141f7b5d840fc753e980a2af59749a1f8d4de0867e93cf5c97"
+  },
+  "pack/core_restofworld/data/ttdb/props/ttdb_props.ttpf": {
+   "size": 35286784,
+   "sha256": "eaf45801f0a0b0407ff41d5e840a27f9cfce144e1a4798ca293003a484e2c0ee"
+  },
+  "pack/core_restofworld/data/ttdb/textures_loose.ttpf": {
+   "size": 21081856,
+   "sha256": "81da4d1904dd038ea59fb5d7b851e2a15b1906a5ff3017f1bd15dd617d46c3dc"
+  },
+  "pack/core_restofworld/data/ttdb/ui/ttdb_ui.ttpf": {
+   "size": 4729600,
+   "sha256": "9df804569a50dfe7d1a0f8ef71fa9a117a370616159489e9028f5acfd5118d66"
+  },
+  "pack/core_restofworld/data/ttdb/vfx/ttdb_vfx.ttpf": {
+   "size": 3129600,
+   "sha256": "6434287056329e60a4ca7ae26fabf91dc3ccf3b738130033400fb88ab42da8cf"
+  },
+  "pack/core_restofworld001/core_restofworld001.rpf": {
+   "size": 791984,
+   "sha256": "6eb47c010bb6bf69f50d69675e50415d345468f3a1193fdf7ab4e54a4d7d6c56"
+  },
+  "pack/core_restofworld001/data/ttdb/ui/ttdb_ui.ttpf": {
+   "size": 38656,
+   "sha256": "9bfb5f4b85be2f6d1d93b2ed83df94a2021346448816b61fd9c08d7d05b8a43c"
+  },
+  "pack/shared_minigame000/data/ttdb/maps/ttdb_maps.ttpf": {
+   "size": 193522176,
+   "sha256": "873a8c7634eacaa062a1bc48888908f3e2d3196159b9fa39e83eb6cfc18dbb06"
+  },
+  "pack/shared_minigame000/data/ttdb/terrain/ttdb_terrain_image_based.ttpf": {
+   "size": 1427712,
+   "sha256": "0354565963b8472bf2f606dc1a4089c14f45cb5ecd416984f5e4212009eb7e74"
+  },
+  "pack/shared_minigame000/shared_minigame000.rpf": {
+   "size": 810581008,
+   "sha256": "badd8f4b3a4e65bc492d2933d0c82239653467317c606c483e616979a5ec5967"
+  },
+  "pack/shared_minigame000_bvh4/shared_minigame000_bvh4.rpf": {
+   "size": 61987040,
+   "sha256": "9525a81d18b922ba5859643883d466f08442f779b7c92a7eaaefde3766292a96"
+  },
+  "pack/story000/data/ttdb/maps/ttdb_maps.ttpf": {
+   "size": 697378560,
+   "sha256": "8e362c1f39383d6ff97eeffbf963602e9ed2e2b97b707e54a3884fe7c8dd408d"
+  },
+  "pack/story000/data/ttdb/terrain/ttdb_terrain_image_based.ttpf": {
+   "size": 222333440,
+   "sha256": "4794cbff80790c7a0b3d2959f3831b53e90c5b56b9bdb61814f98f29a4e4157f"
+  },
+  "pack/story000/data/ttdb/vfx/ttdb_vfx.ttpf": {
+   "size": 3357184,
+   "sha256": "79612738f51faa724cb6d30ad5465419f3038d4b3498115ec1306b0ad7d71f1c"
+  },
+  "pack/story000/story000.rpf": {
+   "size": 20022508672,
+   "sha256": "4d7f87158a1be7e5e4f15ef195ddaa804be94d2ecaafaa9172150f7b6b8abf94"
+  },
+  "pack/story000/story000_script.rpf": {
+   "size": 78023728,
+   "sha256": "fb30232fd94ccfdb2b85bb8deae860b7c449348f2b4a8c38d9395de1ad00b8fb"
+  },
+  "pack/story000_bvh4/story000_bvh4.rpf": {
+   "size": 5632,
+   "sha256": "b9f86219f835c769ca86274f933ab35423af45dad33f130d5c5e4727450ffd24"
+  },
+  "pack/story000_restofworld/story000_restofworld.rpf": {
+   "size": 198354992,
+   "sha256": "f972251e4369d634419e33d2b2b6196f310e70af521dd0c9f00025d0c1c0e6ca"
+  },
+  "packs.rpf": {
+   "size": 4798213264,
+   "sha256": "ed6c55c60112704f7e551cfbb2446f7f069bfd7caa1c257bc427595cf7434651"
+  },
+  "resources.pri": {
+   "size": 1152,
+   "sha256": "1a91d1a8de2fa9bffafcfbdb0f4c1a8a02294647eec71385baa70b8d1e4a165e"
+  },
+  "script.rpf": {
+   "size": 4358960,
+   "sha256": "c4d7e75f867c8527eee75135cd400e22f7c770c159c6bc2c3f80ec0f6e6a8dbb"
+  },
+  "shaders.rpf": {
+   "size": 411695600,
+   "sha256": "0bc1634594e51ca8e7ef5f2bc6f5b32b081ce779ac094d686de08ecb75dc24a8"
+  },
+  "textures.rpf": {
+   "size": 192585024,
+   "sha256": "dc1957ec85d89b1b55cd1fdc5c3997f48d1e0bff9020ec2842120ab34e71c83e"
+  },
+  "vccorlib140.dll": {
+   "size": 336888,
+   "sha256": "79ee6fa49aa2c6f0dfbc1279273fd619e1a9285995ff53a8bc183000c8895b91"
+  },
+  "vcomp140.dll": {
+   "size": 72176,
+   "sha256": "91e249c0f66f827bcacd0be4931b1cec3e4907cc05ea0a5bcd83696c70908963"
+  },
+  "vcruntime140.dll": {
+   "size": 97776,
+   "sha256": "9385104cc3e031dbbcb63f156134a0f6afff455e0ff6887f5a9e1c5f7e2706b0"
+  },
+  "vcruntime140_1.dll": {
+   "size": 37848,
+   "sha256": "0dbd6859f825ab8acab1fa25b6bd1a091d35ca2dbe3185c1187192f2d2ac8154"
+  },
+  "xbs_logo_150.png": {
+   "size": 54536,
+   "sha256": "21a652895663671afef4e947cc8ced47ca66ec00f4b27059c17bef6965a506ca"
+  },
+  "xbs_logo_44.png": {
+   "size": 7102,
+   "sha256": "072c08f82513a8f6a392dd8be371378333191a4aabbc5b6a1fedfe7dbc850916"
+  },
+  "xbs_logo_480.png": {
+   "size": 404663,
+   "sha256": "b5ac80b8d43bc23c9de0593fad04a7eafa5106ed405eeb5db40ad9b37642d535"
+  },
+  "xbs_logo_store.png": {
+   "size": 29356,
+   "sha256": "006999d45faf184bf669610f364b9551874d0fdb154e36ce34e622a300d025da"
+  },
+  "xbs_splash.png": {
+   "size": 2507194,
+   "sha256": "0fa110ecac0a5fac8294921132cc8322440bdf93e74e723eb63eae0143d58e58"
+  }
+ },
+ "expected_exe": "game_scarlett_master.exe"
+}

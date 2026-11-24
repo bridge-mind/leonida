@@ -1,0 +1,30 @@
+#version 460
+// A compute shader written to the translator's runtime contract that stores the subgroup size the driver ran it
+// with (gl_SubgroupSize) in out[0], for d3d12_subgroup_test. s4:s5 (the first two of the four root constants, in the console
+// compute layout from s4) hold the console VA of the output.
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_buffer_reference_uvec2 : require
+#extension GL_KHR_shader_subgroup_basic : require
+
+layout(local_size_x = 64) in;
+
+layout(buffer_reference, std430, buffer_reference_align = 4) buffer Words {
+    uint w[];
+};
+
+layout(push_constant) uniform UserData {
+    uint s[32];
+    uvec2 heap_base;
+    uvec2 code_base;
+} pc;
+
+uvec2 add64(uvec2 a, uvec2 b) {
+    uint carry;
+    const uint low = uaddCarry(a.x, b.x, carry);
+    return uvec2(low, a.y + b.y + carry);
+}
+
+void main() {
+    Words out_words = Words(add64(pc.heap_base, uvec2(pc.s[4], pc.s[5])));
+    if (gl_LocalInvocationIndex == 0u) out_words.w[0] = gl_SubgroupSize;
+}

@@ -1,0 +1,34 @@
+// Clamp a GPU-written D3D12 ExecuteIndirect DISPATCH count without reading it on the CPU.
+// Each record is a VkDispatchIndirectCommand (three uints); disabled records are zero.
+#version 460
+#extension GL_EXT_buffer_reference : require
+layout(local_size_x = 64) in;
+layout(buffer_reference, std430, buffer_reference_align = 4) readonly buffer WordsIn {
+    uint data[];
+};
+layout(buffer_reference, std430, buffer_reference_align = 4) buffer WordsOut {
+    uint data[];
+};
+layout(push_constant) uniform Params {
+    WordsIn arguments;
+    WordsIn count;
+    WordsOut output_words;
+    uint stride_words;
+    uint first_record;
+    uint records;
+} p;
+void main() {
+    const uint local_record = gl_GlobalInvocationID.x;
+    if (local_record >= p.records) return;
+    const uint target = local_record * 3u;
+    if (p.first_record + local_record < p.count.data[0]) {
+        const uint source = local_record * p.stride_words;
+        p.output_words.data[target] = p.arguments.data[source];
+        p.output_words.data[target + 1u] = p.arguments.data[source + 1u];
+        p.output_words.data[target + 2u] = p.arguments.data[source + 2u];
+    } else {
+        p.output_words.data[target] = 0u;
+        p.output_words.data[target + 1u] = 0u;
+        p.output_words.data[target + 2u] = 0u;
+    }
+}

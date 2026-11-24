@@ -1,0 +1,986 @@
+{
+ "classes": {
+  "XAccessibilityImpl": {
+   "id": "3e241977-6237-41e9-8559-102c2d9983f1",
+   "implements": [
+    "IXAccessibilityImpl2"
+   ]
+  },
+  "XAppCaptureImpl": {
+   "id": "a4f1aee2-4bf1-4485-b008-a7c26d52ac27",
+   "implements": [
+    "IXAppCaptureImpl4"
+   ]
+  },
+  "XAppCaptureMetadataImpl": {
+   "id": "186d5592-a72d-45fb-9560-11aed0e6647a",
+   "implements": [
+    "IXAppCaptureMetadataImpl"
+   ]
+  },
+  "XDisplayImpl": {
+   "id": "03f0fe74-fdd9-4e5c-b630-f9339c47acc5",
+   "implements": [
+    "IXDisplayImpl"
+   ]
+  },
+  "XErrorImpl": {
+   "id": "8ca467f7-22e8-4096-8456-bb8aa13f79d8",
+   "implements": [
+    "IXErrorImpl"
+   ]
+  },
+  "XGameActivationImpl": {
+   "id": "7f0fe8b8-e075-49ab-9aa7-a1e065489a9e",
+   "implements": [
+    "IXGameActivationImpl"
+   ]
+  },
+  "XGameEventImpl": {
+   "id": "bbfbdcc7-bfe7-409b-a5ca-edf054960b4d",
+   "implements": [
+    "IXGameEventImpl"
+   ]
+  },
+  "XGameImpl": {
+   "id": "973a344e-24bf-4d0f-8457-56c534892b29",
+   "implements": [
+    "IXGameImpl3"
+   ]
+  },
+  "XGameInviteImpl": {
+   "id": "0651aae2-4012-4077-bf84-8b9097090e2c",
+   "implements": [
+    "IXGameInviteImpl2"
+   ]
+  },
+  "XGameProtocolImpl": {
+   "id": "95fd18d2-74dd-4d7c-aa1b-0b51827665d6",
+   "implements": [
+    "IXGameProtocolImpl"
+   ]
+  },
+  "XGameRuntimeFeatureImpl": {
+   "id": "8836fe87-edb9-4fe3-8dad-05f0d2cd5b40",
+   "implements": [
+    "IXGameRuntimeFeatureImpl"
+   ]
+  },
+  "XGameSaveImpl": {
+   "id": "704c3f58-e629-4cc2-b197-30511b996fe2",
+   "implements": [
+    "IXGameSaveImpl3"
+   ]
+  },
+  "XGameStreamingImpl": {
+   "id": "0a2192aa-b2d5-4d58-83be-383b6d80799e",
+   "implements": [
+    "IXGameStreamingImpl3"
+   ]
+  },
+  "XGameUiImpl": {
+   "id": "dfcd4649-4ff8-4043-ba07-35d607df98b0",
+   "implements": [
+    "IXGameUiImpl4"
+   ]
+  },
+  "XLauncherImpl": {
+   "id": "1b339674-328d-4283-a200-3171f18d3639",
+   "implements": [
+    "IXLauncherImpl"
+   ]
+  },
+  "XNetworkingImpl": {
+   "id": "37e56907-2f10-41e8-b72f-36edb185331a",
+   "implements": [
+    "IXNetworkingImpl2"
+   ]
+  },
+  "XPackageImpl": {
+   "id": "af406016-e850-4aa8-a88d-2f3dcb9dac7e",
+   "implements": [
+    "IXPackageImpl4"
+   ]
+  },
+  "XPersistentLocalStorageImpl": {
+   "id": "f4faf4d4-2d04-4fce-b3e0-474a713a3e84",
+   "implements": [
+    "IXPersistentLocalStorageImpl3"
+   ]
+  },
+  "XStoreImpl": {
+   "id": "0dd112ac-7c24-448c-b92b-3960fb5bd30c",
+   "implements": [
+    "IXStoreImpl6"
+   ]
+  },
+  "XSystemAnalyticsImpl": {
+   "id": "b884675d-b738-4a9c-815d-9a9a1e0c6c9b",
+   "implements": [
+    "IXSystemAnalyticsImpl"
+   ]
+  },
+  "XSystemImpl": {
+   "id": "e349bd1a-fc20-4e40-b99c-4178cc6b409f",
+   "implements": [
+    "IXSystemImpl5"
+   ]
+  },
+  "XThreadingImpl": {
+   "id": "073b7dcb-1fcf-4030-94be-e3c9eb623428",
+   "implements": [
+    "IXThreadingImpl"
+   ]
+  },
+  "XUserDeviceImpl": {
+   "id": "7d824997-10dc-45ab-86b7-2737767c0bf1",
+   "implements": [
+    "IXUserDeviceImpl2"
+   ]
+  },
+  "XUserImpl": {
+   "id": "01acd177-91f9-4763-a38e-ccbb55ce32e0",
+   "implements": [
+    "IXUserImpl6",
+    "IXUserGamertagImpl"
+   ]
+  }
+ },
+ "interfaces": {
+  "IXAccessibilityImpl": {
+   "class": "XAccessibilityImpl",
+   "id": "3e241977-6237-41e9-8559-102c2d9983f1",
+   "inherits": null,
+   "methods": [
+    "XClosedCaptionGetProperties",
+    "XClosedCaptionSetEnabled",
+    "XHighContrastGetMode",
+    "XSpeechToTextSetPositionHint",
+    "XSpeechToTextSendString",
+    "XSpeechSynthesizerEnumerateInstalledVoices",
+    "XSpeechSynthesizerCreate",
+    "XSpeechSynthesizerCloseHandle",
+    "XSpeechSynthesizerSetDefaultVoice",
+    "XSpeechSynthesizerSetCustomVoice",
+    "XSpeechSynthesizerCreateStreamFromText",
+    "XSpeechSynthesizerCloseStreamHandle",
+    "XSpeechSynthesizerGetStreamDataSize",
+    "XSpeechSynthesizerGetStreamData",
+    "XSpeechToTextBeginHypothesisString",
+    "XSpeechToTextUpdateHypothesisString",
+    "XSpeechToTextFinalizeHypothesisString",
+    "XSpeechToTextCancelHypothesisString",
+    "XSpeechSynthesizerCreateStreamFromSsml"
+   ]
+  },
+  "IXAccessibilityImpl2": {
+   "class": "XAccessibilityImpl",
+   "id": "d722b373-8c4d-4692-9e51-d6ad9b37aa7d",
+   "inherits": "IXAccessibilityImpl",
+   "methods": null
+  },
+  "IXAppCaptureImpl": {
+   "class": "XAppCaptureImpl",
+   "id": "a4f1aee2-4bf1-4485-b008-a7c26d52ac27",
+   "inherits": null,
+   "methods": [
+    "XAppCaptureTakeDiagnosticScreenshot",
+    "XAppCaptureRecordDiagnosticClip",
+    "XAppCaptureTakeScreenshot",
+    "XAppCaptureOpenScreenshotStream",
+    "XAppCaptureReadScreenshotStream",
+    "XAppCaptureCloseScreenshotStream",
+    "XAppCaptureEnableRecord",
+    "XAppCaptureDisableRecord"
+   ]
+  },
+  "IXAppCaptureImpl2": {
+   "class": "XAppCaptureImpl",
+   "id": "3a949778-772e-4799-bdea-0a6639e96baa",
+   "inherits": "IXAppCaptureImpl",
+   "methods": [
+    "XAppCaptureGetVideoCaptureSettings",
+    "XAppCaptureRecordTimespan",
+    "XAppCaptureReadLocalStream",
+    "XAppCaptureCloseLocalStream"
+   ]
+  },
+  "IXAppCaptureImpl3": {
+   "class": "XAppCaptureImpl",
+   "id": "2bbca60a-619c-4fe1-812e-fb5c1dbdcf51",
+   "inherits": "IXAppCaptureImpl2",
+   "methods": [
+    "XAppCaptureStartUserRecord",
+    "XAppCaptureStopUserRecord"
+   ]
+  },
+  "IXAppCaptureImpl4": {
+   "class": "XAppCaptureImpl",
+   "id": "22e672d7-b4e3-406c-bd50-8f0d25236f9e",
+   "inherits": "IXAppCaptureImpl3",
+   "methods": [
+    "XAppCaptureCancelUserRecord"
+   ]
+  },
+  "IXAppCaptureMetadataImpl": {
+   "class": "XAppCaptureMetadataImpl",
+   "id": "186d5592-a72d-45fb-9560-11aed0e6647a",
+   "inherits": null,
+   "methods": [
+    "XAppBroadcastIsAppBroadcasting",
+    "XAppBroadcastShowUI",
+    "XAppBroadcastGetStatus",
+    "XAppBroadcastRegisterIsAppBroadcastingChanged",
+    "XAppBroadcastUnregisterIsAppBroadcastingChanged",
+    "XAppCaptureMetadataAddStringEvent",
+    "XAppCaptureMetadataAddInt32Event",
+    "XAppCaptureMetadataAddDoubleEvent",
+    "XAppCaptureMetadataStartStringState",
+    "XAppCaptureMetadataStartInt32State",
+    "XAppCaptureMetadataStartDoubleState",
+    "XAppCaptureMetadataStopState",
+    "XAppCaptureMetadataStopAllStates",
+    "XAppCaptureMetadataRemainingStorageBytesAvailable",
+    "XAppCaptureRegisterMetadataPurged",
+    "XAppCaptureUnRegisterMetadataPurged"
+   ]
+  },
+  "IXDisplayImpl": {
+   "class": "XDisplayImpl",
+   "id": "35f07670-706e-4bfb-9476-090798c5ebf3",
+   "inherits": null,
+   "methods": [
+    null,
+    "XDisplayTryEnableHdrMode"
+   ]
+  },
+  "IXErrorImpl": {
+   "class": "XErrorImpl",
+   "id": "8ca467f7-22e8-4096-8456-bb8aa13f79d8",
+   "inherits": null,
+   "methods": [
+    null,
+    "XErrorSetCallback",
+    "XErrorSetOptions"
+   ]
+  },
+  "IXGameActivationImpl": {
+   "class": "XGameActivationImpl",
+   "id": "2e4f76fe-0fc7-461e-ab4d-a4499434c3cf",
+   "inherits": null,
+   "methods": [
+    "XGameActivationRegisterForEvent",
+    "XGameActivationUnregisterForEvent",
+    "XGameActivationAcceptPendingInvite"
+   ]
+  },
+  "IXGameEventImpl": {
+   "class": "XGameEventImpl",
+   "id": "bbfbdcc7-bfe7-409b-a5ca-edf054960b4d",
+   "inherits": null,
+   "methods": [
+    "XGameEventWrite"
+   ]
+  },
+  "IXGameImpl": {
+   "class": "XGameImpl",
+   "id": "973a344e-24bf-4d0f-8457-56c534892b29",
+   "inherits": null,
+   "methods": [
+    "XGameGetXboxTitleId"
+   ]
+  },
+  "IXGameImpl2": {
+   "class": "XGameImpl",
+   "id": "50849859-0ad8-4f81-80e4-5bc78626f852",
+   "inherits": "IXGameImpl",
+   "methods": [
+    "XLaunchNewGame"
+   ]
+  },
+  "IXGameImpl3": {
+   "class": "XGameImpl",
+   "id": "2549f142-6419-4a06-97b5-931aab7c2f34",
+   "inherits": "IXGameImpl2",
+   "methods": [
+    "XLaunchRestartOnCrash"
+   ]
+  },
+  "IXGameInviteImpl": {
+   "class": "XGameInviteImpl",
+   "id": "0651aae2-4012-4077-bf84-8b9097090e2c",
+   "inherits": null,
+   "methods": [
+    "XGameInviteRegisterForEvent",
+    "XGameInviteUnregisterForEvent"
+   ]
+  },
+  "IXGameInviteImpl2": {
+   "class": "XGameInviteImpl",
+   "id": "014d1cc3-bcfe-41ff-b2f0-e1ef07155828",
+   "inherits": "IXGameInviteImpl",
+   "methods": [
+    "XGameInviteRegisterForPendingEvent",
+    "XGameInviteUnregisterForPendingEvent",
+    "XGameInviteAcceptPendingInvite"
+   ]
+  },
+  "IXGameProtocolImpl": {
+   "class": "XGameProtocolImpl",
+   "id": "026b010c-06c3-4cdd-bbcb-43f229db1cff",
+   "inherits": null,
+   "methods": [
+    "XGameProtocolRegisterForActivation",
+    "XGameProtocolUnregisterForActivation"
+   ]
+  },
+  "IXGameRuntimeFeatureImpl": {
+   "class": "XGameRuntimeFeatureImpl",
+   "id": "8836fe87-edb9-4fe3-8dad-05f0d2cd5b40",
+   "inherits": null,
+   "methods": [
+    "XGameRuntimeIsFeatureAvailable"
+   ]
+  },
+  "IXGameSaveImpl": {
+   "class": "XGameSaveImpl",
+   "id": "704c3f58-e629-4cc2-b197-30511b996fe2",
+   "inherits": null,
+   "methods": [
+    "XGameSaveInitializeProvider",
+    "XGameSaveInitializeProviderAsync",
+    "XGameSaveInitializeProviderResult",
+    "XGameSaveCloseProvider",
+    "XGameSaveGetRemainingQuota",
+    "XGameSaveGetRemainingQuotaAsync",
+    "XGameSaveGetRemainingQuotaResult",
+    "XGameSaveDeleteContainer",
+    "XGameSaveDeleteContainerAsync",
+    "XGameSaveDeleteContainerResult",
+    "XGameSaveGetContainerInfo",
+    "XGameSaveEnumerateContainerInfo",
+    "XGameSaveEnumerateContainerInfoByName",
+    "XGameSaveCreateContainer",
+    "XGameSaveCloseContainer",
+    "XGameSaveEnumerateBlobInfo",
+    "XGameSaveEnumerateBlobInfoByName",
+    "XGameSaveReadBlobData",
+    "XGameSaveReadBlobDataAsync",
+    "XGameSaveReadBlobDataResult",
+    "XGameSaveCreateUpdate",
+    "XGameSaveCloseUpdate",
+    "XGameSaveSubmitBlobWrite",
+    "XGameSaveSubmitBlobDelete",
+    "XGameSaveSubmitUpdate",
+    "XGameSaveSubmitUpdateAsync",
+    "XGameSaveSubmitUpdateResult"
+   ]
+  },
+  "IXGameSaveImpl2": {
+   "class": "XGameSaveImpl",
+   "id": "704c3f58-e629-4cc2-b197-30511b996ee2",
+   "inherits": "IXGameSaveImpl",
+   "methods": [
+    "XGameSaveFilesGetFolderWithUiAsync",
+    "XGameSaveFilesGetFolderWithUiResult",
+    "XGameSaveFilesGetRemainingQuota"
+   ]
+  },
+  "IXGameSaveImpl3": {
+   "class": "XGameSaveImpl",
+   "id": "1bfff3af-f14a-40a3-8e35-9ada906593f9",
+   "inherits": "IXGameSaveImpl2",
+   "methods": null
+  },
+  "IXGameStreamingImpl": {
+   "class": "XGameStreamingImpl",
+   "id": "8aff07f5-a1bf-4db8-80a5-31cca0de51b7",
+   "inherits": null,
+   "methods": [
+    "XGameStreamingInitialize",
+    "XGameStreamingUninitialize",
+    "XGameStreamingIsStreaming",
+    "XGameStreamingRegisterClientPropertiesChanged",
+    "XGameStreamingUnregisterClientPropertiesChanged",
+    "XGameStreamingGetStreamPhysicalDimensions",
+    "XGameStreamingGetClientCount",
+    "XGameStreamingGetClients",
+    "XGameStreamingGetConnectionState",
+    "XGameStreamingRegisterConnectionStateChanged",
+    "XGameStreamingUnregisterConnectionStateChanged",
+    "XGameStreamingGetStreamAddedLatency",
+    "XGameStreamingGetServerLocationNameSize",
+    "XGameStreamingGetServerLocationName",
+    "XGameStreamingHideTouchControls",
+    "XGameStreamingShowTouchControlLayout",
+    "XGameStreamingHideTouchControlsOnClient",
+    "XGameStreamingShowTouchControlLayoutOnClient",
+    "XGameStreamingIsTouchInputEnabled",
+    "XGameStreamingGetLastFrameDisplayed",
+    "XGameStreamingGetAssociatedFrame",
+    "XGameStreamingGetGamepadPhysicality",
+    "XGameStreamingUpdateTouchControlsState",
+    "XGameStreamingUpdateTouchControlsStateOnClient",
+    "XGameStreamingShowTouchControlsWithStateUpdate",
+    "XGameStreamingShowTouchControlsWithStateUpdateOnClient",
+    "XGameStreamingGetTouchBundleVersionNameSize",
+    "XGameStreamingGetTouchBundleVersion",
+    "XGameStreamingGetClientIPAddress"
+   ]
+  },
+  "IXGameStreamingImpl2": {
+   "class": "XGameStreamingImpl",
+   "id": "5f5e5169-746c-4001-ad1c-da728d01c9eb",
+   "inherits": "IXGameStreamingImpl",
+   "methods": [
+    "XGameStreamingGetSessionId"
+   ]
+  },
+  "IXGameStreamingImpl3": {
+   "class": "XGameStreamingImpl",
+   "id": "57786622-6605-46d0-b917-0f22bbcd9c52",
+   "inherits": "IXGameStreamingImpl2",
+   "methods": [
+    "XGameStreamingGetDisplayDetails",
+    "XGameStreamingSetResolution"
+   ]
+  },
+  "IXGameUiImpl": {
+   "class": "XGameUiImpl",
+   "id": "6eeaa73e-9669-43ad-a2c7-d0da4e1f50a1",
+   "inherits": null,
+   "methods": [
+    "XGameUiShowMessageDialogAsync",
+    "XGameUiShowMessageDialogResult",
+    "XGameUiShowSendGameInviteAsync",
+    "XGameUiShowSendGameInviteResult",
+    "XGameUiShowPlayerProfileCardAsync",
+    "XGameUiShowPlayerProfileCardResult",
+    "XGameUiShowAchievementsAsync",
+    "XGameUiShowAchievementsResult",
+    "XGameUiShowPlayerPickerAsync",
+    "XGameUiShowPlayerPickerResultCount",
+    "XGameUiShowPlayerPickerResult",
+    "XGameUiShowErrorDialogAsync",
+    "XGameUiShowErrorDialogResult",
+    "XGameUiSetNotificationPositionHint",
+    "XGameUiShowTextEntryAsync",
+    "XGameUiShowTextEntryResultSize",
+    "XGameUiShowTextEntryResult",
+    null,
+    null,
+    null,
+    null,
+    "XGameUiShowWebAuthenticationAsync",
+    "XGameUiShowWebAuthenticationResultSize",
+    "XGameUiShowWebAuthenticationResult",
+    "XGameUiShowWebAuthenticationWithOptionsAsync",
+    null,
+    null
+   ]
+  },
+  "IXGameUiImpl2": {
+   "class": "XGameUiImpl",
+   "id": "36a03122-9ea3-4a3a-a8a4-899cfd85d7db",
+   "inherits": "IXGameUiImpl",
+   "methods": [
+    "XGameUiShowMultiplayerActivityGameInviteAsync",
+    "XGameUiShowMultiplayerActivityGameInviteResult",
+    null,
+    null,
+    "XGameUiTextEntryOpen",
+    "XGameUiTextEntryClose",
+    "XGameUiTextEntryGetState",
+    "XGameUiTextEntryGetExtents",
+    "XGameUiTextEntryUpdatePositionHint",
+    "XGameUiTextEntryUpdateVisibility"
+   ]
+  },
+  "IXGameUiImpl3": {
+   "class": "XGameUiImpl",
+   "id": "ade7eba1-2093-42ce-a544-a523a66790e0",
+   "inherits": "IXGameUiImpl2",
+   "methods": [
+    "XGameUiShowStateShareAsync",
+    "XGameUiShowStateShareResult"
+   ]
+  },
+  "IXGameUiImpl4": {
+   "class": "XGameUiImpl",
+   "id": "eaf669df-5542-4590-99a3-8dc061f837cc",
+   "inherits": "IXGameUiImpl3",
+   "methods": [
+    "XGameUiSetUiCallbacks",
+    "XGameUiSetMessageDialogUiResponse",
+    "XGameUiSetPlayerPickerUiResponse",
+    "XGameUiSetTextEntryUiResponse",
+    "XGameUiSetPlayerProfileCardUiResponse",
+    "XGameUiSetSendGameInviteUiResponse",
+    "XGameUiSetAchievementsUiResponse",
+    "XGameUiSetMultiplayerActivityGameInviteUiResponse",
+    "XGameUiSetErrorDialogUiResponse"
+   ]
+  },
+  "IXLauncherImpl": {
+   "class": "XLauncherImpl",
+   "id": "1b339674-328d-4283-a200-3171f18d3639",
+   "inherits": null,
+   "methods": [
+    "XLaunchUri",
+    "XDisplayAcquireTimeoutDeferral",
+    "XDisplayCloseTimeoutDeferralHandle"
+   ]
+  },
+  "IXNetworkingImpl": {
+   "class": "XNetworkingImpl",
+   "id": "37e56907-2f10-41e8-b72f-36edb185331a",
+   "inherits": null,
+   "methods": [
+    "XNetworkingQueryPreferredLocalUdpMultiplayerPort",
+    "XNetworkingQueryPreferredLocalUdpMultiplayerPortAsync",
+    "XNetworkingQueryPreferredLocalUdpMultiplayerPortAsyncResult",
+    "XNetworkingRegisterPreferredLocalUdpMultiplayerPortChanged",
+    "XNetworkingUnregisterPreferredLocalUdpMultiplayerPortChanged",
+    "XNetworkingQuerySecurityInformationForUrlAsync",
+    "XNetworkingQuerySecurityInformationForUrlAsyncResultSize",
+    "XNetworkingQuerySecurityInformationForUrlAsyncResult",
+    "XNetworkingQuerySecurityInformationForUrlUtf16Async",
+    "XNetworkingQuerySecurityInformationForUrlUtf16AsyncResultSize",
+    "XNetworkingQuerySecurityInformationForUrlUtf16AsyncResult",
+    "XNetworkingVerifyServerCertificate",
+    "XNetworkingGetConnectivityHint",
+    "XNetworkingRegisterConnectivityHintChanged",
+    "XNetworkingUnregisterConnectivityHintChanged"
+   ]
+  },
+  "IXNetworkingImpl2": {
+   "class": "XNetworkingImpl",
+   "id": "bf2346b2-39af-4658-b5ea-44713c7e83b3",
+   "inherits": "IXNetworkingImpl",
+   "methods": [
+    "XNetworkingQueryConfigurationSetting",
+    "XNetworkingSetConfigurationSetting",
+    "XNetworkingQueryStatistics"
+   ]
+  },
+  "IXPackageImpl": {
+   "class": "XPackageImpl",
+   "id": "3720de07-e8e4-44a3-ad32-b359e8adbe55",
+   "inherits": null,
+   "methods": [
+    "XPackageGetCurrentProcessPackageIdentifier",
+    "XPackageIsPackagedProcess",
+    "XPackageCreateInstallationMonitor",
+    "XPackageCloseInstallationMonitorHandle",
+    "XPackageGetInstallationProgress",
+    "XPackageUpdateInstallationMonitor",
+    "XPackageRegisterInstallationProgressChanged",
+    "XPackageUnregisterInstallationProgressChanged",
+    "XPackageGetUserLocale",
+    "XPackageFindChunkAvailability",
+    "XPackageEnumerateChunkAvailability",
+    "XPackageChangeChunkInstallOrder",
+    "XPackageInstallChunks",
+    "XPackageInstallChunksAsync",
+    "XPackageInstallChunksResult",
+    "XPackageEstimateDownloadSize",
+    "XPackageUninstallChunks",
+    null,
+    null,
+    "XPackageUnregisterPackageInstalled",
+    "XPackageMount",
+    "XPackageGetMountPathSize",
+    "XPackageGetMountPath",
+    "XPackageCloseMountHandle",
+    null,
+    "XPackageEnumeratePackages",
+    "XPackageRegisterPackageInstalled",
+    "XPackageGetWriteStats",
+    null,
+    "XPackageUninstallUWPInstance",
+    "XPackageEnumerateFeatures",
+    "XPackageUninstallPackage"
+   ]
+  },
+  "IXPackageImpl2": {
+   "class": "XPackageImpl",
+   "id": "f92d8712-2b27-4d8a-bf01-11a6f8e3eb42",
+   "inherits": "IXPackageImpl",
+   "methods": [
+    "XPackageEnumeratePackages",
+    "XPackageRegisterPackageInstalled",
+    "XPackageMountWithUiAsync",
+    "XPackageMountWithUiResult"
+   ]
+  },
+  "IXPackageImpl3": {
+   "class": "XPackageImpl",
+   "id": "e2a4734b-2f4a-456d-aa8f-d065e04fb209",
+   "inherits": "IXPackageImpl2",
+   "methods": [
+    "XPackageEnumeratePackages",
+    "XPackageRegisterPackageInstalled"
+   ]
+  },
+  "IXPackageImpl4": {
+   "class": "XPackageImpl",
+   "id": "0b9d556e-ab70-43f4-baa0-9999ac4cb040",
+   "inherits": "IXPackageImpl3",
+   "methods": [
+    "XPackageGetPackageKind"
+   ]
+  },
+  "IXPersistentLocalStorageImpl": {
+   "class": "XPersistentLocalStorageImpl",
+   "id": "f4faf4d4-2d04-4fce-b3e0-474a713a3e84",
+   "inherits": null,
+   "methods": [
+    "XPersistentLocalStorageGetPathSize",
+    "XPersistentLocalStorageGetPath",
+    "XPersistentLocalStorageGetSpaceInfo",
+    "XPersistentLocalStoragePromptUserForSpaceAsync",
+    "XPersistentLocalStoragePromptUserForSpaceResult"
+   ]
+  },
+  "IXPersistentLocalStorageImpl2": {
+   "class": "XPersistentLocalStorageImpl",
+   "id": "d29411df-0794-4553-8b27-95fc02d0f75d",
+   "inherits": "IXPersistentLocalStorageImpl",
+   "methods": null
+  },
+  "IXPersistentLocalStorageImpl3": {
+   "class": "XPersistentLocalStorageImpl",
+   "id": "41a4e10c-5a7e-41d9-8c37-37bde62a07d6",
+   "inherits": "IXPersistentLocalStorageImpl2",
+   "methods": [
+    "XPersistentLocalStorageMountForPackage"
+   ]
+  },
+  "IXStoreImpl": {
+   "class": "XStoreImpl",
+   "id": "0dd112ac-7c24-448c-b92b-3960fb5bd30c",
+   "inherits": null,
+   "methods": [
+    "XStoreCreateContext",
+    "XStoreCloseContextHandle",
+    "XStoreQueryAssociatedProductsAsync",
+    "XStoreQueryAssociatedProductsResult",
+    "XStoreQueryProductsAsync",
+    "XStoreQueryProductsResult",
+    "XStoreQueryEntitledProductsAsync",
+    "XStoreQueryEntitledProductsResult",
+    "XStoreQueryProductForCurrentGameAsync",
+    "XStoreQueryProductForCurrentGameResult",
+    "XStoreQueryProductForPackageAsync",
+    "XStoreQueryProductForPackageResult",
+    "XStoreEnumerateProductsQuery",
+    "XStoreProductsQueryHasMorePages",
+    "XStoreProductsQueryNextPageAsync",
+    "XStoreProductsQueryNextPageResult",
+    "XStoreCloseProductsQueryHandle",
+    "XStoreAcquireLicenseForPackageAsync",
+    "XStoreAcquireLicenseForPackageResult",
+    "XStoreIsLicenseValid",
+    "XStoreCloseLicenseHandle",
+    "XStoreCanAcquireLicenseForStoreIdAsync",
+    "XStoreCanAcquireLicenseForStoreIdResult",
+    "XStoreCanAcquireLicenseForPackageAsync",
+    "XStoreCanAcquireLicenseForPackageResult",
+    "XStoreQueryGameLicenseAsync",
+    "XStoreQueryGameLicenseResult",
+    "XStoreQueryAddOnLicensesAsync",
+    "XStoreQueryAddOnLicensesResultCount",
+    "XStoreQueryAddOnLicensesResult",
+    "XStoreQueryConsumableBalanceRemainingAsync",
+    "XStoreQueryConsumableBalanceRemainingResult",
+    "XStoreReportConsumableFulfillmentAsync",
+    "XStoreReportConsumableFulfillmentResult",
+    "XStoreGetUserCollectionsIdAsync",
+    "XStoreGetUserCollectionsIdResultSize",
+    "XStoreGetUserCollectionsIdResult",
+    "XStoreGetUserPurchaseIdAsync",
+    "XStoreGetUserPurchaseIdResultSize",
+    "XStoreGetUserPurchaseIdResult",
+    "XStoreQueryLicenseTokenAsync",
+    "XStoreQueryLicenseTokenResultSize",
+    "XStoreQueryLicenseTokenResult",
+    null,
+    null,
+    null,
+    "XStoreShowPurchaseUIAsync",
+    "XStoreShowPurchaseUIResult",
+    "XStoreShowRateAndReviewUIAsync",
+    "XStoreShowRateAndReviewUIResult",
+    "XStoreShowRedeemTokenUIAsync",
+    "XStoreShowRedeemTokenUIResult",
+    "XStoreQueryGameAndDlcPackageUpdatesAsync",
+    "XStoreQueryGameAndDlcPackageUpdatesResultCount",
+    "XStoreQueryGameAndDlcPackageUpdatesResult",
+    "XStoreDownloadPackageUpdatesAsync",
+    "XStoreDownloadPackageUpdatesResult",
+    "XStoreDownloadAndInstallPackageUpdatesAsync",
+    "XStoreDownloadAndInstallPackageUpdatesResult",
+    "XStoreDownloadAndInstallPackagesAsync",
+    "XStoreDownloadAndInstallPackagesResultCount",
+    "XStoreDownloadAndInstallPackagesResult",
+    "XStoreQueryPackageIdentifier",
+    "XStoreRegisterGameLicenseChanged",
+    "XStoreUnregisterGameLicenseChanged",
+    "XStoreRegisterPackageLicenseLost",
+    "XStoreUnregisterPackageLicenseLost"
+   ]
+  },
+  "IXStoreImpl2": {
+   "class": "XStoreImpl",
+   "id": "60b09f4e-1b85-45b1-826c-169118e230e1",
+   "inherits": "IXStoreImpl",
+   "methods": [
+    "XStoreIsAvailabilityPurchasable"
+   ]
+  },
+  "IXStoreImpl3": {
+   "class": "XStoreImpl",
+   "id": "2d42fea5-e71d-4b76-97cd-c50afbb3ae5d",
+   "inherits": "IXStoreImpl2",
+   "methods": [
+    "XStoreAcquireLicenseForDurablesAsync",
+    "XStoreAcquireLicenseForDurablesResult"
+   ]
+  },
+  "IXStoreImpl4": {
+   "class": "XStoreImpl",
+   "id": "de3dbdd4-0b37-4bdb-a10e-acf3a354d06a",
+   "inherits": "IXStoreImpl3",
+   "methods": [
+    "XStoreShowAssociatedProductsUIAsync",
+    "XStoreShowAssociatedProductsUIResult",
+    "XStoreShowProductPageUIAsync",
+    "XStoreShowProductPageUIResult"
+   ]
+  },
+  "IXStoreImpl5": {
+   "class": "XStoreImpl",
+   "id": "5c48dedf-0b67-4492-a4b5-6829b8e796e1",
+   "inherits": "IXStoreImpl4",
+   "methods": [
+    "XStoreQueryAssociatedProductsForStoreIdAsync",
+    "XStoreQueryAssociatedProductsForStoreIdResult",
+    "XStoreQueryPackageUpdatesAsync",
+    "XStoreQueryPackageUpdatesResultCount",
+    "XStoreQueryPackageUpdatesResult"
+   ]
+  },
+  "IXStoreImpl6": {
+   "class": "XStoreImpl",
+   "id": "b09d803c-2414-4a05-82c6-66dfdc9e9a44",
+   "inherits": "IXStoreImpl5",
+   "methods": [
+    "XStoreShowGiftingUIAsync",
+    "XStoreShowGiftingUIResult"
+   ]
+  },
+  "IXSystemAnalyticsImpl": {
+   "class": "XSystemAnalyticsImpl",
+   "id": "b884675d-b738-4a9c-815d-9a9a1e0c6c9b",
+   "inherits": null,
+   "methods": [
+    "XSystemGetAnalyticsInfo"
+   ]
+  },
+  "IXSystemImpl": {
+   "class": "XSystemImpl",
+   "id": "e349bd1a-fc20-4e40-b99c-4178cc6b409f",
+   "inherits": null,
+   "methods": [
+    "XSystemGetConsoleId",
+    "XSystemGetXboxLiveSandboxId",
+    "XSystemGetAppSpecificDeviceId"
+   ]
+  },
+  "IXSystemImpl2": {
+   "class": "XSystemImpl",
+   "id": "6fd71f09-7513-49f0-89bc-bfaf5df6f852",
+   "inherits": "IXSystemImpl",
+   "methods": null
+  },
+  "IXSystemImpl3": {
+   "class": "XSystemImpl",
+   "id": "67ce4bfc-b1d1-4ac7-bc3a-cb9219a97a85",
+   "inherits": "IXSystemImpl2",
+   "methods": [
+    "XSystemHandleTrack",
+    "XSystemIsHandleValid"
+   ]
+  },
+  "IXSystemImpl4": {
+   "class": "XSystemImpl",
+   "id": "dadc2895-34b0-4ef5-a83e-45114d629b80",
+   "inherits": "IXSystemImpl3",
+   "methods": [
+    "XSystemAllowFullDownloadBandwidth"
+   ]
+  },
+  "IXSystemImpl5": {
+   "class": "XSystemImpl",
+   "id": "1861cf2e-e18b-4834-a9f5-b4a4e6efb4cf",
+   "inherits": "IXSystemImpl4",
+   "methods": null
+  },
+  "IXThreadingImpl": {
+   "class": "XThreadingImpl",
+   "id": "073b7dcb-1fcf-4030-94be-e3c9eb623428",
+   "inherits": null,
+   "methods": [
+    "XAsyncGetStatus",
+    "XAsyncGetResultSize",
+    "XAsyncCancel",
+    "XAsyncRun",
+    "XAsyncBegin",
+    "XAsyncBeginAlloc",
+    "XAsyncSchedule",
+    "XAsyncComplete",
+    "XAsyncGetResult",
+    "XTaskQueueCreate",
+    "XTaskQueueCreateComposite",
+    "XTaskQueueGetPort",
+    "XTaskQueueDuplicateHandle",
+    "XTaskQueueDispatch",
+    "XTaskQueueCloseHandle",
+    "XTaskQueueSubmitCallback",
+    "XTaskQueueSubmitDelayedCallback",
+    "XTaskQueueRegisterWaiter",
+    "XTaskQueueUnregisterWaiter",
+    "XTaskQueueTerminate",
+    "XTaskQueueRegisterMonitor",
+    "XTaskQueueUnregisterMonitor",
+    "XTaskQueueGetCurrentProcessTaskQueue",
+    "XTaskQueueSetCurrentProcessTaskQueue",
+    "XThreadSetTimeSensitive",
+    "XTaskQueueIsEmpty",
+    "XThreadAssertNotTimeSensitive",
+    "XThreadIsTimeSensitive"
+   ]
+  },
+  "IXUserDeviceImpl": {
+   "class": "XUserDeviceImpl",
+   "id": "7d824997-10dc-45ab-86b7-2737767c0bf1",
+   "inherits": null,
+   "methods": [
+    "XUserFindForDevice",
+    "XUserRegisterForDeviceAssociationChanged",
+    "XUserUnregisterForDeviceAssociationChanged",
+    "XUserGetDefaultAudioEndpointUtf16",
+    "XUserRegisterForDefaultAudioEndpointUtf16Changed",
+    "XUserUnregisterForDefaultAudioEndpointUtf16Changed",
+    "XUserFindControllerForUserWithUiAsync",
+    "XUserFindControllerForUserWithUiResult"
+   ]
+  },
+  "IXUserDeviceImpl2": {
+   "class": "XUserDeviceImpl",
+   "id": "0cc6a956-e7e1-4fdf-9341-9d5da649ebc8",
+   "inherits": "IXUserDeviceImpl",
+   "methods": null
+  },
+  "IXUserGamertagImpl": {
+   "class": "XUserImpl",
+   "id": "cef4fac0-7676-4a94-a119-4c43f9eb5b74",
+   "inherits": null,
+   "methods": [
+    "XUserGetGamertag"
+   ]
+  },
+  "IXUserImpl": {
+   "class": "XUserImpl",
+   "id": "01acd177-91f9-4763-a38e-ccbb55ce32e0",
+   "inherits": null,
+   "methods": [
+    "XUserDuplicateHandle",
+    "XUserCloseHandle",
+    "XUserCompare",
+    "XUserGetMaxUsers",
+    "XUserAddAsync",
+    "XUserAddResult",
+    "XUserGetLocalId",
+    "XUserFindUserByLocalId",
+    "XUserGetId",
+    "XUserFindUserById",
+    "XUserGetIsGuest",
+    "XUserGetState",
+    null,
+    "XUserGetGamerPictureAsync",
+    "XUserGetGamerPictureResultSize",
+    "XUserGetGamerPictureResult",
+    "XUserGetAgeGroup",
+    "XUserCheckPrivilege",
+    "XUserResolvePrivilegeWithUiAsync",
+    "XUserResolvePrivilegeWithUiResult",
+    "XUserGetTokenAndSignatureAsync",
+    "XUserGetTokenAndSignatureResultSize",
+    "XUserGetTokenAndSignatureResult",
+    "XUserGetTokenAndSignatureUtf16Async",
+    "XUserGetTokenAndSignatureUtf16ResultSize",
+    "XUserGetTokenAndSignatureUtf16Result",
+    "XUserResolveIssueWithUiAsync",
+    "XUserResolveIssueWithUiResult",
+    "XUserResolveIssueWithUiUtf16Async",
+    "XUserResolveIssueWithUiUtf16Result",
+    "XUserRegisterForChangeEvent",
+    "XUserUnregisterForChangeEvent",
+    "XUserGetSignOutDeferral",
+    "XUserCloseSignOutDeferralHandle"
+   ]
+  },
+  "IXUserImpl2": {
+   "class": "XUserImpl",
+   "id": "eb9bf948-18dc-4d82-bbcc-40e0a809c4c0",
+   "inherits": "IXUserImpl",
+   "methods": [
+    "XUserAddByIdWithUiAsync",
+    "XUserAddByIdWithUiResult"
+   ]
+  },
+  "IXUserImpl3": {
+   "class": "XUserImpl",
+   "id": "1bf2f8c5-d507-4e52-bb05-f726d0e71161",
+   "inherits": "IXUserImpl2",
+   "methods": [
+    "XUserGetMsaTokenSilentlyAsync",
+    "XUserGetMsaTokenSilentlyResult",
+    "XUserGetMsaTokenSilentlyResultSize"
+   ]
+  },
+  "IXUserImpl4": {
+   "class": "XUserImpl",
+   "id": "079415e3-6727-437f-8e9d-8f8f9b2439f7",
+   "inherits": "IXUserImpl3",
+   "methods": [
+    "XUserIsStoreUser"
+   ]
+  },
+  "IXUserImpl5": {
+   "class": "XUserImpl",
+   "id": "26f3c674-a2fe-44fa-b6c4-a323bc94ff53",
+   "inherits": "IXUserImpl4",
+   "methods": [
+    "XUserPlatformRemoteConnectSetEventHandlers",
+    "XUserPlatformRemoteConnectCancelPrompt",
+    "XUserPlatformSpopPromptSetEventHandlers",
+    "XUserPlatformSpopPromptComplete"
+   ]
+  },
+  "IXUserImpl6": {
+   "class": "XUserImpl",
+   "id": "5131d685-4394-4ee6-8c18-bfb5d4aef1ff",
+   "inherits": "IXUserImpl5",
+   "methods": [
+    "XUserIsSignOutPresent",
+    "XUserSignOutAsync",
+    "XUserSignOutResult"
+   ]
+  }
+ },
+ "licence": "The source is GPL-3.0. Facts only: ids, inheritance and method order; no text is copied.",
+ "note": "The runtime classes QueryApiImpl hands out. An interface's vtable is IUnknown's three slots, then the methods of its inheritance chain, base first. A null method is one the docs list as unknown; null 'methods' means the docs give no layout for that interface (its methods, if any, are listed under its base). Made by tools/gen_gdk_runtime_classes.py.",
+ "source": "https://github.com/xodus-gaming/xgameruntime-docs at 7090008692569aa6081e30dfdd9de58237741e24"
+}

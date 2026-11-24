@@ -1,0 +1,6 @@
+// Synthetic internal shader: one invocation captures a D3D12 64-bit predicate as a Vulkan condition.
+#version 450
+layout(local_size_x=1) in;
+layout(set=0,binding=0,std430) buffer Words { uint words[]; } data;
+layout(push_constant) uniform Index { uint base; } index;
+void main() { data.words[index.base+2] = data.words[index.base] | data.words[index.base+1]; }

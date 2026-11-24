@@ -1,0 +1,13 @@
+#version 450
+
+layout(local_size_x = 64) in;
+layout(set = 0, binding = 0, std430) buffer QueryResults { uvec2 results[]; };
+layout(push_constant) uniform ResolveRange { uint count; };
+
+void main() {
+    uint index = gl_GlobalInvocationID.x;
+    if (index < count) {
+        uvec2 raw = results[index];
+        results[index] = uvec2(uint((raw.x | raw.y) != 0u), 0u);
+    }
+}

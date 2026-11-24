@@ -1,0 +1,11 @@
+// Synthetic byte-granular buffer copy, executed inside the captured conditional-rendering scope.
+#version 450
+#extension GL_EXT_shader_8bit_storage : require
+layout(local_size_x=64) in;
+layout(set=0,binding=0,std430) readonly buffer Source { uint8_t bytes[]; } source;
+layout(set=0,binding=1,std430) buffer Destination { uint8_t bytes[]; } destination;
+layout(push_constant) uniform Copy { uint source_offset; uint destination_offset; uint size; } copy;
+void main() {
+    uint i=gl_GlobalInvocationID.x;
+    if(i<copy.size) destination.bytes[copy.destination_offset+i]=source.bytes[copy.source_offset+i];
+}

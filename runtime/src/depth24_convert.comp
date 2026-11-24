@@ -1,0 +1,73 @@
+// D24_UNORM_S8_UINT on a GPU without D24: the layer stores D32_SFLOAT_S8_UINT, and the depth words of a copy
+// footprint (24-bit UNORM in bits 0-23, bits 24-31 unspecified) are converted here. depth24_convert_spv.h is this file
+// compiled with `glslc --target-env=vulkan1.1 -O -mfmt=c` (see the header for the command); keep them together.
+//
+// to_float != 0 (upload):   scratch[s] = float bits of the float nearest to d / 16777215, d = app[a] & 0xffffff
+// to_float == 0 (readback): app[a]     = D3D's quantisation of scratch[s] (depth24.h; round to nearest even of f * 16777215,
+//                           NaN and negatives 0, 1 and above 16777215), the unspecified top byte written as 0
+// The upload direction is integer arithmetic (no float division, whose rounding is the GPU's choice); the readback
+// uses one float multiply, which Vulkan requires to be correctly rounded, and roundEven.
+//
+// The same pass repacks 96-bit R32G32B32 texels, which the layer holds in R32G32B32A32 images (D3D-62; `to_float`
+// 2 and 3). A footprint texel is then three words and a scratch texel four, and the words are copied as they are:
+// to_float == 3 (upload):   scratch[s .. s+2] = app[a .. a+2], scratch[s+3] = 0 (never read: views read alpha as one)
+// to_float == 2 (readback): app[a .. a+2]     = scratch[s .. s+2]
+#version 450
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) buffer App { uint app[]; };
+layout(set = 0, binding = 1) buffer Scratch { uint scratch[]; };
+
+layout(push_constant) uniform Push {
+    uint width, height, slices;
+    uint to_float;   // 0 and 1: D24 words and floats; 2 and 3: 96-bit texels of 3 and 4 words (see above)
+    uint app_base;   // first word of the region in `app`, within the bound window
+    uint app_row;    // words between rows and between slices of the app buffer
+    uint app_slice;
+    uint scratch_base;  // first word of the region in `scratch`, within the bound window
+} pc;
+
+// d / (2^24 - 1) as a float. With m the 24-bit mantissa of d (d = m * 2^(e-23)) the quotient is
+// (m + m / (2^24 - 1)) * 2^(e-47), and m / (2^24 - 1) lies in (0.5, 1] for every m in [2^23, 2^24], so the nearest
+// 24-bit mantissa is m + 1 and the result is exactly float(m + 1) * 2^(e-47).
+float depth24_to_float(uint d) {
+    if (d == 0u) return 0.0;
+    int e = findMSB(d);
+    uint m = d << uint(23 - e);
+    return float(m + 1u) * uintBitsToFloat(uint(e - 47 + 127) << 23);
+}
+
+// The 24-bit UNORM of f as WARP and AMD's D3D12 drivers write it: the product with 2^24 - 1 is rounded to a float
+// first, then to the nearest integer with ties to even (NVIDIA's hardware breaks some ties the other way; see
+// depth24.h). NaN and negatives give 0, 1 and above the maximum.
+uint depth24_from_bits(uint bits) {
+    // In unsigned order, all negative encodings and positive NaNs lie above positive infinity.
+    if (bits > 0x7f800000u) return 0u;
+    if (bits >= 0x3f800000u) return 0xffffffu;
+    return uint(roundEven(uintBitsToFloat(bits) * 16777215.0));
+}
+
+void main() {
+    uvec3 g = gl_GlobalInvocationID;
+    if (g.x >= pc.width || g.y >= pc.height || g.z >= pc.slices) return;
+    if (pc.to_float >= 2u) {
+        uint a = pc.app_base + g.z * pc.app_slice + g.y * pc.app_row + g.x * 3u;
+        uint s = pc.scratch_base + ((g.z * pc.height + g.y) * pc.width + g.x) * 4u;
+        if (pc.to_float == 3u) {
+            scratch[s] = app[a];
+            scratch[s + 1u] = app[a + 1u];
+            scratch[s + 2u] = app[a + 2u];
+            scratch[s + 3u] = 0u;
+        } else {
+            app[a] = scratch[s];
+            app[a + 1u] = scratch[s + 1u];
+            app[a + 2u] = scratch[s + 2u];
+        }
+        return;
+    }
+    uint a = pc.app_base + g.z * pc.app_slice + g.y * pc.app_row + g.x;
+    uint s = pc.scratch_base + (g.z * pc.height + g.y) * pc.width + g.x;
+    if (pc.to_float != 0u) scratch[s] = floatBitsToUint(depth24_to_float(app[a] & 0xffffffu));
+    else app[a] = depth24_from_bits(scratch[s]);
+}

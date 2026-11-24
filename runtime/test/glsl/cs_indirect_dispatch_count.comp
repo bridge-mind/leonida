@@ -1,0 +1,18 @@
+#version 460
+// Synthetic translated-shader stand-in: root UAV s4:s5 (the first two of the console compute layout's user SGPRs,
+// which start at s4), plus the 144-byte user-data contract.
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_buffer_reference_uvec2 : require
+layout(local_size_x = 1) in;
+layout(buffer_reference, std430, buffer_reference_align = 4) buffer Words { uint w[]; };
+layout(push_constant) uniform UserData { uint s[32]; uvec2 heap_base; uvec2 code_base; } pc;
+uvec2 add64(uvec2 a, uvec2 b) {
+    uint carry;
+    uint lo = uaddCarry(a.x, b.x, carry);
+    return uvec2(lo, a.y + b.y + carry);
+}
+void main() {
+    Words result = Words(add64(pc.heap_base, uvec2(pc.s[4], pc.s[5])));
+    atomicAdd(result.w[0], 1u);
+    atomicAdd(result.w[1], gl_WorkGroupID.x + 1u);
+}

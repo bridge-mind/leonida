@@ -1,0 +1,204 @@
+// Copyright(c) Microsoft Corporation. All rights reserved.
+//
+
+#pragma once
+
+#include "XTaskQueue.h"
+#include "XTaskQueueDiagnostics.h"
+
+//----------------------------------------------------------------//
+//
+// These APIs should be reserved for driving unit test harnesses.
+//
+//----------------------------------------------------------------//
+
+/// <summary>
+/// Returns TRUE if there is no outstanding work in this
+/// queue for the given callback port.
+/// </summary>
+/// <param name='queue'>The queue to check.</param>
+/// <param name='port'>The port to check.</param>
+STDAPI_(bool) XTaskQueueIsEmpty(
+    _In_ XTaskQueueHandle queue,
+    _In_ XTaskQueuePort port
+    ) noexcept;
+
+/// <summary>
+/// Suspends terminations on the task queue.  May return an error if
+/// the queue is already terminated.
+/// </summary>
+/// <param name='queue'>The queue to suspend terminations.</param>
+STDAPI XTaskQueueSuspendTermination(
+    _In_ XTaskQueueHandle queue
+    ) noexcept;
+
+/// <summary>
+/// Resumes the ability to terminate the task queue. If a termination was
+/// attempted it will be continued.
+/// </summary>
+/// <param name='queue'>The queue resume terminations.</param>
+STDAPI_(void) XTaskQueueResumeTermination(
+    _In_ XTaskQueueHandle queue
+    ) noexcept;
+
+/// <summary>
+/// This structure can be passed as a pointer to the task queue so unit tests
+/// can hook into its behavior. Some race conditions are very difficult to get
+/// to happen naturally so sometimes a hook is needed. A pointer to this
+/// structure will be stored on the task queue. It is up to the test to ensure
+/// the structure lifetime exceeds that of the task queue under test.
+/// </summary>
+struct XTaskQueueTestHooks
+{
+    virtual void PendingEntriesRemovedDuringTermination(
+        XTaskQueuePort port)
+    {
+        UNREFERENCED_PARAMETER(port);
+    }
+
+    virtual void NoNextPendingCallbackFound(
+        XTaskQueuePort port,
+        uint64_t dueTime)
+    {
+        UNREFERENCED_PARAMETER(port);
+        UNREFERENCED_PARAMETER(dueTime);
+    }
+
+    virtual void NextPendingCallbackScheduled(
+        XTaskQueuePort port,
+        uint64_t lastDueTime,
+        uint64_t nextDueTime)
+    {
+        UNREFERENCED_PARAMETER(port);
+        UNREFERENCED_PARAMETER(lastDueTime);
+        UNREFERENCED_PARAMETER(nextDueTime);
+    }
+
+    // Called after a timer sweep found a future pending callback, before the
+    // timer is re-armed from the fired due time to that callback's deadline.
+    virtual void NextPendingCallbackFound(
+        XTaskQueuePort port,
+        uint64_t dueTime,
+        uint64_t nextDueTime)
+    {
+        UNREFERENCED_PARAMETER(port);
+        UNREFERENCED_PARAMETER(dueTime);
+        UNREFERENCED_PARAMETER(nextDueTime);
+    }
+};
+
+/// <summary>
+/// Sets or clears test hooks on a task queue.
+/// </summary>
+STDAPI XTaskQueueSetTestHooks(
+    _In_ XTaskQueueHandle queue,
+    _In_ XTaskQueueTestHooks* hooks
+    ) noexcept;
+
+/// <summary>
+/// Submits any pending delayed callbacks that are due to run. This is
+/// intended for use in unit tests.
+/// </summary>
+STDAPI XTaskQueueSubmitPendingCallbacks(
+    _In_ XTaskQueueHandle queue,
+    _In_ XTaskQueuePort port
+    ) noexcept;
+
+//----------------------------------------------------------------//
+//
+// These APIs are internal to the runtime
+//
+//----------------------------------------------------------------//
+
+/// <summary>
+/// Suspends the activity of all task queues in the process. When
+/// a task queue is suspended:
+///
+/// 1. It will not signal when new items are added.
+/// 2. It will not return items from the dispatcher (it acts like it
+///    is empty).
+/// </summary>
+STDAPI_(void) XTaskQueueGlobalSuspend(
+    ) noexcept;
+
+/// <summary>
+/// Resumes the activity of all task queues in the process. When
+/// a task queue is resumed:
+///
+/// 1. Queues that are not empty will signal they have items.
+/// 2. The dispatcher will start returing items again.
+/// </summary>
+STDAPI_(void) XTaskQueueGlobalResume(
+    ) noexcept;
+
+/// <summary>
+/// Options when duplicating a task queue handle.
+/// </summary>
+enum class XTaskQueueDuplicateOptions
+{
+    /// <summary>
+    /// Default behavior.
+    /// </summary>
+    None,
+
+    /// <summary>
+    /// The duplicated queue is a reference to the actual
+    /// queue object, not a duplicated queue handle. References
+    /// work just like fully duplicated handles but they are not
+    /// tracked by the handle tracking infrastructure and do not
+    /// cause an allocation for the handle.
+    /// </summary>
+    Reference
+};
+
+/// <summary>
+/// Increments the refcount on the queue and allows supplying
+/// options as to how the duplicate is performed.
+/// </summary>
+STDAPI XTaskQueueDuplicateHandleWithOptions(
+    _In_ XTaskQueueHandle queueHandle,
+    _In_ XTaskQueueDuplicateOptions options,
+    _Out_ XTaskQueueHandle *duplicatedHandle
+    ) noexcept;
+
+/// <summary>
+/// Returns a handle to the process task queue, or nullptr if there is no
+/// process task queue.  By default, there is a default process task queue
+/// that uses the thread pool for both work and completion ports. This is an
+/// internal variant that takes duplicate options.
+/// </summary>
+STDAPI_(bool) XTaskQueueGetCurrentProcessTaskQueueWithOptions(
+    _In_ XTaskQueueDuplicateOptions options,
+    _Out_ XTaskQueueHandle *queue
+    ) noexcept;
+
+/// <summary>
+/// Uninitializes global task queue state. This closes handles to per-process
+/// task queues and resets state back to defaults. If there is a per-process
+/// task queue, it will be closed but not terminated.  Queue termination is
+/// up to the caller. This API returns true if all task queues have been
+/// cleaned up and deleted, or false if there are still outstanding references.
+/// A timeout may be provided to wait for outstanding queues to be cleaned up.
+/// The default is not to wait. The maximum timeout capped to 5000ms.
+/// </summary>
+STDAPI_(bool) XTaskQueueUninitialize(
+    _In_ uint32_t timeoutMilliseconds = 0
+    ) noexcept;
+
+#ifdef HC_UNITTEST_API
+/// <summary>
+/// Unit-test diagnostics: the number of task queue / task queue port objects
+/// still alive and the outstanding global task queue reference count. Used to
+/// report what leaked when XTaskQueueUninitialize fails.
+/// </summary>
+struct XTaskQueueLiveObjectCounts
+{
+    uint32_t globalRefs;
+    uint32_t queues;
+    uint32_t ports;
+};
+
+STDAPI_(void) XTaskQueueGetLiveObjectCounts(
+    _Out_ XTaskQueueLiveObjectCounts* counts
+    ) noexcept;
+#endif

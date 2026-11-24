@@ -1,0 +1,150 @@
+// PresentX plane composition (docs/d3d12_vulkan.md section 4.5): one or two planes, each scaled from a source rectangle to
+// a destination rectangle of the output, plane 1 blended over plane 0, written to an RGBA16F image the presenter then
+// copies to the swapchain. present_compose_spv.h is this file compiled with
+// `glslc --target-env=vulkan1.1 -O -mfmt=c` (see the header for the command); keep them together.
+//
+// Every plane is read with texelFetch (no sampler: the filtering is done here, so it works on any sampled format and
+// only reads texels inside the source rectangle). Values are the encoded ones of the plane's colour space: SDR planes
+// hold sRGB or G2.2 values (push constant sdr_eotf), HDR10 planes hold ST.2084 (PQ) Rec.2020 values. An sRGB-format
+// source is decoded by the texture unit, so it is encoded again first and its bytes are read as they went in.
+//
+// Filtering and blending happen in linear light, premultiplied (docs section 4.5): every texel is decoded to linear before
+// it is weighted (SDR: the EOTF, 1.0 = SDR white, Rec.709; HDR10: PQ to nits, Rec.2020). The filtered plane is converted to
+// the working space of the output (HDR10 output: linear Rec.2020 nits, SDR white = sdr_white nits; SDR output: linear
+// Rec.709, 1.0 = SDR white), plane 1 is blended over plane 0 there, and the sum is encoded once (PQ, or the inverse of
+// the SDR EOTF). HDR10 plane -> SDR output: a luminance shoulder (identity below 0.8 of SDR white, extended Reinhard above, peak at
+// hdr_peak nits mapped to 1.0), then clipped per channel (no gamut mapping).
+#version 450
+#extension GL_EXT_samplerless_texture_functions : require
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+
+layout(set = 0, binding = 0) uniform texture2D plane0;
+layout(set = 0, binding = 1) uniform texture2D plane1;
+layout(set = 0, binding = 2, rgba16f) uniform writeonly image2D out_image;
+
+const uint flag_point = 1u;
+const uint flag_srgb_source = 2u;
+const uint flag_hdr10 = 4u;
+const uint flag_straight_alpha = 8u;
+const uint flag_opaque = 16u;  // set here for plane 0: its alpha is ignored
+
+layout(push_constant) uniform Push {
+    vec4 dest0;  // destination rectangle in output pixels: left, top, right, bottom
+    vec4 dest1;
+    vec4 src0;   // source rectangle in texels
+    vec4 src1;
+    uint flags0;
+    uint flags1;
+    uint plane_count;
+    uint out_hdr;     // 1: the output holds PQ Rec.2020 values
+    float sdr_white;  // nits of SDR white, for the conversions
+    uint width, height;
+    uint sdr_eotf;    // 0: piecewise sRGB, 1: gamma 2.2
+    float hdr_peak;   // nits of the HDR10 content's peak, the tone mapper's white point
+    uint pad0, pad1, pad2;
+} pc;
+
+vec3 srgb_encode(vec3 c) {
+    c = clamp(c, 0.0, 1.0);
+    return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, greaterThan(c, vec3(0.0031308)));
+}
+
+vec3 srgb_decode(vec3 e) {
+    e = max(e, 0.0);
+    return mix(e / 12.92, pow((e + 0.055) / 1.055, vec3(2.4)), greaterThan(e, vec3(0.04045)));
+}
+
+// SDR encoded -> linear (1.0 = SDR white; may exceed 1 for additive premultiplied colour), and back (clipped to 0..1).
+vec3 sdr_decode(vec3 e) { return pc.sdr_eotf == 1u ? pow(max(e, 0.0), vec3(2.2)) : srgb_decode(e); }
+vec3 sdr_encode(vec3 l) { return pc.sdr_eotf == 1u ? pow(clamp(l, 0.0, 1.0), vec3(1.0 / 2.2)) : srgb_encode(l); }
+
+const float m1 = 0.1593017578125, m2 = 78.84375, c1 = 0.8359375, c2 = 18.8515625, c3 = 18.6875;
+
+vec3 pq_to_nits(vec3 e) {
+    vec3 ep = pow(clamp(e, 0.0, 1.0), vec3(1.0 / m2));
+    return 10000.0 * pow(max(ep - c1, 0.0) / (c2 - c3 * ep), vec3(1.0 / m1));
+}
+
+vec3 nits_to_pq(vec3 nits) {
+    vec3 y = pow(clamp(nits / 10000.0, 0.0, 1.0), vec3(m1));
+    return pow((c1 + c2 * y) / (1.0 + c3 * y), vec3(m2));
+}
+
+// One texel as linear premultiplied colour (plane space) and its alpha. Premultiplied data is divided by alpha for the
+// decode (the curve applies to the colour, not to colour times alpha) and multiplied again after.
+vec4 fetch_texel(texture2D t, ivec2 i, uint flags) {
+    vec4 c = texelFetch(t, i, 0);
+    bool opaque = (flags & flag_opaque) != 0u;
+    float a = opaque ? 1.0 : clamp(c.a, 0.0, 1.0);
+    vec3 e = (flags & flag_srgb_source) != 0u ? srgb_encode(c.rgb) : c.rgb;
+    if (!opaque && (flags & flag_straight_alpha) == 0u) e = a > 0.0 ? e / a : vec3(0.0);
+    vec3 lin = (flags & flag_hdr10) != 0u ? pq_to_nits(e) : sdr_decode(e);
+    return vec4(lin * a, a);
+}
+
+// The plane's linear premultiplied value at output pixel `pixel` (its centre), in the plane's own space.
+vec4 fetch_plane(texture2D t, vec4 dest, vec4 src, uint flags, ivec2 pixel) {
+    vec2 p = (vec2(pixel) + 0.5 - dest.xy) / (dest.zw - dest.xy);  // 0..1 across the destination rectangle
+    vec2 s = src.xy + p * (src.zw - src.xy);                        // continuous texel coordinates
+    vec2 lo = src.xy, hi = src.zw - 1.0;
+    if ((flags & flag_point) != 0u) return fetch_texel(t, ivec2(clamp(floor(s), lo, hi)), flags);
+    vec2 f = clamp(s - 0.5, lo, hi);  // the texel whose centre is at or before the sample, clamped inside the rectangle
+    vec2 base = floor(f), w = f - base;
+    ivec2 i0 = ivec2(base), i1 = ivec2(min(base + 1.0, hi));
+    return mix(mix(fetch_texel(t, ivec2(i0.x, i0.y), flags), fetch_texel(t, ivec2(i1.x, i0.y), flags), w.x),
+               mix(fetch_texel(t, ivec2(i0.x, i1.y), flags), fetch_texel(t, ivec2(i1.x, i1.y), flags), w.x), w.y);
+}
+
+vec3 bt709_to_bt2020(vec3 v) {
+    return vec3(dot(vec3(0.627404, 0.329283, 0.043313), v), dot(vec3(0.069097, 0.919540, 0.011362), v),
+                dot(vec3(0.016391, 0.088013, 0.895595), v));
+}
+
+vec3 bt2020_to_bt709(vec3 v) {
+    return vec3(dot(vec3(1.660491, -0.587641, -0.072850), v), dot(vec3(-0.124550, 1.132900, -0.008349), v),
+                dot(vec3(-0.018151, -0.100579, 1.118730), v));
+}
+
+// Tone map: a shoulder on luminance. Identity up to the knee (0.8 of SDR white), then extended Reinhard (Reinhard et al.
+// 2002, eq. 4) on the excess, scaled to be continuous in value and slope at the knee and to map the content peak to 1.0:
+// with t = 1 - knee, u = (Y - knee) / t, w = (Lw - knee) / t: Yd = knee + t u (1 + u / w^2) / (1 + u). The colour is scaled
+// by Yd / Y. `v`: linear Rec.709, 1.0 = SDR white; Lw = hdr_peak / sdr_white (at least 1).
+vec3 tone_map(vec3 v) {
+    const float knee = 0.8;
+    float y = dot(v, vec3(0.2126, 0.7152, 0.0722));
+    if (y <= knee) return v;
+    float t = 1.0 - knee;
+    float w = (max(pc.hdr_peak / pc.sdr_white, 1.0) - knee) / t;
+    float u = (y - knee) / t;
+    return v * ((knee + t * u * (1.0 + u / (w * w)) / (1.0 + u)) / y);
+}
+
+// A linear premultiplied colour of alpha `a` from the plane's space to the output's working space. Both conversions are
+// linear except the tone map, which needs the unassociated colour.
+vec3 to_working(vec3 lin, float a, bool plane_hdr) {
+    bool out_hdr = pc.out_hdr != 0u;
+    if (plane_hdr == out_hdr) return lin;
+    if (!plane_hdr) return bt709_to_bt2020(lin) * pc.sdr_white;
+    if (a <= 0.0) return vec3(0.0);
+    return tone_map(max(bt2020_to_bt709(lin / a) / pc.sdr_white, 0.0)) * a;
+}
+
+vec3 encode_output(vec3 w) { return pc.out_hdr != 0u ? nits_to_pq(max(w, 0.0)) : sdr_encode(w); }
+
+void main() {
+    ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
+    if (pixel.x >= int(pc.width) || pixel.y >= int(pc.height)) return;
+    vec2 centre = vec2(pixel) + 0.5;
+
+    vec3 base = vec3(0.0);  // outside plane 0's rectangle: black
+    if (all(greaterThanEqual(centre, pc.dest0.xy)) && all(lessThan(centre, pc.dest0.zw))) {
+        vec4 c = fetch_plane(plane0, pc.dest0, pc.src0, pc.flags0 | flag_opaque, pixel);
+        base = to_working(c.rgb, 1.0, (pc.flags0 & flag_hdr10) != 0u);
+    }
+    if (pc.plane_count > 1u && all(greaterThanEqual(centre, pc.dest1.xy)) && all(lessThan(centre, pc.dest1.zw))) {
+        vec4 c = fetch_plane(plane1, pc.dest1, pc.src1, pc.flags1, pixel);
+        base = to_working(c.rgb, c.a, (pc.flags1 & flag_hdr10) != 0u) + (1.0 - c.a) * base;
+    }
+    imageStore(out_image, pixel, vec4(encode_output(base), 1.0));
+}

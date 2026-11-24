@@ -1,0 +1,117 @@
+#version 460
+// A compute shader that finds and samples an image the way translated shaders do (docs/design.md, "Images"; the
+// lookup is tools/rdna2spirv.py desc_probe), for d3d12_descriptor_test. A translated shader loads a T# and an S#
+// from its descriptor tables; this one is handed them as push constants: the eight dwords of a heap slot and the
+// four of a sampler slot. It looks both up in the hash table at set 0 binding 2 (FNV-1a over the eight key dwords,
+// eight probes, a miss is index 0; an S# key is its four dwords and four of 0xFFFFFFFF), samples the 2D image
+// array at binding 0 (a 2D array at binding 3, or a volume at binding 6) with the sampler array at binding 1. For 2D it writes
+//   result[first + i] = the texel at ((i % 8) + 0.5, (i / 8) + 0.5) / 8 + (1, 0), as RGBA8 with red in the low byte.
+// With mode 1 the image is an integer one (an R8G8B8A8_UINT view, read through the same binding as a
+// utexture2D), and each channel is stored as its value clamped to 255: a UINT border colour shows as 0 or 1.
+// The whole tile to the right in U: a sampler that wraps in U gives the texel at the same place in the image,
+// one that clamps (as the fallback sampler at index 0 does) the image's right edge. So the result shows that
+// the S# was found, not only the T#.
+// Set 0 is the device's bindless set; set 1 is the test's output buffer.
+#extension GL_EXT_nonuniform_qualifier : require
+#if defined(TEST_MS_FLOAT) || defined(TEST_MS_UINT) || defined(TEST_MS_SINT)
+#extension GL_EXT_samplerless_texture_functions : require
+#endif
+
+layout(local_size_x = 64) in;
+
+layout(push_constant) uniform Descriptors {
+    uint tsharp[8];
+    uint ssharp[4];
+    uint first;
+    uint mode;  // 0: normalized, 1: uint, 2: multisampled, 3: multisampled array
+    uint layer;
+} pc;
+
+#if defined(TEST_MS_UINT)
+layout(set = 0, binding = 22) uniform utexture2DMS ms_images[];
+layout(set = 0, binding = 23) uniform utexture2DMSArray ms_arrays[];
+#elif defined(TEST_MS_SINT)
+layout(set = 0, binding = 24) uniform itexture2DMS ms_images[];
+layout(set = 0, binding = 25) uniform itexture2DMSArray ms_arrays[];
+#elif defined(TEST_MS_FLOAT)
+layout(set = 0, binding = 20) uniform texture2DMS ms_images[];
+layout(set = 0, binding = 21) uniform texture2DMSArray ms_arrays[];
+#else
+layout(set = 0, binding = 0) uniform texture2D images[];
+layout(set = 0, binding = 0) uniform utexture2D uimages[];
+layout(set = 0, binding = 1) uniform sampler samplers[];
+layout(set = 0, binding = 3) uniform texture2DArray layers[];
+layout(set = 0, binding = 5) uniform texture1D lines[];
+layout(set = 0, binding = 6) uniform texture3D volumes[];
+#endif
+layout(set = 0, binding = 2, std430) readonly buffer DescriptorMap {
+    uint map[];  // mask, then 10 uints per slot: key[8], index, pad
+};
+layout(set = 1, binding = 0, std430) writeonly buffer Result {
+    uint result[];
+};
+
+uint lookup(uint key[8]) {
+    uint h = 2166136261u;
+    for (int i = 0; i < 8; ++i) h = (h ^ key[i]) * 16777619u;
+    const uint mask = map[0];
+    for (uint k = 0; k < 8; ++k) {
+        const uint slot = 1 + ((h + k) & mask) * 10;
+        bool same = true;
+        for (int i = 0; i < 8; ++i) same = same && map[slot + i] == key[i];
+        if (same) return map[slot + 8];
+    }
+    return 0;
+}
+
+void main() {
+    const uint i = gl_GlobalInvocationID.x;
+    uint image_key[8], sampler_key[8];
+    for (int k = 0; k < 8; ++k) {
+        image_key[k] = pc.tsharp[k];
+        sampler_key[k] = k < 4 ? pc.ssharp[k] : 0xffffffffu;
+    }
+    const uint image = lookup(image_key);
+#if defined(TEST_MS_UINT) || defined(TEST_MS_SINT)
+    // The integer SRV tests clear R32 textures and check the exact bits, including the missing key's zero.
+    // Texel (0,0), layer 0 and sample 0 exist in the fallback as well as in the resources.
+    if (pc.mode == 2) result[pc.first + i] = uint(texelFetch(ms_images[image], ivec2(0), 0).r);
+    else result[pc.first + i] = uint(texelFetch(ms_arrays[image], ivec3(0, 0, pc.layer), 0).r);
+#elif defined(TEST_MS_FLOAT)
+    // Each group reads all four samples of a 4x4 layer, with sample as the fastest index.
+    const ivec2 xy = ivec2((i / 4) % 4, i / 16);
+    const int sample_index = int(i % 4);
+    vec4 color;
+    if (pc.mode == 2) color = texelFetch(ms_images[image], xy, sample_index);
+    else color = texelFetch(ms_arrays[image], ivec3(xy, pc.layer), sample_index);
+    result[pc.first + i] = packUnorm4x8(color);
+#elif defined(TEST_GATHER_ALPHA)
+    const uint smp = lookup(sampler_key);
+    const vec2 uv = (vec2(i % 8, i / 8) + 1.0) / 8.0;
+    const vec4 alpha = textureGather(sampler2D(images[image], samplers[smp]), uv, 3);
+    result[pc.first + i] = packUnorm4x8(alpha);
+#else
+    const uint smp = lookup(sampler_key);
+    const vec2 uv = (vec2(i % 8, i / 8) + 0.5) / 8.0 + vec2(1.0, 0.0);
+    if (pc.mode == 4) {
+        result[pc.first + i] = packUnorm4x8(textureLod(sampler1D(lines[image], samplers[smp]), uv.x, 0.0));
+    } else if ((pc.tsharp[3] >> 28) == 10u) {
+        // A 4x4x4 grid, offset from nearest-sampling boundaries at both 8x8x4 and 4x4x2.
+        const vec3 uvw = (vec3(i % 4, (i / 4) % 4, i / 16) + 0.625) / 4.0;
+        result[pc.first + i] = packUnorm4x8(textureLod(sampler3D(volumes[image], samplers[smp]), uvw, 0.0));
+    } else if ((pc.tsharp[3] >> 28) == 11u) {
+        // A translated cube sample addresses the chosen face in binding 3, relative to the SRV.
+        const vec3 coord = vec3(0.5, 0.5, float(i % pc.layer));
+        result[pc.first + i] = packUnorm4x8(textureLod(sampler2DArray(layers[image], samplers[smp]), coord, 0.0));
+    } else if ((pc.tsharp[3] >> 28) == 13u) {
+        const vec3 coord = vec3(uv, float(i / 32u));  // read both layers of the array SRV
+        result[pc.first + i] = packUnorm4x8(textureLod(sampler2DArray(layers[image], samplers[smp]), coord, 0.0));
+    } else if (pc.mode == 1) {
+        const uvec4 t = min(textureLod(usampler2D(uimages[image], samplers[smp]), uv, 0.0), uvec4(255));
+        result[pc.first + i] = t.r | (t.g << 8) | (t.b << 16) | (t.a << 24);
+    } else {
+        const vec4 texel = textureLod(sampler2D(images[image], samplers[smp]), uv, 0.0);
+        result[pc.first + i] = packUnorm4x8(texel);
+    }
+#endif
+}

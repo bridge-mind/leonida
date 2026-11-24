@@ -1,0 +1,40 @@
+; regen_fixtures: this source has a translator fixture in tests/semantic/fixtures/disasm
+; Wave64 ballot: s_bcnt1_i32_b64 and s_ff1_i32_b64 on 64-lane comparison masks and EXEC.
+; mattr: +wavefrontsize64,-wavefrontsize32
+; Case 1: lanes 16..47 -> s[4:5] -> bcnt=32, ff1=16
+; Case 2: lanes 40..63 (strictly upper half) -> s[10:11] -> bcnt=24, ff1=40
+; Case 3: exec = lanes 48..55 -> bcnt=8, ff1=48
+; Run: VKC_SUBGROUP_SIZE=64 vk_compute_test cs_wave64_ballot.spv 1 dump --require-wave64 -> out[0..5] = 32, 16, 24, 40, 8, 48
+v_cmp_ge_u32_e64 s[4:5], v0, 16
+v_cmp_lt_u32_e64 s[6:7], v0, 48
+s_and_b64 s[4:5], s[4:5], s[6:7]
+s_bcnt1_i32_b64 s8, s[4:5]
+s_ff1_i32_b64 s9, s[4:5]
+v_cmp_ge_u32_e64 s[10:11], v0, 40
+s_bcnt1_i32_b64 s12, s[10:11]
+s_ff1_i32_b64 s13, s[10:11]
+s_mov_b32 exec_lo, 0
+s_mov_b32 exec_hi, 0x00ff0000
+s_bcnt1_i32_b64 s14, exec
+s_ff1_i32_b64 s15, exec
+s_mov_b64 exec, -1
+v_cmpx_eq_u32_e32 0, v0
+v_mov_b32_e32 v1, s8
+v_mov_b32_e32 v2, s9
+v_mov_b32_e32 v3, s12
+v_mov_b32_e32 v4, s13
+v_mov_b32_e32 v5, s14
+v_mov_b32_e32 v6, s15
+v_mov_b32_e32 v10, 0
+v_mov_b32_e32 v11, 4
+v_mov_b32_e32 v12, 8
+v_mov_b32_e32 v13, 12
+v_mov_b32_e32 v14, 16
+v_mov_b32_e32 v15, 20
+buffer_store_dword v1, v10, s[0:3], 0 offen
+buffer_store_dword v2, v11, s[0:3], 0 offen
+buffer_store_dword v3, v12, s[0:3], 0 offen
+buffer_store_dword v4, v13, s[0:3], 0 offen
+buffer_store_dword v5, v14, s[0:3], 0 offen
+buffer_store_dword v6, v15, s[0:3], 0 offen
+s_endpgm

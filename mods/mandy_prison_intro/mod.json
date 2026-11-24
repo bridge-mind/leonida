@@ -1,0 +1,8 @@
+{
+  "name": "Mandy in the prison intro",
+  "enabled": true,
+  "game_version": "1.0.2.1",
+  "archetype_swaps": [
+    { "from": "player_story000_00", "to": "cs_mandy", "when": "always" }
+  ]
+}

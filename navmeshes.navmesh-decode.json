@@ -1,0 +1,518 @@
+{
+ "input": "navmeshes.rpf",
+ "mode": "rpf",
+ "start": 1920,
+ "end": 6707512496,
+ "span": 6707510576,
+ "carver_streams": {
+  "streams": 90295,
+  "stored": 6540238392,
+  "inflated": 20551068624,
+  "zero_padding": 161191191,
+  "unread": 6080993,
+  "tiny_continuations": 10,
+  "tiny_orphans": 0,
+  "past_window": 0,
+  "past_window_stored": 0
+ },
+ "resources": {
+  "0drp": {
+   "resources": 9603,
+   "streams": {
+    "1": 7122,
+    "2": 2481
+   },
+   "stored": 765075110,
+   "inflated": 2802161120,
+   "incomplete": 0
+  },
+  "grid": {
+   "resources": 27482,
+   "streams": {
+    "1": 27476,
+    "2": 6
+   },
+   "stored": 375890383,
+   "inflated": 2325782256,
+   "incomplete": 0
+  },
+  "navmesh": {
+   "resources": 27644,
+   "streams": {
+    "1": 4598,
+    "2": 23046
+   },
+   "stored": 5397713337,
+   "inflated": 15420757856,
+   "incomplete": 0
+  },
+  "psin": {
+   "resources": 22,
+   "streams": {
+    "1": 1,
+    "2": 21
+   },
+   "stored": 1559767,
+   "inflated": 2367712,
+   "incomplete": 1
+  }
+ },
+ "checks": {
+  "0drp": {
+   "block_map": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "blocks_disjoint": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "blocks_in_bounds": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "cover_nodes_whole": {
+    "pass": 9585,
+    "fail": 0
+   },
+   "enum_values_dense": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "enums_in_bounds": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "pages_4k_rule": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "payload_at_0x60": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "prefix_zero": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "q40_in_bounds": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "region_array_count": {
+    "pass": 8412,
+    "fail": 0
+   },
+   "reserved_zero": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "root_index_valid": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "root_is_struct": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "structs_in_bounds": {
+    "pass": 9603,
+    "fail": 0
+   },
+   "version_122": {
+    "pass": 9603,
+    "fail": 0
+   }
+  },
+  "grid": {
+   "block_map": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "control_bytes": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "cubic_extent": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "inner_payload_ff00": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "keys_octree": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "occupied_equals_entries": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "payload_in_bounds": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "prefix_zero": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "reserved_zero": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "sector_origin": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "table_in_bounds": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "values_bijective": {
+    "pass": 27482,
+    "fail": 0
+   }
+  },
+  "navmesh": {
+   "block_map": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "data_size_identity": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "extents_match_root": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "flag0_set": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "flag1_links": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "flag2_no_sector": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "identity_matrix": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "indices_below_vertices": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "links_in_bounds": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "polygons_chain": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "prefix_zero": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "quadtree_root": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "quadtree_valid": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "reserved_zero": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "sector_origin": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "split_70": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "split_80": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "split_88": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "split_98": {
+    "pass": 27644,
+    "fail": 0
+   },
+   "tile_128m": {
+    "pass": 27482,
+    "fail": 0
+   },
+   "volumes_in_bounds": {
+    "pass": 27644,
+    "fail": 0
+   }
+  },
+  "psin": {}
+ },
+ "0drp": {
+  "schemas": {
+   "CCoverPointRegion/12 structs": 7635,
+   "0x4712787b/7 structs": 932,
+   "CCoverPointRegion/11 structs": 777,
+   "0x4712787b/9 structs": 219,
+   "0x4712787b/8 structs": 22,
+   "0x4712787b/3 structs": 14,
+   "CCoverPointRegionManifest/4 structs": 1,
+   "0xb6dbe11b/2 structs": 1,
+   "0x339accda/2 structs": 1,
+   "0x2bf76252/2 structs": 1
+  },
+  "root": {
+   "CCoverPointRegion": 8412,
+   "0x4712787b": 1187,
+   "0x2bf76252": 1,
+   "0x339accda": 1,
+   "0xb6dbe11b": 1,
+   "CCoverPointRegionManifest": 1
+  },
+  "block_at_0x60": {
+   "CCoverPointNode": 9378,
+   "0xde5f1345": 207,
+   "0x00000100": 16,
+   "0x0904902e": 1,
+   "CCoverPointRegionDef": 1
+  },
+  "block_hash": {
+   "CCoverPointNode": 9585,
+   "0x00000100": 8825,
+   "0x00000013": 8412,
+   "0xde5f1345": 8412,
+   "CCoverPointRegion": 8412,
+   "CCoverSpatialTreeNode": 8412,
+   "0x4712787b": 1187,
+   "0x57ad0b12": 1187,
+   "0xdd53676a": 241,
+   "0xf2dd6348": 219,
+   "0x0904902e": 1,
+   "0x2bf76252": 1,
+   "0x339accda": 1,
+   "0xb6dbe11b": 1,
+   "CCoverPointRegionDef": 1,
+   "CCoverPointRegionManifest": 1
+  },
+  "enums": {
+   "eCoverFlags": 9585,
+   "eCoverHeight": 9585,
+   "eCoverUsage": 9585,
+   "0x32ff8fb9": 1187,
+   "eCoverRegionFlags": 1
+  },
+  "q40_shape": {
+   "[('0x101', 32)]": 6462,
+   "[]": 1324,
+   "[('0x101', 48)]": 1182,
+   "[('0x101', 64)]": 600,
+   "[('0x101', 80)]": 31,
+   "[('0x101', 141824)]": 1,
+   "[('0x101', 2800)]": 1,
+   "[('0x101', 95792), ('0x211', 8624)]": 1,
+   "[('0x207', 26560)]": 1
+  },
+  "root_index": {
+   "3": 7650,
+   "4": 932,
+   "2": 779,
+   "6": 219,
+   "5": 22,
+   "1": 1
+  },
+  "u16_0x48": {
+   "n_structs": {
+    "12": 7635,
+    "7": 932,
+    "11": 777,
+    "9": 219,
+    "8": 22,
+    "3": 14,
+    "2": 3,
+    "4": 1
+   },
+   "n_enums": {
+    "3": 8412,
+    "4": 1173,
+    "1": 15,
+    "0": 3
+   },
+   "n_blocks": {
+    "6": 7854,
+    "4": 932,
+    "5": 799,
+    "3": 15,
+    "2": 3
+   }
+  },
+  "pages_4k_zero": 2578,
+  "pages_4k_boundary": {
+   "nonzero": 93,
+   "zero": 214
+  },
+  "cover_nodes": 15629979,
+  "region_cover_nodes": 15474729,
+  "dynamic_cover_nodes": 155250,
+  "region_points": 15474744,
+  "region_inumpoints": {
+   "match": 8411,
+   "mismatch": 1
+  },
+  "first_node": {
+   "id0_index_zero": 9378,
+   "id1_index_ffffffff": 3966,
+   "pages": 9378
+  },
+  "region_bounds": {
+   "min": [
+    -10368.0,
+    -8448.0,
+    -500.0
+   ],
+   "max": [
+    10411.852,
+    9472.0,
+    1350.0
+   ]
+  }
+ },
+ "navmesh": {
+  "flags": {
+   "9": 18791,
+   "11": 5507,
+   "3": 3149,
+   "7": 161,
+   "1": 35,
+   "69": 1
+  },
+  "build_ids": 7,
+  "totals": {
+   "vertices": 138041746,
+   "polygons": 124768148,
+   "pool": 493024188,
+   "special_links": 26679246,
+   "link_indices": 26903247,
+   "volumes": 6246890
+  },
+  "max": {
+   "vertices": 52608,
+   "polygons": 71803,
+   "pool": 235411,
+   "special_links": 30324,
+   "link_indices": 30324,
+   "volumes": 7868
+  },
+  "static_sectors": 24480,
+  "sector_x": [
+   160,
+   295
+  ],
+  "sector_y": [
+   179,
+   358
+  ],
+  "split_blocks_max": {
+   "0x70": 20,
+   "0x80": 29,
+   "0x88": 173,
+   "0x98": 194
+  },
+  "tile_bounds": {
+   "min": [
+    -12288.0,
+    -9856.0,
+    -78.55
+   ],
+   "max": [
+    5120.0,
+    13184.0,
+    403.838
+   ]
+  },
+  "water_bit3": {
+   "b3_1_w_1": 24009,
+   "b3_0_w_0": 3346,
+   "b3_1_w_0": 289
+  },
+  "quadtree": {
+   "nodes": 2337904,
+   "leaves": 1760339,
+   "max_depth": 9
+  }
+ },
+ "grid": {
+  "groups": {
+   "8": 12778,
+   "256": 7131,
+   "512": 6263,
+   "32": 377,
+   "64": 356,
+   "1024": 338,
+   "16": 184,
+   "128": 54,
+   "2048": 1
+  },
+  "extent": {
+   "128": 16487,
+   "256": 7466,
+   "1024": 2662,
+   "512": 866,
+   "4096": 1
+  },
+  "origin_z": {
+   "0.0": 16826,
+   "-128.0": 7048,
+   "-512.0": 2670,
+   "-256.0": 844,
+   "128.0": 81,
+   "256.0": 12,
+   "-2048.0": 1
+  },
+  "sectors": 24480,
+  "sectors_not_in_navmesh": 0,
+  "navmesh_sectors_not_in_grid": 0,
+  "entries_total": 53835068,
+  "entries_max": 14903,
+  "key_depth": {
+   "6": 20640002,
+   "5": 17413561,
+   "7": 5569707,
+   "4": 4278022,
+   "8": 3601634,
+   "3": 1767427,
+   "2": 431181,
+   "1": 101453,
+   "0": 27482,
+   "10": 3649,
+   "9": 950
+  },
+  "inner_nodes": 8617353,
+  "leaf_payload": {
+   "low_byte_01": 26659574,
+   "low_byte_03": 16767045,
+   "ff00": 1791096
+  }
+ },
+ "psin": {
+  "version": {
+   "256": 21,
+   "79": 1
+  },
+  "complete": 21
+ },
+ "elapsed_s": 157.9
+}

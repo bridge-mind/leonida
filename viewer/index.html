@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map Viewer</title>
+<style>
+  :root { --bg: #0d1014; --fg: #e6e8eb; --dim: #8b929b; --accent: #5fb3ff; --warn: #ffb454; --panel: rgba(13,16,20,.82); }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font: 13px/1.45 ui-monospace, Consolas, monospace; overflow: hidden; }
+  canvas { display: block; }
+  #hud { position: fixed; top: 12px; left: 12px; background: var(--panel); padding: 10px 12px; border-radius: 8px; min-width: 250px; pointer-events: none; }
+  #hud b { color: var(--accent); font-weight: 600; }
+  #banner { position: fixed; top: 12px; right: 12px; max-width: 360px; background: var(--panel); border-left: 3px solid var(--warn); padding: 10px 12px; border-radius: 8px; }
+  #banner.hidden { display: none; }
+  #help { position: fixed; bottom: 12px; left: 12px; background: var(--panel); padding: 10px 12px; border-radius: 8px; color: var(--dim); }
+  #help kbd { color: var(--fg); background: #1c2129; padding: 0 5px; border-radius: 3px; }
+  #start { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.45); cursor: pointer; font-size: 15px; }
+  #start.hidden { display: none; }
+  @media (max-width: 760px) {
+    #hud { right: 12px; min-width: 0; }
+    #banner { top: auto; bottom: 104px; left: 12px; max-width: none; }
+    #help { right: 12px; }
+  }
+</style>
+</head>
+<body>
+<div id="hud"></div>
+<div id="banner" class="hidden">
+  <b>TEST TERRAIN</b>: generated in the browser. <span id="world-status"></span><br>
+  Build chunks with <code>python -I tools/world_build.py &lt;work&gt;\assets --out &lt;work&gt;\world</code>
+  and serve with <code>python -I viewer/serve.py --world &lt;work&gt;\world</code>.
+</div>
+<div id="help">
+  <kbd>W A S D</kbd> move · <kbd>Q</kbd>/<kbd>E</kbd> down/up · <kbd>Shift</kbd> fast · <kbd>Ctrl</kbd> slow · wheel: speed<br>
+  <kbd>F</kbd> wireframe · <kbd>T</kbd> textures/clay · <kbd>G</kbd> chunk bounds · <kbd>R</kbd> back to spawn · <kbd>P</kbd> copy link to this view · <kbd>Esc</kbd> release mouse
+</div>
+<div id="start">Click to fly</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+// ---------- world description ----------
+// world/world.json: { "spawn": [x,y,z], "chunks": [ { "id", "url", "bounds": [minx,miny,minz,maxx,maxy,maxz] } ] }
+// A world built with world_build --lod-sets also has "lod_bands": { tier: [start, end] } (metres), and each
+// chunk names its "lod" tier and its grid "cell": [minx, minz, maxx, maxz].
+// Each chunk is a .glb in world space (Y up, metres). Validate the manifest before
+// the camera and streaming code use its coordinates and chunk identifiers.
+const WORLD_MANIFEST_TIMEOUT_MS = 10_000;
+
+function manifestError(world) {
+  const isPosition = (value, length) =>
+    Array.isArray(value) && value.length === length && value.every(Number.isFinite);
+  const isNonemptyString = value => typeof value === "string" && value.trim().length > 0;
+  if (!isPosition(world?.spawn, 3)) return "spawn must contain three finite coordinates";
+  if (!Array.isArray(world.chunks)) return "chunks must be an array";
+  const ids = new Set();
+  for (const [i, chunk] of world.chunks.entries()) {
+    if (!isNonemptyString(chunk?.id) || ids.has(chunk.id)) return `chunks[${i}].id must be a unique, nonempty string`;
+    if (!isNonemptyString(chunk.url)) return `chunks[${i}].url must be a nonempty string`;
+    const b = chunk.bounds;
+    if (!isPosition(b, 6) || b[0] > b[3] || b[1] > b[4] || b[2] > b[5])
+      return `chunks[${i}].bounds must contain six finite, ordered coordinates`;
+    if (chunk.lod !== undefined) {
+      const band = isNonemptyString(chunk.lod) ? world.lod_bands?.[chunk.lod] : undefined;
+      if (!isPosition(band, 2) || band[0] < 0 || band[0] > band[1])
+        return `chunks[${i}].lod must name a lod_bands entry with two finite, ordered distances`;
+      const c = chunk.cell;
+      if (!isPosition(c, 4) || c[0] > c[2] || c[1] > c[3])
+        return `chunks[${i}].cell must contain four finite, ordered coordinates`;
+    }
+    ids.add(chunk.id);
+  }
+  return null;
+}
+
+// Camera in the URL hash: #cam=x,y,z,yaw,pitch. Returns null for anything that is not five finite numbers,
+// so a hand-edited or stale link falls back to the spawn point instead of putting the camera at NaN.
+function parseCamHash(hash) {
+  const m = /^#?cam=([^&]*)/.exec(typeof hash === "string" ? hash : "");
+  if (!m) return null;
+  const parts = m[1].split(",");
+  if (parts.length !== 5 || parts.some(t => t.trim() === "")) return null;
+  const v = parts.map(Number);
+  return v.every(Number.isFinite) ? { pos: v.slice(0, 3), yaw: v[3], pitch: v[4] } : null;
+}
+function formatCamHash(pos, yaw, pitch) {
+  return "#cam=" + [...pos, yaw, pitch].map((n, i) => n.toFixed(i < 3 ? 1 : 3)).join(",");
+}
+
+async function loadWorld() {
+  if (new URLSearchParams(location.search).has("test")) return testWorld("Test mode was requested.");
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), WORLD_MANIFEST_TIMEOUT_MS);
+  let response, world;
+  try {
+    response = await fetch("world/world.json", { cache: "no-store", signal: controller.signal });
+    if (response.status === 404) return testWorld("world/world.json was not found.");
+    if (!response.ok) return testWorld(`world/world.json returned HTTP ${response.status}.`);
+    world = await response.json();
+  } catch {
+    if (controller.signal.aborted) return testWorld("world/world.json download timed out.");
+    return testWorld(response ? "world/world.json could not be read as valid JSON."
+                              : "world/world.json could not be loaded.");
+  } finally {
+    clearTimeout(timer);
+  }
+  const error = manifestError(world);
+  if (error) return testWorld(`Invalid world/world.json: ${error}.`);
+  return { ...world, test: false };
+}
+
+function testWorld(reason) {
+  const size = 256, n = 24, chunks = [];
+  for (let z = -n / 2; z < n / 2; z++)
+    for (let x = -n / 2; x < n / 2; x++)
+      chunks.push({ id: `test_${x}_${z}`, test: [x, z, size],
+                    bounds: [x * size, -50, z * size, (x + 1) * size, 200, (z + 1) * size] });
+  return { test: true, reason, spawn: [0, 120, 0], chunks };
+}
+
+// Deterministic test terrain: rolling hills plus a grid of boxes. Nothing here comes from the game.
+function hash(x, z) { const s = Math.sin(x * 127.1 + z * 311.7) * 43758.5453; return s - Math.floor(s); }
+function noise(x, z) {
+  const xi = Math.floor(x), zi = Math.floor(z), xf = x - xi, zf = z - zi;
+  const u = xf * xf * (3 - 2 * xf), v = zf * zf * (3 - 2 * zf);
+  const a = hash(xi, zi), b = hash(xi + 1, zi), c = hash(xi, zi + 1), d = hash(xi + 1, zi + 1);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+}
+function height(x, z) {
+  return 60 * noise(x / 900, z / 900) + 18 * noise(x / 210, z / 210) + 4 * noise(x / 40, z / 40) - 30;
+}
+function buildTestChunk([cx, cz, size]) {
+  const g = new THREE.Group(), seg = 32;
+  const geo = new THREE.PlaneGeometry(size, size, seg, seg);
+  geo.rotateX(-Math.PI / 2);
+  const pos = geo.attributes.position, col = [];
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i) + cx * size + size / 2, z = pos.getZ(i) + cz * size + size / 2, y = height(x, z);
+    pos.setXYZ(i, x, y, z);
+    const t = THREE.MathUtils.clamp((y + 30) / 90, 0, 1);
+    col.push(0.22 + 0.35 * t, 0.36 + 0.25 * t, 0.24 + 0.1 * t);
+  }
+  geo.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
+  geo.computeVertexNormals();
+  // Sample the shared height field on both sides of each border for matching edge normals.
+  const normal = geo.attributes.normal, stride = seg + 1, step = size / seg;
+  for (let i = 0; i < pos.count; i++) {
+    const row = Math.floor(i / stride), column = i % stride;
+    if (row > 0 && row < seg && column > 0 && column < seg) continue;
+    const x = pos.getX(i), z = pos.getZ(i);
+    const nx = height(x - step, z) - height(x + step, z);
+    const nz = height(x, z - step) - height(x, z + step);
+    const length = Math.hypot(nx, 2 * step, nz);
+    normal.setXYZ(i, nx / length, 2 * step / length, nz / length);
+  }
+  g.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95 })));
+  const box = new THREE.BoxGeometry(1, 1, 1); box.translate(0, 0.5, 0);
+  const count = 18, inst = new THREE.InstancedMesh(box, new THREE.MeshStandardMaterial({ color: 0x9aa4b1, roughness: 0.7 }), count);
+  const m = new THREE.Matrix4();
+  for (let i = 0; i < count; i++) {
+    const x = cx * size + hash(cx * 31 + i, cz) * size, z = cz * size + hash(cx, cz * 17 + i) * size;
+    const w = 8 + 22 * hash(i, cx + cz), h = 6 + 70 * hash(cz + i, cx) ** 3;
+    m.compose(new THREE.Vector3(x, height(x, z) - 1, z), new THREE.Quaternion(), new THREE.Vector3(w, h, w));
+    inst.setMatrixAt(i, m);
+  }
+  g.add(inst);
+  return g;
+}
+
+// ---------- scene ----------
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+} catch (error) {
+  const start = document.getElementById("start");
+  start.setAttribute("role", "alert");
+  start.style.cursor = "default";
+  start.textContent = "Could not start WebGL. Check that WebGL is enabled, then reload.";
+  throw error;
+}
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+renderer.setSize(innerWidth, innerHeight);
+document.body.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x9cc3e6);
+scene.fog = new THREE.Fog(0x9cc3e6, 900, 2600);
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.5, 6000);
+scene.add(new THREE.HemisphereLight(0xdfefff, 0x4a4030, 1.1));
+const sun = new THREE.DirectionalLight(0xfff2dd, 1.6); sun.position.set(0.4, 1, 0.3); scene.add(sun);
+addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+
+// ---------- freecam ----------
+const keys = new Set(); let yaw = 0, pitch = -0.25, speed = 40, locked = false;
+// Pointer lock when the browser allows it; embedded views (iframes, preview panes) fall back to drag-to-look.
+const start = document.getElementById("start");
+let dragLook = false, dragging = false;
+function enableDragLook() {
+  if (locked || dragLook) return;
+  dragLook = true;
+  start.classList.add("hidden");
+  document.getElementById("help").insertAdjacentHTML("beforeend", "<br>mouse lock unavailable here: drag to look");
+}
+start.onclick = async () => {
+  try { await renderer.domElement.requestPointerLock(); }
+  catch { enableDragLook(); }
+};
+document.addEventListener("pointerlockerror", enableDragLook);
+document.addEventListener("pointerlockchange", () => { locked = document.pointerLockElement === renderer.domElement; start.classList.toggle("hidden", locked || dragLook); });
+renderer.domElement.addEventListener("mousedown", e => { if (e.button === 0) dragging = true; });
+addEventListener("mouseup", e => { if (e.button === 0) dragging = false; });
+addEventListener("mousemove", e => {
+  if ((e.buttons & 1) === 0) dragging = false; // a release outside the window can skip mouseup
+  if (!locked && !(dragLook && dragging)) return;
+  yaw -= e.movementX * 0.0022; pitch = THREE.MathUtils.clamp(pitch - e.movementY * 0.0022, -1.55, 1.55);
+});
+addEventListener("wheel", e => { speed = THREE.MathUtils.clamp(speed * (e.deltaY < 0 ? 1.15 : 1 / 1.15), 1, 3000); }, { passive: true });
+addEventListener("blur", () => { keys.clear(); dragging = false; });
+const world = await loadWorld();
+addEventListener("keydown", e => {
+  keys.add(e.code);
+  // Track Ctrl for slow movement, but leave modified shortcuts to the browser.
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.code === "KeyF" && !e.repeat) wire = !wire, applyWire();
+  if (e.code === "KeyT" && !e.repeat) clay = !clay, applyClay();
+  if (e.code === "KeyG" && !e.repeat) toggleBounds();
+  if (e.code === "KeyR") camera.position.fromArray(world.spawn);
+  if (e.code === "KeyP" && !e.repeat) {
+    history.replaceState(null, "", formatCamHash(camera.position.toArray(), yaw, pitch));
+    navigator.clipboard?.writeText(location.href).catch(() => {});
+  }
+});
+addEventListener("keyup", e => keys.delete(e.code));
+
+// ---------- chunk streaming ----------
+const LOAD_R = 1400, UNLOAD_R = 2000, MAX_INFLIGHT = 4;
+const CHUNK_DOWNLOAD_TIMEOUT_MS = 30_000;
+// Three total attempts per chunk, with 1s/2s backoff. Failed chunks keep their budget
+// when leaving and returning; successfully loaded chunks start fresh after unloading.
+const MAX_LOAD_ATTEMPTS = 3, RETRY_DELAY_MS = 1000;
+const loader = new GLTFLoader();
+const live = new Map(); let inflight = 0, wire = false, clay = false, failed = 0;
+const originalMaterials = new WeakMap();
+const clayMat = new THREE.MeshStandardMaterial({ color: 0xb8c0ca, roughness: 0.85, wireframe: wire, side: THREE.DoubleSide });
+const boundsGroup = new THREE.Group(); boundsGroup.visible = false; scene.add(boundsGroup);
+function toggleBounds() {
+  boundsGroup.visible = !boundsGroup.visible;
+  if (!boundsGroup.visible || boundsGroup.children.length) return;
+  for (const { bounds: [minX, minY, minZ, maxX, maxY, maxZ] } of world.chunks) {
+    const box = new THREE.Box3(new THREE.Vector3(minX, minY, minZ), new THREE.Vector3(maxX, maxY, maxZ));
+    boundsGroup.add(new THREE.Box3Helper(box, 0x5fb3ff));
+  }
+}
+function applyClay(root) {
+  clayMat.wireframe = wire;
+  (root ? [root] : [...live.values()].map(c => c.obj).filter(Boolean)).forEach(o =>
+    o.traverse(n => {
+      if (!n.isMesh || !n.material) return;
+      if (!originalMaterials.has(n)) originalMaterials.set(n, n.material);
+      n.material = clay ? clayMat : originalMaterials.get(n);
+    }));
+}
+function applyWire(root) {
+  clayMat.wireframe = wire;
+  (root ? [root] : [...live.values()].map(c => c.obj).filter(Boolean)).forEach(o =>
+    o.traverse(n => {
+      const orig = originalMaterials.get(n);
+      if (orig) [].concat(orig).forEach(m => m.wireframe = wire);
+      if (n.material && n.material !== orig) [].concat(n.material).forEach(m => m.wireframe = wire);
+    }));
+}
+function disposeObject(obj) {
+  const disposedGeo = new Set(), disposedMat = new Set(), disposedTex = new Set();
+  const bitmaps = new Set(), skeletons = new Set();
+  obj.traverse(n => {
+    if (n.geometry && !disposedGeo.has(n.geometry)) { disposedGeo.add(n.geometry); n.geometry.dispose(); }
+    if (n.isInstancedMesh && typeof n.dispose === "function") n.dispose();
+    if (n.isSkinnedMesh && n.skeleton) skeletons.add(n.skeleton);
+    const allMats = [].concat(n.material || [], originalMaterials.get(n) || []);
+    for (const m of allMats) {
+      if (!m || m === clayMat || disposedMat.has(m)) continue;
+      disposedMat.add(m);
+      for (const v of Object.values(m)) {
+        if (v && v.isTexture && !disposedTex.has(v)) {
+          disposedTex.add(v);
+          if (typeof ImageBitmap !== "undefined" && v.image instanceof ImageBitmap) bitmaps.add(v.image);
+          v.dispose();
+        }
+      }
+      m.dispose();
+    }
+    originalMaterials.delete(n);
+  });
+  for (const skeleton of skeletons) skeleton.dispose();
+  for (const bitmap of bitmaps) bitmap.close();
+}
+function dist(c, p) {
+  const b = c.bounds;
+  const dx = Math.max(b[0] - p.x, 0, p.x - b[3]), dy = Math.max(b[1] - p.y, 0, p.y - b[4]), dz = Math.max(b[2] - p.z, 0, p.z - b[5]);
+  return Math.hypot(dx, dy, dz);
+}
+// Choose one loaded tier per cell. Prefer the tier whose band contains the camera's horizontal
+// distance, and use a cached tier within LOD_SLACK while the preferred tier is unavailable.
+const LOD_SLACK = 32;
+function cellDist(c, p) {
+  const r = c.cell;
+  return Math.hypot(Math.max(r[0] - p.x, 0, p.x - r[2]), Math.max(r[1] - p.z, 0, p.z - r[3]));
+}
+// The distance used to rank a chunk, and whether it should load (slack 0) or stay loaded (LOD_SLACK).
+function range(def, p) {
+  const band = def.lod !== undefined ? world.lod_bands?.[def.lod] : undefined;
+  if (!band) { const d = dist(def, p); return { d, load: d < LOAD_R, keep: d <= UNLOAD_R }; }
+  const d = cellDist(def, p);
+  return { d, load: d >= band[0] && d < band[1], keep: d >= band[0] - LOD_SLACK && d < band[1] + LOD_SLACK };
+}
+function drop(id) {
+  const c = live.get(id); if (!c) return;
+  live.delete(id);
+  c.controller?.abort();
+  if (c.obj) {
+    scene.remove(c.obj);
+    disposeObject(c.obj);
+  }
+}
+async function loadChunk(entry) {
+  const { def, controller } = entry;
+  inflight++;
+  try {
+    let response, bytes;
+    const timer = setTimeout(() => controller.abort(), CHUNK_DOWNLOAD_TIMEOUT_MS);
+    try {
+      response = await fetch(def.url, { signal: controller.signal });
+      if (!response.ok) throw new Error(`Chunk request failed: ${response.status}`);
+      bytes = await response.arrayBuffer();
+      controller.signal.throwIfAborted();
+    } finally {
+      // Bound both headers and body, but not the non-cancellable GLB parse.
+      clearTimeout(timer);
+    }
+    const url = response.url || def.url;
+    const resourcePath = THREE.LoaderUtils.extractUrlBase(url.split(/[?#]/, 1)[0]);
+    const g = await loader.parseAsync(bytes, resourcePath);
+    // GLTFLoader cannot cancel a parse already underway. Dispose its late result.
+    if (live.get(def.id) !== entry) { disposeObject(g.scene); return; }
+    entry.obj = g.scene; scene.add(g.scene); applyClay(g.scene); applyWire(g.scene);
+  } catch {
+    if (live.get(def.id) !== entry) return;
+    failed++;
+    entry.retryAt = performance.now() + RETRY_DELAY_MS * 2 ** (entry.attempts - 1);
+  } finally {
+    entry.loading = false;
+    entry.controller = null;
+    entry.previous = null;
+    inflight--;
+  }
+}
+function stream(now = performance.now()) {
+  const p = camera.position;
+  const visibleTiers = new Map();
+  for (const [id, c] of live) {
+    if (!c.obj && !c.loading) continue;
+    const { load, keep } = range(c.def, p);
+    if (keep) {
+      // Orphan HD has its own band and no replacement in the LOD chain.
+      if (c.obj && c.def.lod === "orphan_hd") {
+        c.obj.visible = load;
+      } else if (c.obj && c.def.lod !== undefined) {
+        const cell = c.def.cell.join(",");
+        const current = visibleTiers.get(cell);
+        c.obj.visible = !current || (load && !current.inBand);
+        if (c.obj.visible) {
+          if (current) current.obj.visible = false;
+          visibleTiers.set(cell, { obj: c.obj, inBand: load });
+        }
+      }
+      continue;
+    }
+    drop(id);
+    // A canceled retry does not erase the previous failures or spend another attempt.
+    if (c.previous) live.set(id, c.previous);
+  }
+  // Always evict stale chunks, but only look for new work when a slot is free.
+  if (inflight >= MAX_INFLIGHT) return;
+
+  const want = [];
+  for (const def of world.chunks) {
+    const entry = live.get(def.id);
+    if (entry && (entry.obj || entry.loading || entry.attempts >= MAX_LOAD_ATTEMPTS || now < entry.retryAt)) continue;
+    const { d: distance, load } = range(def, p);
+    if (load) want.push({ def, distance });
+  }
+  want.sort((a, b) => a.distance - b.distance);
+  for (const { def } of want) {
+    if (inflight >= MAX_INFLIGHT) break;
+    const previous = live.get(def.id);
+    const entry = { def, obj: null, loading: true, attempts: (previous?.attempts || 0) + 1, retryAt: 0, previous };
+    live.set(def.id, entry);
+    if (world.test) { entry.loading = false; entry.obj = buildTestChunk(def.test); scene.add(entry.obj); applyClay(entry.obj); applyWire(entry.obj); continue; }
+    entry.controller = new AbortController();
+    void loadChunk(entry);
+  }
+}
+
+// ---------- main loop ----------
+camera.position.fromArray(world.spawn);
+const startCam = parseCamHash(location.hash);
+if (startCam) { camera.position.fromArray(startCam.pos); yaw = startCam.yaw; pitch = THREE.MathUtils.clamp(startCam.pitch, -1.55, 1.55); }
+if (world.test) {
+  document.getElementById("world-status").textContent = world.reason;
+  document.getElementById("banner").classList.remove("hidden");
+}
+const hud = document.getElementById("hud"), clock = new THREE.Clock();
+let fpsT = 0, fpsN = 0, fps = 0;
+const fwd = new THREE.Vector3(), right = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.1);
+  camera.quaternion.setFromEuler(new THREE.Euler(pitch, yaw, 0, "YXZ"));
+  camera.getWorldDirection(fwd); right.crossVectors(fwd, up).normalize();
+  const v = new THREE.Vector3(), s = speed * (keys.has("ShiftLeft") || keys.has("ShiftRight") ? 5 : 1) * (keys.has("ControlLeft") || keys.has("ControlRight") ? 0.2 : 1);
+  if (keys.has("KeyW")) v.add(fwd); if (keys.has("KeyS")) v.sub(fwd);
+  if (keys.has("KeyD")) v.add(right); if (keys.has("KeyA")) v.sub(right);
+  if (keys.has("KeyE")) v.y += 1; if (keys.has("KeyQ")) v.y -= 1;
+  if (v.lengthSq()) camera.position.addScaledVector(v.normalize(), s * dt);
+  stream();
+  renderer.render(scene, camera);
+  fpsN++; fpsT += dt; if (fpsT > 0.5) { fps = fpsN / fpsT; fpsN = 0; fpsT = 0; }
+  const p = camera.position, loaded = [...live.values()].filter(c => c.obj).length;
+  hud.innerHTML = `<b>${world.test ? "test terrain" : "world"}</b><br>pos ${p.x.toFixed(1)}, ${p.y.toFixed(1)}, ${p.z.toFixed(1)}<br>` +
+    `speed ${speed.toFixed(0)} m/s · ${fps.toFixed(0)} fps<br>chunks ${loaded}/${world.chunks.length} loaded, ${inflight} loading` +
+    (failed ? `, <span style="color:var(--warn)">${failed} load errors</span>` : "") +
+    `<br>draw calls ${renderer.info.render.calls}, tris ${(renderer.info.render.triangles / 1000).toFixed(0)}k`;
+});
+</script>
+</body>
+</html>

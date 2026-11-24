@@ -1,0 +1,69 @@
+#version 460
+// Compute shader for d3d12_r9g9b9e5_uav_test: verifies that an R9G9B9E5_SHAREDEXP UAV texture registered in set 0
+// can be written as packed RGB9E5 uint32 words through its R32_UINT storage views (binding 9 uimage2D and binding 4
+// r32ui) and then sampled back through set 0 binding 0 (VK_FORMAT_E5B9G9R9_UFLOAT_PACK32) as decoded HDR float RGB
+// values without validation errors.
+#extension GL_EXT_nonuniform_qualifier : require
+
+layout(local_size_x = 16) in;
+
+layout(push_constant) uniform Params {
+    uint tsharp[8];
+    uint ssharp[4];
+    uint mode;    // 0: write via binding 9 (first half) + binding 4 (second half); 1: sample via binding 0
+    uint width;
+    uint height;
+    uint pad;
+} pc;
+
+layout(set = 0, binding = 0) uniform texture2D sampled_images[];
+layout(set = 0, binding = 1) uniform sampler samplers[];
+layout(set = 0, binding = 2, std430) readonly buffer DescriptorMap {
+    uint map[];
+};
+layout(set = 0, binding = 4, r32ui) uniform writeonly uimage2D storage_r32ui_images[];
+layout(set = 0, binding = 9, r32ui) uniform writeonly uimage2D storage_uint_images[];
+
+layout(set = 1, binding = 0, std430) readonly buffer InputWords {
+    uint packed_words[];
+};
+layout(set = 1, binding = 1, std430) writeonly buffer OutputFloats {
+    vec4 out_values[];
+};
+
+uint lookup(uint key[8]) {
+    uint h = 2166136261u;
+    for (int i = 0; i < 8; ++i) h = (h ^ key[i]) * 16777619u;
+    const uint mask = map[0];
+    for (uint k = 0; k < 8; ++k) {
+        const uint slot = 1 + ((h + k) & mask) * 10;
+        bool same = true;
+        for (int i = 0; i < 8; ++i) same = same && map[slot + i] == key[i];
+        if (same) return map[slot + 8];
+    }
+    return 0;
+}
+
+void main() {
+    const uint i = gl_GlobalInvocationID.x;
+    const uint total = pc.width * pc.height;
+    if (i >= total) return;
+    uint image_key[8];
+    for (int k = 0; k < 8; ++k) image_key[k] = pc.tsharp[k];
+    const uint image = lookup(image_key);
+    const ivec2 xy = ivec2(i % pc.width, i / pc.width);
+
+    if (pc.mode == 0u) {
+        if (i < total / 2u) {
+            imageStore(storage_uint_images[image], xy, uvec4(packed_words[i], 0u, 0u, 0u));
+        } else {
+            imageStore(storage_r32ui_images[image], xy, uvec4(packed_words[i], 0u, 0u, 0u));
+        }
+    } else {
+        uint sampler_key[8];
+        for (int k = 0; k < 8; ++k) sampler_key[k] = k < 4 ? pc.ssharp[k] : 0xffffffffu;
+        const uint smp = lookup(sampler_key);
+        const vec2 uv = (vec2(xy) + 0.5) / vec2(float(pc.width), float(pc.height));
+        out_values[i] = textureLod(sampler2D(sampled_images[image], samplers[smp]), uv, 0.0);
+    }
+}

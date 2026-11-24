@@ -1,0 +1,31 @@
+#version 450
+// vk_compute_test's subgroup probe (cs_wave_probe_spv.h). Where the device can't pin a compute subgroup size
+// (MoltenVK: requiredSubgroupSizeStages is 0), vk_compute_test runs this first, with the test shader's local size
+// and pipeline flags, and checks what each invocation reports: its subgroup's size, its lane and subgroup number,
+// and how many lanes a ballot of the whole subgroup counts. The ballot is the real width: MoltenVK's MSL declares
+// SubgroupSize as the constant 32, while the lane, the subgroup number and simd_ballot come from the hardware.
+// Four words per invocation at base + 16 * gl_LocalInvocationIndex, the buffer address in the first push-constant
+// words (s0, s1), so the probe fits the 128-byte push-constant layout of --pc-tail-ubo as well as the 144-byte one.
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_buffer_reference_uvec2 : require
+#extension GL_KHR_shader_subgroup_basic : require
+#extension GL_KHR_shader_subgroup_ballot : require
+
+layout(local_size_x_id = 0, local_size_y_id = 1, local_size_z_id = 2) in;
+
+layout(buffer_reference, std430, buffer_reference_align = 4) buffer Words {
+    uint w[];
+};
+
+layout(push_constant) uniform UserData {
+    uvec2 base;
+} pc;
+
+void main() {
+    Words o = Words(pc.base);
+    const uint i = gl_LocalInvocationIndex * 4u;
+    o.w[i + 0u] = gl_SubgroupSize;
+    o.w[i + 1u] = gl_SubgroupInvocationID;
+    o.w[i + 2u] = gl_SubgroupID;
+    o.w[i + 3u] = subgroupBallotBitCount(subgroupBallot(true));
+}

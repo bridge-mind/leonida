@@ -1,0 +1,6 @@
+{
+  "name": "First-person view on foot",
+  "enabled": true,
+  "game_version": "1.0.2.1",
+  "camera": { "view_mode": "first_person", "first_person_value": 4, "contexts": [0] }
+}

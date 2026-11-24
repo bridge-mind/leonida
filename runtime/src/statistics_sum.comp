@@ -1,0 +1,27 @@
+#version 450
+
+// Adds the D3D12_QUERY_DATA_PIPELINE_STATISTICS segments of one split pipeline-statistics query (D3D-162): one
+// invocation per counter, in the order of VkQueryPipelineStatisticFlagBits, which is the D3D12 field order.
+// `mesh` segments come from the pool a mesh draw can run in (D3D-291), which counts only clipping, fragment and
+// compute: they are copied to counters 5..8 of their record, so CSInvocations sits at 8 and the input-assembly,
+// vertex, geometry and tessellation counters (0..4, 8 and 9 of the D3D12 order) add nothing.
+layout(local_size_x = 11) in;
+layout(set = 0, binding = 0, std430) buffer QueryResults {
+    uvec2 total[11];
+    uvec2 segments[];  // `count` results of 11 counters each
+};
+layout(push_constant) uniform ResolveRange { uint count; uint mesh; };
+
+void main() {
+    const uint counter = gl_LocalInvocationID.x;
+    uvec2 sum = total[counter];
+    const bool counted = mesh == 0u || (counter >= 5u && counter <= 7u) || counter == 10u;
+    const uint source = mesh != 0u && counter == 10u ? 8u : counter;
+    for (uint i = 0; counted && i < count; ++i) {
+        uvec2 segment = segments[i * 11 + source];
+        uint low = sum.x + segment.x;
+        sum.y += segment.y + uint(low < sum.x);
+        sum.x = low;
+    }
+    total[counter] = sum;
+}

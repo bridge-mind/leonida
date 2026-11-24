@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><RollForward>Major</RollForward><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><ServerGarbageCollection>true</ServerGarbageCollection><RestorePackagesWithLockFile>true</RestorePackagesWithLockFile></PropertyGroup>
+  <!-- third_party/rpf9-explorer is a git submodule (git submodule update, with the init option) -->
+  <ItemGroup><ProjectReference Include="..\..\third_party\rpf9-explorer\Core\RpfPreview.Core.csproj" /></ItemGroup>
+</Project>

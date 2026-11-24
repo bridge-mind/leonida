@@ -1,0 +1,74 @@
+#version 460
+// A compute shader written to the translator's runtime contract (docs/design.md, "User data" and "Xbox GPU
+// addresses"), standing in for a translated one in d3d12_compute_test: the 144-byte push-constant block holds
+// s0..s31 (the root arguments), the heap base and the code base, and every memory access goes to heap base +
+// console VA. It reads each kind of root argument the D3D12 layer packs, in the console compute layout
+// (rt::rootsig::pack_stage, from s4, one dword per table; s0..s3 are the driver's):
+//   s4, s5   root constants: base and step
+//   s6:s7    a root UAV: the console VA of the output buffer
+//   s8       a descriptor table: the 32-bit console VA of its first entry (the heaps live below 4 GiB); that entry
+//            is a 64-bit console VA the application wrote itself
+//   code     the shader's own program (FSSM blob), dword 1
+// and writes out[i] = s4 + s5 * i + table_target[i % 4] + code[1].
+#extension GL_EXT_buffer_reference : require
+#extension GL_EXT_buffer_reference_uvec2 : require
+
+layout(local_size_x = 64) in;
+
+layout(buffer_reference, std430, buffer_reference_align = 4) buffer Words {
+    uint w[];
+};
+
+layout(push_constant) uniform UserData {
+    uint s[32];
+    uvec2 heap_base;
+    uvec2 code_base;
+} pc;
+
+uvec2 add64(uvec2 a, uvec2 b) {
+    uint carry;
+    const uint low = uaddCarry(a.x, b.x, carry);
+    return uvec2(low, a.y + b.y + carry);
+}
+
+Words at(uvec2 va) {
+    return Words(add64(pc.heap_base, va));
+}
+
+void main() {
+    const uint i = gl_GlobalInvocationID.x;
+    Words table = at(uvec2(pc.s[8], 0u));
+    Words result = at(uvec2(pc.s[6], pc.s[7]));
+    if (pc.s[5] == 0u) {
+        // CBV V# mode: table holds a 16-byte GFX10 raw buffer descriptor written by CreateConstantBufferView.
+        const uint num_records = table.w[2];
+        const uint byte_off = pc.s[4] + i * 4u;
+        if (byte_off + 4u <= num_records) {
+            Words cbv = at(uvec2(table.w[0], table.w[1] & 0xFFFFu));
+            result.w[i] = cbv.w[byte_off >> 2u];
+        } else {
+            result.w[i] = 0u;
+        }
+        return;
+    }
+    if (pc.s[5] == 0xFFFFFFFFu) {
+        // Buffer SRV V# mode: decode 16-byte GFX10 buffer descriptor written by CreateShaderResourceView.
+        const uint stride = (table.w[1] >> 16u) & 0x3FFFu;
+        const uint num_records = table.w[2];
+        const uint oob_select = (table.w[3] >> 28u) & 3u;
+        const uvec2 base = uvec2(table.w[0], table.w[1] & 0xFFFFu);
+        if (oob_select == 3u) {
+            const uint byte_off = pc.s[4] + i * 4u;
+            result.w[i] = (byte_off + 4u <= num_records) ? at(base).w[byte_off >> 2u] : 0u;
+        } else if (oob_select == 1u && stride >= 4u) {
+            const uint idx = pc.s[4] + i;
+            result.w[i] = (idx < num_records) ? at(base).w[(idx * stride) >> 2u] : 0u;
+        } else {
+            result.w[i] = 0u;
+        }
+        return;
+    }
+    Words constants = at(uvec2(table.w[0], table.w[1]));
+    Words code = at(pc.code_base);
+    result.w[i] = pc.s[4] + pc.s[5] * i + constants.w[i % 4] + code.w[1];
+}
